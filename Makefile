@@ -1,6 +1,6 @@
 # GNU -*- makefile -*-
 
-VERSION := ${shell python -c "import BitVector; print BitVector.__version__"}
+VERSION := ${shell grep '^__version__' BitVector/__init__.py | cut -d\' -f 2}
 
 default:
 	@echo

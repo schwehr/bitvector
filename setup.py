@@ -2,7 +2,10 @@
 
 from setuptools import setup, find_packages
 
-VERSION = '3.3.2'
+for line in open('BitVector/__init__.py'):
+    if line.startswith('__version__'):
+        VERSION = line.split('\'')[1]
+        break
 
 setup(name='BitVector',
       version=VERSION,
@@ -11,8 +14,11 @@ setup(name='BitVector',
       maintainer='Avinash Kak',
       maintainer_email='kak@purdue.edu',
       url='https://engineering.purdue.edu/kak/dist/BitVector-%s.html' % VERSION,
-      download_url='https://engineering.purdue.edu/kak/dist/BitVector-%s.tar.gz' % VERSION,
-      description='A pure-Python memory-efficient packed representation for bit arrays',
+      download_url=(
+          'https://engineering.purdue.edu/kak/dist/BitVector-%s.tar.gz' %
+          VERSION),
+      description=('A pure-Python memory-efficient packed representation for '
+                   'bit arrays',
       long_description='''
 This class presents a pure-Python memory-efficient packed
 representation for bit arrays.
@@ -73,10 +79,14 @@ The class is provided with the following operators/methods:
 -      unpermute
 -      write_to_file
 -      write_bits_to_fileobject
-
-          ''',
+''',
       license='Python Software Foundation License',
-      keywords='bit array, bit vector, bit string, logical operations on bit fields',
+      keywords=', '.join(
+          'bit array',
+          'bit vector',
+          'bit string',
+          'logical operations on bit fields',
+      )
       platforms='All platforms',
       classifiers=[
           'Topic :: Utilities',
