@@ -1325,8 +1325,8 @@ class BitVector( object ):
                          keyword arguments for the following keywords:
                          filename, fp, size, intVal, bitlist, bitstring,
                          hexstring, textstring, and rawbytes)''')
-        allowed_keys = 'bitlist','bitstring','filename','fp','intVal',\
-                       'size','textstring','hexstring','rawbytes'
+        allowed_keys = ('bitlist','bitstring','filename','fp','intVal',
+                       'size','textstring','hexstring','rawbytes')
         keywords_used = kwargs.keys()
         for keyword in keywords_used:
             if keyword not in allowed_keys:
@@ -1354,8 +1354,8 @@ class BitVector( object ):
             self.more_to_read = True
             return
         elif fp:
-            if filename or size or intVal or bitlist or bitstring or hexstring or \
-                                                               textstring or rawbytes:
+            if (filename or size or intVal or bitlist or bitstring or hexstring
+                or textstring or rawbytes):
                 raise ValueError('''When fileobject is specified, you cannot give
                                     values to any other constructor args''')
             bits = self.read_bits_from_fileobject(fp)
@@ -1409,8 +1409,8 @@ class BitVector( object ):
                     bitlist = [0]*n + bitlist
                     self.size = len( bitlist )
         elif size is not None and size >= 0:
-            if filename or fp or intVal or bitlist or bitstring or hexstring or \
-                                                             textstring or rawbytes:
+            if (filename or fp or intVal or bitlist or bitstring or hexstring
+                or textstring or rawbytes):
                 raise ValueError('''When size is specified (without an intVal), you cannot
                                     give values to any other constructor args''')
             self.size = size
@@ -1432,7 +1432,7 @@ class BitVector( object ):
             if filename or fp or size or intVal or bitlist or bitstring or hexstring or rawbytes:
                 raise ValueError('''When bits are specified through textstring, you
                                     cannot give values to any other constructor args''')
-            hexlist = ''.join(map(lambda x: x[2:], map(lambda x: hex(x) if len(hex(x)[2:])==2 \
+            hexlist = ''.join(map(lambda x: x[2:], map(lambda x: hex(x) if len(hex(x)[2:])==2
                                  else hex(x)[:2] + '0' + hex(x)[2:], map(ord, list(textstring)))))
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
@@ -1449,7 +1449,7 @@ class BitVector( object ):
             import binascii
             hexlist = binascii.hexlify(rawbytes)
             if sys.version_info[0] == 3:
-                bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], \
+                bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x],
                                                                 list(map(chr,list(hexlist))))))))
             else:
                 bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
@@ -1760,7 +1760,7 @@ class BitVector( object ):
         if self.size % 4:
             raise ValueError('''\nThe bitvector for get_hex_string_from_bitvector()
                                   must be an integral multiple of 4 bits''')
-        return ''.join(map(lambda x: x.replace('0x',''), \
+        return ''.join(map(lambda x: x.replace('0x',''),
                        map(hex,map(int,[self[i:i+4] for i in range(0,self.size,4)]))))
 
     getHexStringFromBitVector = get_hex_string_from_bitvector
@@ -1794,7 +1794,7 @@ class BitVector( object ):
         left_most_bits.append(left_most_bits[0])
         del(left_most_bits[0])
         self.vector = list(map(operator.__rshift__, self.vector, [1]*size))
-        self.vector = list(map( operator.__or__, self.vector, \
+        self.vector = list(map( operator.__or__, self.vector,
                               list( map(operator.__lshift__, left_most_bits, [15]*size) )))
 
         self._setbit(self.size -1, bitstring_leftmost_bit)
@@ -1809,7 +1809,7 @@ class BitVector( object ):
         right_most_bits.insert(0, bitstring_rightmost_bit)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1]*size))
-        self.vector = list(map( operator.__or__, self.vector, \
+        self.vector = list(map( operator.__or__, self.vector,
                                 list(map(operator.__rshift__, right_most_bits, [15]*size))))
 
         self._setbit(0, bitstring_rightmost_bit)
@@ -1859,7 +1859,7 @@ class BitVector( object ):
         left_most_bits.append(left_most_bits[0])
         del(left_most_bits[0])
         self.vector = list(map(operator.__rshift__, self.vector, [1]*size))
-        self.vector = list(map( operator.__or__, self.vector, \
+        self.vector = list(map( operator.__or__, self.vector,
                                list(map(operator.__lshift__, left_most_bits, [15]*size))))
         self._setbit(self.size -1, 0)
 
@@ -1876,7 +1876,7 @@ class BitVector( object ):
         right_most_bits.insert(0, 0)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1]*size))
-        self.vector = list(map( operator.__or__, self.vector, \
+        self.vector = list(map( operator.__or__, self.vector,
                                    list(map(operator.__rshift__,right_most_bits, [15]*size))))
         self._setbit(0, 0)
 
@@ -2089,8 +2089,8 @@ class BitVector( object ):
         '''
         Computes the Jaccard similarity coefficient between two bit vectors
         '''
-        assert self.intValue() > 0 or other.intValue() > 0, \
-                                 'Jaccard called on two zero vectors --- NOT ALLOWED'
+        assert self.intValue() > 0 or other.intValue() > 0, (
+                                 'Jaccard called on two zero vectors --- NOT ALLOWED')
         assert self.size == other.size, 'vectors of unequal length'
         intersect = self & other
         union = self | other
@@ -2298,8 +2298,8 @@ class BitVector( object ):
             x, x_old = x_old ^ quotient.gf_multiply(x), x
             y, y_old = y_old ^ quotient.gf_multiply(y), y
         if int(num) != 1:
-            return 'NO MI. However, the GCD of ', str(NUM), ' and ', \
-                                 str(MOD), ' is ', str(num)
+            return ('NO MI. However, the GCD of ', str(NUM), ' and ',
+                                 str(MOD), ' is ', str(num))
         else:
             z = x_old ^ MOD
             quotient, remainder = z.gf_divide(MOD, n)
@@ -2830,7 +2830,7 @@ if __name__ == '__main__':
     n = 8
     a = BitVector(bitstring='11100010110001')
     quotient, remainder = a.gf_divide(mod, n)
-    print('Dividing a=' + str(a) + ' by mod=' + str(mod) + ' in GF(2^8) returns the quotient ' \
+    print('Dividing a=' + str(a) + ' by mod=' + str(mod) + ' in GF(2^8) returns the quotient '
                                        + str(quotient) + ' and the remainder ' + str(remainder))
                                                      # 10001111
 
@@ -2843,7 +2843,7 @@ if __name__ == '__main__':
     print('Modular product of a=' + str(a) + ' b=' + str(b) + ' in GF(2^8) is ' + str(c))
                                                      # 10100110
 
-    print('\nTest multiplicative inverses in GF(2^3) with ' + \
+    print('\nTest multiplicative inverses in GF(2^3) with ' +
                                    'modulus polynomial = x^3 + x + 1:')
     print('Find multiplicative inverse of a single bit array')
     modulus = BitVector(bitstring='100011011')       # AES modulus
@@ -2852,9 +2852,9 @@ if __name__ == '__main__':
     mi = a.gf_MI(modulus,n)
     print('Multiplicative inverse of ' + str(a) + ' in GF(2^8) is ' + str(mi))
 
-    print('\nIn the following three rows shown, the first row shows the ' +\
-          '\nbinary code words, the second the multiplicative inverses,' +\
-          '\nand the third the product of a binary word with its' +\
+    print('\nIn the following three rows shown, the first row shows the '
+          '\nbinary code words, the second the multiplicative inverses,'
+          '\nand the third the product of a binary word with its'
           '\nmultiplicative inverse:\n')
     mod = BitVector(bitstring = '1011')
     n = 3
@@ -2864,7 +2864,7 @@ if __name__ == '__main__':
     print('bit arrays in GF(2^3): ' + str([str(x) for x in bitarrays]))
     print('multiplicati_inverses: ' +  str(mi_str_list))
 
-    products = [ str(bitarrays[i].gf_multiply_modular(mi_list[i], mod, n)) \
+    products = [ str(bitarrays[i].gf_multiply_modular(mi_list[i], mod, n))
                         for i in range(len(bitarrays)) ]
     print('bit_array * multi_inv: ' + str(products))
 
