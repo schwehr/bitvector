@@ -2544,7 +2544,7 @@ if __name__ == '__main__':
     print(bv1 <= bv2)                           # True
     bv3 = BitVector( intVal = 5678 )
     print(bv3.int_val())                        # 5678
-    print(bv3)                                  # 10110000101110
+    print(bv3)                                  # 1011000101110
     print(bv1 == bv3)                           # False
     print(bv3 > bv1)                            # True
     print(bv3 >= bv1)                           # True
