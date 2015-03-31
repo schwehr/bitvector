@@ -1316,16 +1316,18 @@ class BitVector(object):
         '''
         p = int(self)
         probes = [2, 3, 5, 7, 11, 13, 17]
-        for a in probes:
-            if a == p: return 1
-        if any([p % a == 0 for a in probes]): return 0
+        if p in probes:
+            return 1
+        if any([p % a == 0 for a in probes]):
+            return 0
         k, q = 0, p-1
         while not q&1:
             q >>= 1
             k += 1
         for a in probes:
             a_raised_to_q = pow(a, q, p)
-            if a_raised_to_q == 1 or a_raised_to_q == p-1: continue
+            if a_raised_to_q == 1 or a_raised_to_q == p-1:
+                continue
             a_raised_to_jq = a_raised_to_q
             primeflag = 0
             for j in range(k-1):
@@ -1333,7 +1335,8 @@ class BitVector(object):
                 if a_raised_to_jq == p-1:
                     primeflag = 1
                     break
-            if not primeflag: return 0
+            if not primeflag:
+                return 0
         probability_of_prime = 1 - 1.0/(4 ** len(probes))
         return probability_of_prime
 
