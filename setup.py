@@ -14,7 +14,7 @@ setup(name='BitVector',
       download_url='https://engineering.purdue.edu/kak/dist/BitVector-3.3.2.tar.gz',
       description='A pure-Python memory-efficient packed representation for bit arrays',
       long_description='''
-This class presents a pure-Python memory-efficient packed 
+This class presents a pure-Python memory-efficient packed
 representation for bit arrays.
 
 **Version 3.3.2** has a bug fix for the case when you
@@ -51,8 +51,8 @@ The class is provided with the following operators/methods:
 -      __lshift__
 -      __rshift__
 -      __add__
--      count_bits 
--      count_bits_sparse      (faster for sparse bit vectors)     
+-      count_bits
+-      count_bits_sparse      (faster for sparse bit vectors)
 -      deep_copy
 -      divide_into_two
 -      gcd
@@ -64,12 +64,12 @@ The class is provided with the following operators/methods:
 -      gf_multiply            (for multiplications in GF(2))
 -      gf_multiply_modular    (for multiplications in GF(2^n))
 -      hamming_distance
--      int_val                (for returning the integer value) 
+-      int_val                (for returning the integer value)
 -      is_power_of_2
 -      is_power_of_2_sparse   (faster for sparse bit vectors)
 -      jaccard_distance
 -      jaccard_similarity
--      length                 
+-      length
 -      multiplicative_inverse
 -      next_set_bit
 -      pad_from_left

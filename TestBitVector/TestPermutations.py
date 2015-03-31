@@ -16,7 +16,7 @@ class PermutationTestCase(unittest.TestCase):
             try:
                 if (args[1] == 'permute'):
                     actual = args[0].permute( list(map( lambda x: int(x),
-                                                   list( args[2] ) ) ) ) 
+                                                   list( args[2] ) ) ) )
                 elif (args[1] == 'unpermute'):
                     actual = args[0].unpermute( list(map( lambda x: int(x),
                                                      list( args[2] ) ) ) )
@@ -28,4 +28,4 @@ class PermutationTestCase(unittest.TestCase):
 def getTestSuites(type):
     return unittest.TestSuite([
             unittest.makeSuite(PermutationTestCase, type)
-                ])                    
+                ])

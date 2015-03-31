@@ -23,7 +23,7 @@ logicTests = [
 
 class BooleanLogicTestCase(unittest.TestCase):
     def checkLogicOp(self):
-        print("\nTesting Boolean operators") 
+        print("\nTesting Boolean operators")
         for args, expected in logicTests:
             try:
                 op = args[2]
@@ -42,4 +42,4 @@ class BooleanLogicTestCase(unittest.TestCase):
 def getTestSuites(type):
     return unittest.TestSuite([
             unittest.makeSuite(BooleanLogicTestCase, type)
-                ])                    
+                ])

@@ -43,4 +43,4 @@ class ComparisonTestCases(unittest.TestCase):
 def getTestSuites(type):
     return unittest.TestSuite([
             unittest.makeSuite(ComparisonTestCases, type)
-                             ])                    
+                             ])
