@@ -134,6 +134,464 @@ And if you want to do the same with a hex string, you call
 Now, as you would expect, the bits in the bit vector will
 correspond directly to the hex digits in your hex string.
 
+OPERATIONS SUPPORTED BY THE BITVECTOR CLASS:
+
+DISPLAYING BIT VECTORS:
+
+@tag1
+(1) Since the BitVector class implements the __str__ method, a bit
+    vector can be displayed on a terminal by
+
+          print(bitvec)
+
+    or, for only Python 2.x, by
+
+          print bitvec
+
+    Basically, you can always obtain the string representation of a
+    bit vector by
+
+          str(bitvec)
+
+    and integer value by
+
+          int(bitvec)
+
+
+ACCESSING AND SETTING INDIVIDUAL BITS AND SLICES:
+
+@tag2
+(2) Any single bit of a bit vector bv can be set to 1 or 0 by
+
+           bv[M] = 1_or_0
+           print(bv[M])
+
+     or, for just Python 2.x, by
+
+           bv[M] = 1_or_0
+           print bv[M]
+
+     for accessing (and setting) the bit at the position that is
+     indexed M.  You can retrieve the bit at position M by bv[M].
+     Note that the index 0 corresponds to the first bit at the left
+     end of a bit pattern.  This is made possible by the
+     implementation of the __getitem__ and __setitem__ methods.
+
+ @tag3
+ (3) A slice of a bit vector obtained by
+
+           bv[i:j]
+
+     is a bit vector constructed from the bits at index positions
+     from i through j-1.  This is made possible by the
+     implementation of the __getslice__ method.
+
+ @tag4
+ (4) You can also carry out slice assignment:
+
+           bv1 = BitVector(size = 25)
+           bv2 = BitVector(bitstring = '1010001')
+           bv1[6:9]  = bv2[0:3]
+           bv3 = BitVector(bitstring = '101')
+           bv1[0:3]  = bv3
+
+     The first slice assignment will set the 6th, 7th, and the 8th
+     bits of the bit vector bv1 according to the first three bits of
+     bv2.  The second slice assignment will set the first three bits
+     of bv1 according to the three bits in bv3.  This is made
+     possible by the slice setting code in the __setitem__ method.
+
+ @tag5
+ (5) You can iterate over a bit vector, as illustrated by
+
+           for bit in bitvec:
+               print(bit)
+
+     This is made possible by the override definition for the special
+     __iter__() method.
+
+ @tag6
+ (6) Negative subscripts for array-like indexing are supported.
+     Therefore,
+
+           bitvec[-i]
+
+     is legal assuming that the index range is not violated.  A
+     negative index carries the usual Python interpretation: The
+     last element of a bit vector is indexed -1 and the first
+     element -(n+1) if n is the total number of bits in the bit
+     vector.  Negative subscripts are made possible by
+     special-casing such access in the implementation of the
+     __getitem__ method (actually it is the _getbit method).
+
+ @tag7
+ (7) You can reset a previously constructed bit vector to either the
+     all-zeros state or the all-ones state by
+
+           bv1 = BitVector(size = 25)
+           ...
+           ...
+           bv1.reset(1)
+           ...
+           ...
+           bv1.reset(0)
+
+     The first call to reset() will set all the bits of bv1 to 1's
+     and the second call all the bits to 0's.
+
+
+tle
+ICAL OPERATIONS ON BIT VECTORS:
+
+ @tag8
+ (8) Given two bit vectors bv1 and bv2, you can perform bitwise
+     logical operations on them by
+
+           result_bv  =  bv1 ^ bv2           # for bitwise XOR
+           result_bv  =  bv1 & bv2           # for bitwise AND
+           result_bv  =  bv1 | bv2           # for bitwise OR
+           result_bv  =  ~bv1                # for bitwise negation
+
+     These are made possible by implementing the __xor__, __and__,
+     __or__, and __invert__ methods, respectively.
+
+
+tle
+PARING BIT VECTORS:
+
+ @tag9
+ (9) Given two bit vectors bv1 and bv2, you can carry out the
+     following comparisons that return Boolean values:
+
+           bv1 ==  bv2
+           bv1 !=  bv2
+           bv1 <   bv2
+           bv1 <=  bv2
+           bv1 >   bv2
+           bv1 >=  bv2
+
+     The equalities and inequalities are determined by the integer
+     values associated with the bit vectors.  These operator
+     overloadings are made possible by providing implementation code
+     for __eq__, __ne__, __lt__, __le__, __gt__, and __ge__,
+     respectively.
+
+
+tle
+ER SUPPORTED OPERATIONS:
+
+@tag10
+(10) You can permute and unpermute bit vectors:
+
+           bv_permuted   =  bv.permute(permutation_list)
+
+           bv_unpermuted =  bv.unpermute(permutation_list)
+
+@tag11
+(11) Left and right circular rotations can be carried out by
+
+           bitvec  << N
+
+           bitvec  >> N
+
+     for circular rotations to the left and to the right by N bit
+     positions.  These operator overloadings are made possible by
+     implementing the __lshift__ and __rshift__ methods,
+     respectively.
+
+@tag12
+(12) If you want to shift a bitvector non-circularly:
+
+           bitvec = BitVector(bitstring = '10010000')
+           bitvec.shift_left(3)              # 10000000
+           bitvec.shift_right(3)             # 00010000
+
+     Obviously, for a sufficient large left or right non-circular
+     shift, you will end up with a bitvector that is all zeros.
+
+@tag13
+(13) A bit vector containing an even number of bits can be divided
+     into two equal parts by
+
+           [left_half, right_half] = bitvec.divide_into_two()
+
+     where left_half and right_half hold references to the two
+     returned bit vectors.
+
+@tag14
+(14) You can find the integer value of a bit array by
+
+           bitvec.int_val()
+
+     or by
+
+           int(bitvec)
+
+@tag15
+(15) You can convert a bit vector into its string representation by
+
+           str(bitvec)
+
+@tag16
+(16) Because __add__ is supplied, you can always join two bit vectors
+     by
+
+           bitvec3  =  bitvec1  +  bitvec2
+
+     bitvec3 is a new bit vector that contains all the bits of
+     bitvec1 followed by all the bits of bitvec2.
+
+@tag17
+(17) You can find the length of a bitvector by
+
+           len = bitvec.length()
+
+@tag18
+(18) You can make a deep copy of a bitvector by
+
+          bitvec_copy =  bitvec.deep_copy()
+
+@tag19
+(19) You can write a bit vector directly to a file, as illustrated
+     by the following example that reads one bit vector from a file
+     and then writes it to another file
+
+           bv = BitVector(filename = 'input.txt')
+           bv1 = bv.read_bits_from_file(64)
+           print(bv1)
+           FILEOUT = open('output.bits', 'wb')
+           bv1.write_to_file(FILEOUT)
+           FILEOUT.close()
+           bv = BitVector(filename = 'output.bits')
+           bv2 = bv.read_bits_from_file(64)
+           print(bv2)
+
+      IMPORTANT: The size of a bit vector must be a multiple of of 8
+                  for this write function to work.  If this
+                  condition is not met, the function will throw an
+                  exception.
+
+      IMPORTANT FOR WINDOWS USERS: When writing an internally
+                  generated bit vector out to a disk file, it is
+                  important to open the file in the binary mode as
+                  shown.  Otherwise, the bit pattern 00001010
+                  ('\\n') in your bitstring will be written out as
+                  0000110100001010 ('\\r\\n'), which is the
+                  linebreak on Windows machines.
+
+@tag20
+(20) You can also write a bit vector directly to a stream object, as
+     illustrated by
+
+           fp_write = io.StringIO()
+           bitvec.write_bits_to_fileobject(fp_write)
+           print(fp_write.getvalue())
+
+@tag21
+(21) You can pad a bit vector from the left or from the right with a
+     designated number of zeros
+
+           bitvec.pad_from_left(n)
+
+           bitvec.pad_from_right(n)
+
+     In the first case, the new bit vector will be the same as the
+     old bit vector except for the additional n zeros on the left.
+     The same thing happens in the second case except that now the
+     additional n zeros will be on the right.
+
+@tag22
+(22) You can test if a bit vector x is contained in another bit
+     vector y by using the syntax 'if x in y'.  This is made
+     possible by the override definition for the special
+     __contains__ method.
+
+@tag23
+(23) You can change the bit pattern associated with a previously
+     constructed BitVector instance:
+
+       bv = BitVector(intVal = 7, size =16)
+       print(bv)                              # 0000000000000111
+       bv.set_value(intVal = 45)
+       print(bv)                              # 101101
+
+@tag24
+(24) You can count the number of bits set in a BitVector instance by
+
+       bv = BitVector(bitstring = '100111')
+       print(bv.count_bits())                 # 4
+
+@tag25
+(25) For folks who use bit vectors with millions of bits in them but
+     with only a few bits set, your bit counting will go much, much
+     faster if you call count_bits_sparse() instead of count_bits():
+
+       # a BitVector with 2 million bits:
+       bv = BitVector(size = 2000000)
+       bv[345234] = 1
+       bv[233]=1
+       bv[243]=1
+       bv[18]=1
+       bv[785] =1
+       print(bv.count_bits_sparse())          # 5
+
+@tag26
+(26) You can calculate the similarity and the distance between two
+     bit vectors using the Jaccard similarity coefficient and the
+     Jaccard distance.  Also, you can calculate the Hamming distance
+     between two bit vectors:
+
+       bv1 = BitVector(bitstring = '11111111')
+       bv2 = BitVector(bitstring = '00101011')
+       print bv1.jaccard_similarity(bv2)
+       print(str(bv1.jaccard_distance(bv2)))
+       print(str(bv1.hamming_distance(bv2)))
+
+@tag27
+(27) Starting from a given bit position, you can find the position
+     index of the next set bit:
+
+       bv = BitVector(bitstring = '00000000000001')
+       print(bv.next_set_bit(5))                       # 13
+
+     since the position index of the SET bit after the bit
+     whose position index 5 is 13.
+
+@tag28
+(28) You can measure the "rank" of a bit that is set at a given
+     position.  Rank is the number of bits that are set up to the
+     position of the bit you are interested in.
+
+       bv = BitVector(bitstring = '01010101011100')
+       print(bv.rank_of_bit_set_at_index(10))          # 6
+
+@tag29
+(29) You can test whether the integer value of a bit vector is a
+     power of two.  The sparse version of this method will work much
+     faster for very long bit vectors.  However, the regular version
+     may work faster for small bit vectors.
+
+       bv = BitVector(bitstring = '10000000001110')
+       print(bv.is_power_of_2())
+       print(bv.is_power_of_2_sparse())
+
+@tag30
+(30) Given a bit vector, you can construct a bit vector with all the
+     bits reversed, in the sense that what was left to right before
+     now becomes right to left.
+
+       bv = BitVector(bitstring = '0001100000000000001')
+       print(str(bv.reverse()))
+
+@tag31
+(31) You can find the greatest common divisor of two bit vectors:
+
+       bv1 = BitVector(bitstring = '01100110')     # int val: 102
+       bv2 = BitVector(bitstring = '011010')       # int val: 26
+       bv = bv1.gcd(bv2)
+       print(int(bv))                              # 2
+
+@tag32
+(32) You can find the multiplicative inverse of a bit vector
+     vis-a-vis a given modulus:
+
+       bv_modulus = BitVector(intVal = 32)
+       bv = BitVector(intVal = 17)
+       bv_result = bv.multiplicative_inverse(bv_modulus)
+       if bv_result is not None:
+           print(str(int(bv_result)))           # 17
+       else:
+           print 'No multiplicative inverse in this case'
+
+     This multiplicative inverse is calculated using normal integer
+     arithmetic.  For multiplicative inverses in GF(2^n), use the
+     gf_MI() method described below.
+
+@tag33
+(33) To find the multiplicative inverse of a bit vector in the
+     Galois Field GF(2^n) with respect to a modulus polynomial, you
+     can do the following:
+
+        modulus = BitVector(bitstring = '100011011')
+        n = 8
+        a = BitVector(bitstring = '00110011')
+        multi_inverse = a.gf_MI(modulus, n)
+        print multi_inverse                        # 01101100
+
+@tag34
+(34) If you just want to multiply two bit patterns in GF(2):
+
+        a = BitVector(bitstring='0110001')
+        b = BitVector(bitstring='0110')
+        c = a.gf_multiply(b)
+        print(c)                                   # 00010100110
+
+@tag35
+(35) On the other hand, if you want to carry out modular
+     multiplications in the Galois Field GF(2^n):
+
+        modulus = BitVector(bitstring='100011011') # AES modulus
+        n = 8
+        a = BitVector(bitstring='0110001')
+        b = BitVector(bitstring='0110')
+        c = a.gf_multiply_modular(b, modulus, n)
+        print(c)                                   # 10100110
+
+@tag36
+(36) To divide by a modulus bitvector in the Galois Field GF(2^n):
+
+        mod = BitVector(bitstring='100011011')     # AES modulus
+        n = 8
+        bitvec = BitVector(bitstring='11100010110001')
+        quotient, remainder = bitvec.gf_divide(mod, n)
+        print(quotient)                            # 00000000111010
+        print(remainder)                           # 10001111
+
+@tag37
+(37) You can extract from a bit vector the runs of 1's and 0's
+     in the vector
+
+        bv = BitVector(bitlist = (1,1, 1, 0, 0, 1))
+        print(str(bv.runs()))                      # ['111', '00', '1']
+
+@tag38
+(38) You can generate a bit vector with random bits that span in
+     full the specified width.  For example, if you wanted the
+     random bit vector to fully span 32 bits, you would say
+
+        bv = BitVector(intVal = 0)
+        bv = bv.gen_rand_bits_for_prime(32)
+        print(bv)                # 11011010001111011010011111000101
+
+@tag39
+(39) You can test whether a randomly generated bit vector is a prime
+     number using the probabilistic Miller-Rabin test
+
+        bv = BitVector(intVal = 0)
+        bv = bv.gen_rand_bits_for_prime(32)
+        check = bv.test_for_primality()
+        print(check)
+
+@tag40
+(40) You can call get_text_from_bitvector() to directly convert a bit
+     vector into a text string (this is a useful thing to do only if
+     the length of the vector is an integral multiple of 8 and every
+     byte in your bitvector has a print representation):
+
+        bv = BitVector(textstring = 'hello')
+        print(bv)        # 0110100001100101011011000110110001101111
+        mytext = bv3.get_text_from_bitvector()
+        print mytext                           # hello
+
+@tag41
+(41) You can directly convert a bit vector into a hex string (this
+     is a useful thing to do only if the length of the vector is an
+     integral multiple of 4):
+
+        bv4 = BitVector(hexstring = '68656c6c6f')
+        print(bv4)     # 0110100001100101011011000110110001101111
+        myhexstring = bv4.get_hex_string_from_bitvector()
+        print myhexstring                      # 68656c6c6
 
 
 ACKNOWLEDGMENTS:
