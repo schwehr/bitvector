@@ -1321,10 +1321,10 @@ class BitVector( object ):
     def __init__( self, *args, **kwargs ):
         if args:
                raise ValueError(
-                      '''BitVector constructor can only be called with
-                         keyword arguments for the following keywords:
-                         filename, fp, size, intVal, bitlist, bitstring,
-                         hexstring, textstring, and rawbytes)''')
+                      'BitVector constructor can only be called with '
+                      'keyword arguments for the following keywords: '
+                      'filename, fp, size, intVal, bitlist, bitstring, '
+                      'hexstring, textstring, and rawbytes)')
         allowed_keys = ('bitlist','bitstring','filename','fp','intVal',
                        'size','textstring','hexstring','rawbytes')
         keywords_used = kwargs.keys()
@@ -1347,8 +1347,8 @@ class BitVector( object ):
         self.FILEOUT = None
         if filename:
             if fp or size or intVal or bitlist or bitstring or hexstring or textstring or rawbytes:
-                raise ValueError('''When filename is specified, you cannot give values
-                                    to any other constructor args''')
+                raise ValueError('When filename is specified, you cannot give values '
+                                 'to any other constructor args')
             self.filename = filename
             self.FILEIN = open(filename, 'rb')
             self.more_to_read = True
@@ -1356,28 +1356,28 @@ class BitVector( object ):
         elif fp:
             if (filename or size or intVal or bitlist or bitstring or hexstring
                 or textstring or rawbytes):
-                raise ValueError('''When fileobject is specified, you cannot give
-                                    values to any other constructor args''')
+                raise ValueError('When fileobject is specified, you cannot give '
+                                 'values to any other constructor args')
             bits = self.read_bits_from_fileobject(fp)
             bitlist =  list(map(int, bits))
             self.size = len( bitlist )
         elif intVal or intVal == 0:
             if filename or fp or bitlist or bitstring or hexstring or textstring or rawbytes:
-                raise ValueError('''When intVal is specified, you can only give a
-                                    value to the 'size' constructor arg''')
+                raise ValueError('When intVal is specified, you can only give a '
+                                 'value to the \'size\' constructor arg')
             if intVal == 0:
                 bitlist = [0]
                 if size is None:
                     self.size = 1
                 elif size == 0:
-                    raise ValueError('''The value specified for size must be at least
-                                        as large as for the smallest bit vector possible
-                                        for intVal''')
+                    raise ValueError('The value specified for size must be at least '
+                                     'as large as for the smallest bit vector possible '
+                                     'for intVal')
                 else:
                     if size < len(bitlist):
-                        raise ValueError('''The value specified for size must be at least
-                                            as large as for the smallest bit vector
-                                            possible for intVal''')
+                        raise ValueError('The value specified for size must be at least '
+                                         'as large as for the smallest bit vector '
+                                         'possible for intVal')
                     n = size - len(bitlist)
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
@@ -1397,55 +1397,55 @@ class BitVector( object ):
                     self.size = len(bitlist)
                 elif size == 0:
                     if size < len(bitlist):
-                        raise ValueError('''The value specified for size must be at least
-                                            as large as for the smallest bit vector possible
-                                            for intVal''')
+                        raise ValueError('The value specified for size must be at least '
+                                         'as large as for the smallest bit vector possible '
+                                         'for intVal')
                 else:
                     if size < len(bitlist):
-                        raise ValueError('''The value specified for size must be at least
-                                            as large as for the smallest bit vector possible
-                                            for intVal''')
+                        raise ValueError('The value specified for size must be at least '
+                                         'as large as for the smallest bit vector possible '
+                                         'for intVal')
                     n = size - len(bitlist)
                     bitlist = [0]*n + bitlist
                     self.size = len( bitlist )
         elif size is not None and size >= 0:
             if (filename or fp or intVal or bitlist or bitstring or hexstring
                 or textstring or rawbytes):
-                raise ValueError('''When size is specified (without an intVal), you cannot
-                                    give values to any other constructor args''')
+                raise ValueError('When size is specified (without an intVal), you cannot '
+                                 'give values to any other constructor args')
             self.size = size
             two_byte_ints_needed = (size + 15) // 16
             self.vector = array.array('H', [0]*two_byte_ints_needed)
             return
         elif bitstring or bitstring == '':
             if filename or fp or size or intVal or bitlist or hexstring or textstring or rawbytes:
-                raise ValueError('''When a bitstring is specified, you cannot give
-                                    values to any other constructor args''')
+                raise ValueError('When a bitstring is specified, you cannot give '
+                                 'values to any other constructor args')
             bitlist =  list(map(int, list(bitstring)))
             self.size = len(bitlist)
         elif bitlist:
             if filename or fp or size or intVal or bitstring or hexstring or textstring or rawbytes:
-                raise ValueError('''When bits are specified, you cannot give values
-                                    to any other constructor args''')
+                raise ValueError('When bits are specified, you cannot give values '
+                                 'to any other constructor args')
             self.size = len(bitlist)
         elif textstring or textstring == '':
             if filename or fp or size or intVal or bitlist or bitstring or hexstring or rawbytes:
-                raise ValueError('''When bits are specified through textstring, you
-                                    cannot give values to any other constructor args''')
+                raise ValueError('When bits are specified through textstring, you '
+                                 'cannot give values to any other constructor args')
             hexlist = ''.join(map(lambda x: x[2:], map(lambda x: hex(x) if len(hex(x)[2:])==2
                                  else hex(x)[:2] + '0' + hex(x)[2:], map(ord, list(textstring)))))
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
         elif hexstring or hexstring == '':
             if filename or fp or size or intVal or bitlist or bitstring or textstring or rawbytes:
-                raise ValueError('''When bits are specified through hexstring, you
-                                    cannot give values to any other constructor args''')
+                raise ValueError('When bits are specified through hexstring, you '
+                                 'cannot give values to any other constructor args')
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexstring))))))
             self.size = len(bitlist)
         elif rawbytes:
             if filename or fp or size or intVal or bitlist or bitstring or textstring or hexstring:
-                raise ValueError('''When bits are specified through rawbytes, you
-                                    cannot give values to any other constructor args''')
+                raise ValueError('When bits are specified through rawbytes, you '
+                                 'cannot give values to any other constructor args')
             import binascii
             hexlist = binascii.hexlify(rawbytes)
             if sys.version_info[0] == 3:
@@ -1598,8 +1598,8 @@ class BitVector( object ):
         BitVector object from however many bits there are in the file.  If the file
         contains zero bits, return a BitVector object of size attribute set to 0.
         '''
-        error_str = '''You need to first construct a BitVector
-        object with a filename as  argument'''
+        error_str = ('You need to first construct a BitVector '
+            'object with a filename as argument')
         if not self.filename:
             raise SyntaxError( error_str )
         if blocksize % 8 != 0:
@@ -1702,9 +1702,9 @@ class BitVector( object ):
         by a call to open()). Since all file I/O is byte oriented, the bitvector must
         be multiple of 8 bits. Each byte treated as MSB first (0th index).
         '''
-        err_str = '''Only a bit vector whose length is a multiple of 8 can
-            be written to a file.  Use the padding functions to satisfy
-            this constraint.'''
+        err_str = ('Only a bit vector whose length is a multiple of 8 can '
+            'be written to a file.  Use the padding functions to satisfy '
+            'this constraint.')
         if not self.FILEOUT:
             self.FILEOUT = file_out
         if self.size % 8:
@@ -1744,8 +1744,8 @@ class BitVector( object ):
         byte in your bitvector has a print representation)
         '''
         if self.size % 8:
-            raise ValueError('''\nThe bitvector for get_text_from_bitvector()
-                                  must be an integral multiple of 8 bits''')
+            raise ValueError('The bitvector for get_text_from_bitvector() '
+                             'must be an integral multiple of 8 bits')
         return ''.join(map(chr, map(int,[self[i:i+8] for i in range(0,self.size,8)])))
 
     getTextFromBitVector = get_text_from_bitvector
@@ -1758,8 +1758,8 @@ class BitVector( object ):
         of 4)
         '''
         if self.size % 4:
-            raise ValueError('''\nThe bitvector for get_hex_string_from_bitvector()
-                                  must be an integral multiple of 4 bits''')
+            raise ValueError('The bitvector for get_hex_string_from_bitvector() '
+                             'must be an integral multiple of 4 bits')
         return ''.join(map(lambda x: x.replace('0x',''),
                        map(hex,map(int,[self[i:i+4] for i in range(0,self.size,4)]))))
 
@@ -1768,8 +1768,8 @@ class BitVector( object ):
     def __lshift__( self, n ):
         'For an in-place left circular shift by n bit positions'
         if self.size == 0:
-            raise ValueError('''Circular shift of an empty vector
-                                makes no sense''')
+            raise ValueError('Circular shift of an empty vector '
+                             'makes no sense')
         if n < 0:
             return self >> abs(n)
         for i in range(n):
@@ -1778,8 +1778,8 @@ class BitVector( object ):
     def __rshift__( self, n ):
         'For an in-place right circular shift by n bit positions.'
         if self.size == 0:
-            raise ValueError('''Circular shift of an empty vector
-                                makes no sense''')
+            raise ValueError('Circular shift of an empty vector '
+                             'makes no sense')
         if n < 0:
             return self << abs(n)
         for i in range(n):
@@ -1904,8 +1904,8 @@ class BitVector( object ):
         # The following section is for slice assignment:
         if isinstance(pos, slice):
             if (not isinstance( item, BitVector )):
-                raise TypeError('''For slice assignment,
-                    the right hand side must be a BitVector''')
+                raise TypeError('For slice assignment, '
+                    'the right hand side must be a BitVector')
             if (not pos.start and not pos.stop):
                 return item.deep_copy()
             elif not pos.start:
@@ -2311,7 +2311,7 @@ class BitVector( object ):
         Each run is either a string of all 1's or a string of all 0's.
         '''
         if self.size == 0:
-            raise ValueError('''An empty vector has no runs''')
+            raise ValueError('An empty vector has no runs')
         allruns = []
         run = ''
         previous_bit = self[0]
