@@ -1,7 +1,6 @@
 # GNU -*- makefile -*-
-# Created by Kurt Schwehr (schwehr@com.unh.edu)
 
-VERSION := ${shell python -c "import BitVector;print BitVector.__version__"}
+VERSION := ${shell python -c "import BitVector; print BitVector.__version__"}
 
 default:
 	@echo
@@ -25,6 +24,9 @@ help:
 
 clean:
 	rm -f *.pyc *~
+	rm -f */*.pyc
+	rm -rf */__pycache__
+	rm -rf BitVector.egg-info
 
 real-clean: clean
 	rm -f MANIFEST  *.html bitvector-py.info
@@ -35,7 +37,7 @@ test:
 	@echo
 	@echo Testing...
 	@echo
-	./TestBitVector/Test.py 
+	python setup.py test
 
 sdist: test
 	@echo
@@ -48,6 +50,9 @@ check:
 	@grep -n FIX *.py *.in PKG-INFO Makefile | grep -v grep
 	@echo
 	pychecker BitVector
+
+clean-whitespace:
+	perl -pi -e 's|\s+$$|\n|g' *.py */*.py
 
 ##############################
 # Rules for the future
@@ -68,7 +73,7 @@ bitvector-py.info: bitvector-py.info.in Makefile sdist
 	      && perl -p -e "s/\@MD5\@/$$MD5/g" fink.tmp > $@
 	rm -f fink.tmp
 
-FINK_TREE := 10.4-transitional
+FINK_TREE := 10.10
 install-fink: bitvector-py.info
 	sudo cp bitvector-py.info /sw/fink/${FINK_TREE}/local/main/finkinfo/libs/
 	sudo cp dist/BitVector-${VERSION}.tar.bz2 /sw/src/
