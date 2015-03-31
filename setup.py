@@ -18,7 +18,7 @@ setup(name='BitVector',
           'https://engineering.purdue.edu/kak/dist/BitVector-%s.tar.gz' %
           VERSION),
       description=('A pure-Python memory-efficient packed representation for '
-                   'bit arrays',
+                   'bit arrays'),
       long_description='''
 This class presents a pure-Python memory-efficient packed
 representation for bit arrays.
@@ -81,12 +81,11 @@ The class is provided with the following operators/methods:
 -      write_bits_to_fileobject
 ''',
       license='Python Software Foundation License',
-      keywords=', '.join(
+      keywords=', '.join([
           'bit array',
           'bit vector',
           'bit string',
-          'logical operations on bit fields',
-      )
+          'logical operations on bit fields']),
       platforms='All platforms',
       classifiers=[
           'Topic :: Utilities',
