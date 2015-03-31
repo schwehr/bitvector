@@ -1,31 +1,29 @@
-import BitVector
 import unittest
 
-bv = BitVector.BitVector( bitstring = '00110011' )
+import BitVector
 
-circularShiftTests = [
-    ((3, '>>'), '01100110'),
-    ((3, '<<'), '10011001'),
+
+class CircularShiftTest(unittest.TestCase):
+
+  def testCircularShifts(self):
+    """Testing circular shifts."""
+    bv = BitVector.BitVector(bitstring='00110011')
+
+    circular_shift_tests = [
+        ((3, '>>'), '01100110'),
+        ((3, '<<'), '10011001'),
     ]
 
-class CircularShiftTestCase(unittest.TestCase):
-    def checkCircularShifts(self):
-        print("\nTesting CircularShifts")
-        for args, expected in circularShiftTests:
-            try:
-                op = args[1]
-                if (op == '>>'):
-                    actual = BitVector.BitVector( bitstring = str(bv) )
-                    actual >> args[0]
-                elif (op == '<<'):
-                    actual = BitVector.BitVector( bitstring = str(bv) )
-                    actual << args[0]
-                assert actual == BitVector.BitVector( bitstring = expected )
-            except Exception as e:
-                print(e)
-                print("        CIRCULAR SHIFT TEST FAILED")
+    for args, expected in circular_shift_tests:
+      op = args[1]
+      if op == '>>':
+        actual = BitVector.BitVector(bitstring=str(bv))
+        actual >> args[0]
+      elif op == '<<':
+        actual = BitVector.BitVector(bitstring=str(bv))
+        actual << args[0]
+      self.assertEqual(actual, BitVector.BitVector(bitstring=expected))
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(CircularShiftTestCase, type)
-                ])
+
+if __name__ == '__main__':
+  unittest.main()
