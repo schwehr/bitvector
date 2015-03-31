@@ -1,0 +1,31 @@
+The BitVector class was packaged using Distutils.  For installation,
+execute the following command-line in the source directory (this is
+the directory that contains the setup.py file after you have
+downloaded and uncompressed the tar archive):
+
+    python setup.py install
+
+You have to have root privileges for this to work.  On Linux
+distributions, this will install the module file at a location that
+looks like
+
+     /usr/lib/python2.7/dist-packages/
+
+If you do not have root access, you have the option of working
+directly off the directory in which you downloaded the software by
+simply placing the following statements at the top of your scripts
+that use the BitVector class
+
+    import sys
+    sys.path.append( 'pathname_to_BitVector_directory' )
+
+To uninstall the module, simply delete the source directory, locate
+where BitVector was installed with "locate BitVector" and delete
+those files.  As mentioned above, the full pathname to the installed
+version is likely to look like
+/usr/lib/python2.7/dist-packages/BitVector*
+
+If you want to carry out a non-standard install of BitVector, look
+up the on-line information on Disutils by pointing your browser to
+
+       http://docs.python.org/dist/dist.html
