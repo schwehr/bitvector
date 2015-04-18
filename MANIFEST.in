@@ -3,7 +3,6 @@ include BitVector/__init__.py
 include setup.py
 include Makefile
 include README
-include BitVector-3.3.2.html
 include test/bitvector_test.py
 include test/TestBooleanLogic.py
 include test/TestComparisonOps.py
@@ -17,7 +16,6 @@ include test/testinput4.txt
 include test/testinput5.txt
 include test/testinput6.txt
 include test/testinput7.txt
-include Examples/BitVector.py
 include Examples/BitVectorDemo.py
 include Examples/README
 include Examples/testinput1.txt
