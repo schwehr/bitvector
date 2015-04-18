@@ -10,7 +10,7 @@ import operator
 import random
 import sys
 
-__version__ = '3.3.2'
+__version__ = '3.3.2forked'
 
 _hexdict = {
     '0' : '0000', '1' : '0001', '2' : '0010', '3' : '0011',
