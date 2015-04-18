@@ -1,200 +1,16 @@
 #!/usr/bin/env python
+# Copyright: (C) 2014 Avinash Kak. Python Software Foundation.
 
-__version__ = '3.3.2'
-
-__doc__ = '''
-BitVector.py
-
-Version: ''' + __version__ + '''
-
-Author: Avinash Kak (kak@purdue.edu)
-
-Copyright: (C) 2014 Avinash Kak. Python Software Foundation.
-
-@title
-INTRODUCTION:
-
-   The BitVector class is for a memory-efficient packed representation
-   of bit arrays and for logical operations on such arrays. The
-   operations supported on bit vectors are:
-
-          __add__                for concatenation
-          __and__                for bitwise logical AND
-          __contains__
-          __eq__, __ne__, __lt__, __le__, __gt__, __ge__
-          __getitem__            for indexed access
-          __getslice__           for slice access
-          __int__                for returning integer value
-          __invert__             for inverting the 1's and 0's
-          __iter__               for iterating through
-          __len__                for len()
-          __lshift__             for circular shifts to the left
-          __or__                 for bitwise logical OR
-          __rshift__             for circular shifts to the right
-          __setitem__            for indexed and slice setting
-          __str__                for str()
-          __xor__                for bitwise logical XOR
-          count_bits
-          count_bits_sparse      faster for sparse bit vectors
-          deep_copy
-          divide_into_two
-          gcd                    for greatest common divisor
-          gen_rand_bits_for_prime
-          get_hex_string_from_bitvector
-          get_text_from_bitvector
-          gf_divide              for divisions in GF(2^n)
-          gf_MI                  for multiplicative inverse in GF(2^n)
-          gf_multiply            for multiplications in GF(2)
-          gf_multiply_modular    for multiplications in GF(2^n)
-          hamming_distance
-          int_val                for returning the integer value
-          is_power_of_2
-          is_power_of_2_sparse   faster for sparse bit vectors
-          jaccard_distance
-          jaccard_similarity
-          length
-          multiplicative_inverse
-          next_set_bit
-          pad_from_left
-          pad_from_right
-          permute
-          rank_of_bit_set_at_index
-          read_bits_from_file
-          reset
-          reverse
-          runs
-          shift_left             for non-circular left shift
-          shift_right            for non-circular right shift
-          slice assignment
-          set_value
-          test_for_primality
-          unpermute
-          write_to_file
-          write_bits_to_fileobject
-
-@title
-CONSTRUCTING BIT VECTORS:
-
-    You can construct a bit vector in the following different ways:
-
-    @tagC0
-    (C0)  You construct an EMPTY bit vector using the following syntax:
-
-            bv  = BitVector(size = 0)
-
-    @tagC1
-    (C1)  You can construct a bit vector directly from either a tuple
-          or a list of bits, as in
-
-            bv =  BitVector(bitlist = [1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1])
-
-    @tagC2
-    (C2)  You can construct a bit vector from an integer by
-
-            bv =  BitVector(intVal = 56789)
-
-          The bits stored now will correspond to the binary
-          representation of the integer.  The resulting bit vector is
-          the shortest possible bit vector for the integer value
-          supplied.  For example, when intVal is 0, the bit vector
-          constructed will consist of just the bit 0.
-
-    @tagC3
-    (C3)  When initializing a bit vector with an intVal as shown above,
-          you can also specify a size for the bit vector:
-
-            bv = BitVector(intVal = 0, size = 8)
-
-          will return the bit vector consisting of the bit pattern
-          00000000.  The zero padding needed for meeting the size
-          requirement is always on the left.  If the size supplied is
-          smaller than what it takes to create the shortest possible
-          bit vector for intVal, an exception is thrown.
-
-    @tagC4
-    (C4)  You can create a zero-initialized bit vector of a given size by
-
-            bv  = BitVector(size = 62)
-
-          This bit vector will hold exactly 62 bits, all initialized to
-          the 0 bit value.
-
-    @tagC5
-    (C5)  You can construct a bit vector from a disk file by a two-step
-          procedure. First you construct an instance of bit vector by
-
-            bv  =  BitVector(filename = 'somefile')
-
-          This bit vector itself is incapable of holding the bits.  To
-          now create bit vectors that actually hold the bits, you need
-          to make the following sort of a call on the above variable
-          bv:
-
-            bv1 =  bv.read_bits_from_file(64)
-
-          bv1 will be a regular bit vector containing 64 bits from the
-          disk file. If you want to re-read a file from the beginning
-          for some reason, you must obviously first close the file
-          object that was acquired with a call to the BitVector
-          constructor with a filename argument.  This can be
-          accomplished by
-
-            bv.close_file_object()
-
-    @tagC6
-    (C6)  You can construct a bit vector from a string of 1's and 0's by
-
-            bv  =  BitVector(bitstring = '110011110000')
-
-    @tagC7
-    (C7)  Yet another way to construct a bit vector is to read the bits
-          directly from a file-like object, as in
-
-            import io
-            x = '111100001111'
-            fp_read = io.StringIO(x)
-            bv = BitVector(fp = fp_read)
-            print(bv)                              # 111100001111
-
-    @tagC8
-    (C8)  You can also construct a bit vector directly from a text string
-          as shown by the example:
-
-            bv3 = BitVector(textstring = 'hello')
-            print(bv3)     # 0110100001100101011011000110110001101111
-            mytext = bv3.get_text_from_bitvector()
-            print mytext                           # hello
-
-          The bit vector is constructed by using the one-byte ASCII
-          encoding of the characters in the text string.
-
-    @tagC9
-    (C9)  You can also construct a bit vector directly from a string
-          of hex digits as shown by the example:
-
-            bv4 = BitVector(hexstring = '68656c6c6f')
-            print(bv4)     # 0110100001100101011011000110110001101111
-            myhexstring = bv4.get_hex_string_from_bitvector()
-            print myhexstring                      # 68656c6c6
-
-    @tagC10
-    (C10) You can also construct a bit vector directly from a bytes type
-          object you previously created in your script.  This can be
-          useful when you are trying to recover the integer parameters
-          stored in public and private keys.  A typical usage scenario:
-
-            keydata = base64.b64decode(open(sys.argv[1]).read().split(None)[1])
-            bv = BitVector.BitVector(rawbytes = keydata)
-
-          where sys.argv[1] is meant to supply the name of a public key
-          file (in this case an SSH RSA public key file).
-
-@endofdocs
-'''
+"""Memory-efficient packed representation of bit arrays."""
 
 import array
+import binascii
+import functools
 import operator
+import random
 import sys
+
+__version__ = '3.3.2'
 
 _hexdict = {
     '0' : '0000', '1' : '0001', '2' : '0010', '3' : '0011',
@@ -390,7 +206,6 @@ class BitVector(object):
                 raise ValueError(
                     'When bits are specified through rawbytes, you '
                     'cannot give values to any other constructor args')
-            import binascii
             hexlist = binascii.hexlify(rawbytes)
             if sys.version_info[0] == 3:
                 bitlist = list(
@@ -1014,8 +829,7 @@ class BitVector(object):
         '''
         Return the number of bits set in a BitVector instance.
         '''
-        from functools import reduce
-        return reduce(lambda x, y: int(x)+int(y), self)
+        return functools.reduce(lambda x, y: int(x)+int(y), self)
 
     def set_value(self, *args, **kwargs):
         '''
@@ -1351,7 +1165,6 @@ class BitVector(object):
         do by setting the two most significant bits and the least
         significant bit.
         '''
-        import random
         candidate = random.getrandbits(width)
         candidate |= 1
         candidate |= (1 << width-1)
