@@ -55,21 +55,26 @@ class BitVector(object):
 
     def __init__(self, *args, **kwargs):
         if args:
-            raise ValueError(
-                'BitVector constructor can only be called with '
-                'keyword arguments for the following keywords: '
-                'filename, fp, size, intVal, bitlist, bitstring, '
-                'hexstring, textstring, and rawbytes)')
-        allowed_keys = ('bitlist', 'bitstring', 'filename', 'fp', 'intVal',
-                        'size', 'textstring', 'hexstring', 'rawbytes')
-        keywords_used = kwargs.keys()
-        for keyword in keywords_used:
-            if keyword not in allowed_keys:
-                raise ValueError('Wrong keyword used --- check spelling')
-        filename = fp = intVal = size = bitlist = None
+            raise ValueError('positional args not allowed')
+        allowed_keys = {'bitlist', 'bitstring', 'filename', 'fp', 'intVal',
+                        'size', 'textstring', 'hexstring', 'rawbytes'}
+        if not set(kwargs.keys()).issubset(allowed_keys):
+            raise ValueError('Wrong keyword used --- check spelling')
+
+        self.filename = None
+        self.size = 0
+        self.FILEIN = None
+        self.FILEOUT = None
+        if 'filename' in kwargs:
+            if len(kwargs) != 1:
+                raise ValueError('filename cannot be used with other args')
+            self.filename = kwargs['filename']
+            self.FILEIN = open(self.filename, 'rb')
+            self.more_to_read = True
+            return
+
+        fp = intVal = size = bitlist = None
         bitstring = textstring = hexstring = rawbytes = None
-        if 'filename' in kwargs   : filename=kwargs.pop('filename')
-        if 'fp' in kwargs         : fp = kwargs.pop('fp')
         if 'size' in kwargs       : size = kwargs.pop('size')
         if 'intVal' in kwargs     : intVal = kwargs.pop('intVal')
         if 'bitlist' in kwargs    : bitlist = kwargs.pop('bitlist')
@@ -77,29 +82,14 @@ class BitVector(object):
         if 'hexstring' in kwargs  : hexstring = kwargs.pop('hexstring')
         if 'textstring' in kwargs : textstring = kwargs.pop('textstring')
         if 'rawbytes' in kwargs   : rawbytes = kwargs.pop('rawbytes')
-        self.filename = None
-        self.size = 0
-        self.FILEIN = None
-        self.FILEOUT = None
-        if filename:
-            if (fp or size or intVal or bitlist or bitstring or hexstring
-                or textstring or rawbytes):
-                raise ValueError('When filename is specified, you cannot give '
-                                 'values to any other constructor args')
-            self.filename = filename
-            self.FILEIN = open(filename, 'rb')
-            self.more_to_read = True
-            return
-        elif fp:
-            if (filename or size or intVal or bitlist or bitstring or hexstring
-                or textstring or rawbytes):
-                raise ValueError('When fileobject is specified, you cannot '
-                                 'give values to any other constructor args')
-            bits = self.read_bits_from_fileobject(fp)
+        if 'fp' in kwargs:
+            if len(kwargs) != 1:
+                raise ValueError('fileobject cannot be used with other args')
+            bits = self.read_bits_from_fileobject(kwargs['fp'])
             bitlist =  list(map(int, bits))
             self.size = len(bitlist)
         elif intVal or intVal == 0:
-            if (filename or fp or bitlist or bitstring or hexstring
+            if (fp or bitlist or bitstring or hexstring
                 or textstring or rawbytes):
                 raise ValueError('When intVal is specified, you can only give '
                                  'a value to the \'size\' constructor arg')
@@ -150,7 +140,7 @@ class BitVector(object):
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
         elif size is not None and size >= 0:
-            if (filename or fp or intVal or bitlist or bitstring or hexstring
+            if (fp or intVal or bitlist or bitstring or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When size is specified (without an intVal), you cannot '
@@ -160,7 +150,7 @@ class BitVector(object):
             self.vector = array.array('H', [0]*two_byte_ints_needed)
             return
         elif bitstring or bitstring == '':
-            if (filename or fp or size or intVal or bitlist or hexstring
+            if (fp or size or intVal or bitlist or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When a bitstring is specified, you cannot give '
@@ -168,14 +158,14 @@ class BitVector(object):
             bitlist =  list(map(int, list(bitstring)))
             self.size = len(bitlist)
         elif bitlist:
-            if (filename or fp or size or intVal or bitstring or hexstring
+            if (fp or size or intVal or bitstring or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When bits are specified, you cannot give values '
                     'to any other constructor args')
             self.size = len(bitlist)
         elif textstring or textstring == '':
-            if (filename or fp or size or intVal or bitlist or bitstring
+            if (fp or size or intVal or bitlist or bitstring
                 or hexstring or rawbytes):
                 raise ValueError(
                     'When bits are specified through textstring, you '
@@ -185,13 +175,13 @@ class BitVector(object):
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
         elif hexstring or hexstring == '':
-            if filename or fp or size or intVal or bitlist or bitstring or textstring or rawbytes:
+            if fp or size or intVal or bitlist or bitstring or textstring or rawbytes:
                 raise ValueError('When bits are specified through hexstring, you '
                                  'cannot give values to any other constructor args')
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexstring))))))
             self.size = len(bitlist)
         elif rawbytes:
-            if (filename or fp or size or intVal or bitlist or bitstring
+            if (fp or size or intVal or bitlist or bitstring
                 or textstring or hexstring):
                 raise ValueError(
                     'When bits are specified through rawbytes, you '
