@@ -58,7 +58,8 @@ class BitVector(object):
             raise ValueError('positional args not allowed')
         allowed_keys = {'bitlist', 'bitstring', 'filename', 'fp', 'intVal',
                         'size', 'textstring', 'hexstring', 'rawbytes'}
-        if not set(kwargs.keys()).issubset(allowed_keys):
+        kwargs_set = set(kwargs.keys())
+        if not kwargs_set.issubset(allowed_keys):
             raise ValueError('Wrong keyword used --- check spelling')
 
         self.filename = None
@@ -73,46 +74,39 @@ class BitVector(object):
             self.more_to_read = True
             return
 
-        fp = intVal = size = bitlist = None
-        bitstring = textstring = hexstring = rawbytes = None
-        if 'size' in kwargs       : size = kwargs.pop('size')
-        if 'intVal' in kwargs     : intVal = kwargs.pop('intVal')
-        if 'bitlist' in kwargs    : bitlist = kwargs.pop('bitlist')
-        if 'bitstring' in kwargs  : bitstring = kwargs.pop('bitstring')
-        if 'hexstring' in kwargs  : hexstring = kwargs.pop('hexstring')
-        if 'textstring' in kwargs : textstring = kwargs.pop('textstring')
-        if 'rawbytes' in kwargs   : rawbytes = kwargs.pop('rawbytes')
+        size = kwargs.pop('size', None)
+        intVal = kwargs.pop('intVal', None)
+        bitlist = kwargs.pop('bitlist', None)
+        bitstring = kwargs.pop('bitstring', None)
+        hexstring = kwargs.pop('hexstring', None)
+        textstring = kwargs.pop('textstring', None)
+        rawbytes = kwargs.pop('rawbytes', None)
+
+        if size is not None and size < 0:
+            raise ValueError('size must be >= 0')
+
         if 'fp' in kwargs:
-            if len(kwargs) != 1:
+            if kwargs_set != set(['fp']):
                 raise ValueError('fileobject cannot be used with other args')
             bits = self.read_bits_from_fileobject(kwargs['fp'])
             bitlist =  list(map(int, bits))
             self.size = len(bitlist)
         elif intVal or intVal == 0:
-            if (fp or bitlist or bitstring or hexstring
-                or textstring or rawbytes):
-                raise ValueError('When intVal is specified, you can only give '
-                                 'a value to the \'size\' constructor arg')
+            if not kwargs_set.issubset(set(('intVal', 'size'))):
+                raise ValueError('intVal only takes a size arg')
             if intVal == 0:
                 bitlist = [0]
                 if size is None:
                     self.size = 1
-                elif size == 0:
-                    raise ValueError('The value specified for size must be at '
-                                     'least as large as for the smallest bit '
+                elif size == 0 or size < len(bitlist):
+                    raise ValueError('size must be >= smallest bit '
                                      'vector possible for intVal')
                 else:
-                    if size < len(bitlist):
-                        raise ValueError(
-                            'The value specified for size must be at least as '
-                            'large as for the smallest bit vector possible for '
-                            'intVal')
                     n = size - len(bitlist)
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
             else:
-                hexVal = hex(intVal).lower().rstrip('l')
-                hexVal = hexVal[2:]
+                hexVal = hex(intVal).lower().rstrip('l')[2:]
                 if len(hexVal) == 1:
                     hexVal = '0' + hexVal
                 bitlist = ''.join(map(lambda x: _hexdict[x],hexVal))
@@ -124,23 +118,18 @@ class BitVector(object):
                 del bitlist[0:i]
                 if size is None:
                     self.size = len(bitlist)
-                elif size == 0:
+                elif size == 0 or size < len(bitlist):
                     if size < len(bitlist):
                         raise ValueError(
                             'The value specified for size must be at least as '
                             'large as for the smallest bit vector possible '
                             'for intVal')
                 else:
-                    if size < len(bitlist):
-                        raise ValueError(
-                            'The value specified for size must be at least as '
-                            'large as for the smallest bit vector possible '
-                            'for intVal')
                     n = size - len(bitlist)
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
-        elif size is not None and size >= 0:
-            if (fp or intVal or bitlist or bitstring or hexstring
+        elif size is not None:
+            if (intVal or bitlist or bitstring or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When size is specified (without an intVal), you cannot '
@@ -150,7 +139,7 @@ class BitVector(object):
             self.vector = array.array('H', [0]*two_byte_ints_needed)
             return
         elif bitstring or bitstring == '':
-            if (fp or size or intVal or bitlist or hexstring
+            if (size or intVal or bitlist or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When a bitstring is specified, you cannot give '
@@ -158,14 +147,14 @@ class BitVector(object):
             bitlist =  list(map(int, list(bitstring)))
             self.size = len(bitlist)
         elif bitlist:
-            if (fp or size or intVal or bitstring or hexstring
+            if (size or intVal or bitstring or hexstring
                 or textstring or rawbytes):
                 raise ValueError(
                     'When bits are specified, you cannot give values '
                     'to any other constructor args')
             self.size = len(bitlist)
         elif textstring or textstring == '':
-            if (fp or size or intVal or bitlist or bitstring
+            if (size or intVal or bitlist or bitstring
                 or hexstring or rawbytes):
                 raise ValueError(
                     'When bits are specified through textstring, you '
@@ -175,13 +164,13 @@ class BitVector(object):
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
         elif hexstring or hexstring == '':
-            if fp or size or intVal or bitlist or bitstring or textstring or rawbytes:
+            if size or intVal or bitlist or bitstring or textstring or rawbytes:
                 raise ValueError('When bits are specified through hexstring, you '
                                  'cannot give values to any other constructor args')
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexstring))))))
             self.size = len(bitlist)
         elif rawbytes:
-            if (fp or size or intVal or bitlist or bitstring
+            if (size or intVal or bitlist or bitstring
                 or textstring or hexstring):
                 raise ValueError(
                     'When bits are specified through rawbytes, you '
@@ -200,8 +189,10 @@ class BitVector(object):
             self.size = len(bitlist)
         else:
             raise ValueError('wrong arg(s) for constructor')
+
         two_byte_ints_needed = (len(bitlist) + 15) // 16
         self.vector = array.array('H', [0]*two_byte_ints_needed)
+        # TODO(schwehr): Explain this.
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
     def _setbit(self, posn, val):
