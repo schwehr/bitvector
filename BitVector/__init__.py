@@ -75,7 +75,6 @@ class BitVector(object):
             return
 
         size = kwargs.pop('size', None)
-        intVal = kwargs.pop('intVal', None)
         bitlist = kwargs.pop('bitlist', None)
         bitstring = kwargs.pop('bitstring', None)
         hexstring = kwargs.pop('hexstring', None)
@@ -91,7 +90,9 @@ class BitVector(object):
             bits = self.read_bits_from_fileobject(kwargs['fp'])
             bitlist =  list(map(int, bits))
             self.size = len(bitlist)
-        elif intVal or intVal == 0:
+        elif 'intVal' in kwargs and kwargs['intVal'] is not None:
+            intVal = kwargs.pop('intVal')
+
             if not kwargs_set.issubset(set(('intVal', 'size'))):
                 raise ValueError('intVal only takes a size arg')
             if intVal == 0:
@@ -129,8 +130,7 @@ class BitVector(object):
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
         elif size is not None:
-            if (intVal or bitlist or bitstring or hexstring
-                or textstring or rawbytes):
+            if bitlist or bitstring or hexstring or textstring or rawbytes:
                 raise ValueError(
                     'When size is specified (without an intVal), you cannot '
                     'give values to any other constructor args')
@@ -139,23 +139,20 @@ class BitVector(object):
             self.vector = array.array('H', [0]*two_byte_ints_needed)
             return
         elif bitstring or bitstring == '':
-            if (size or intVal or bitlist or hexstring
-                or textstring or rawbytes):
+            if size or bitlist or hexstring or textstring or rawbytes:
                 raise ValueError(
                     'When a bitstring is specified, you cannot give '
                     'values to any other constructor args')
             bitlist =  list(map(int, list(bitstring)))
             self.size = len(bitlist)
         elif bitlist:
-            if (size or intVal or bitstring or hexstring
-                or textstring or rawbytes):
+            if size or bitstring or hexstring or textstring or rawbytes:
                 raise ValueError(
                     'When bits are specified, you cannot give values '
                     'to any other constructor args')
             self.size = len(bitlist)
         elif textstring or textstring == '':
-            if (size or intVal or bitlist or bitstring
-                or hexstring or rawbytes):
+            if size or bitlist or bitstring or hexstring or rawbytes:
                 raise ValueError(
                     'When bits are specified through textstring, you '
                     'cannot give values to any other constructor args')
@@ -164,14 +161,13 @@ class BitVector(object):
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
         elif hexstring or hexstring == '':
-            if size or intVal or bitlist or bitstring or textstring or rawbytes:
+            if size or bitlist or bitstring or textstring or rawbytes:
                 raise ValueError('When bits are specified through hexstring, you '
                                  'cannot give values to any other constructor args')
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexstring))))))
             self.size = len(bitlist)
         elif rawbytes:
-            if (size or intVal or bitlist or bitstring
-                or textstring or hexstring):
+            if size or bitlist or bitstring or textstring or hexstring:
                 raise ValueError(
                     'When bits are specified through rawbytes, you '
                     'cannot give values to any other constructor args')
