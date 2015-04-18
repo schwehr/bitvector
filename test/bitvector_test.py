@@ -474,6 +474,7 @@ class BitvectorTest(unittest.TestCase):
             products,
             ['001', '001', '001', '001', '001', '001', '001'])
 
+    @unittest.skip('slow')
     def testAesMultiplicativeInverses(self):
         # In GF(2^8) with modulus polynomial x^8 + x^4 + x^3 + x + 1
         # This takes a few seconds.
