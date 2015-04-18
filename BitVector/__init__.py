@@ -122,55 +122,42 @@ class BitVector(object):
                 elif size == 0 or size < len(bitlist):
                     if size < len(bitlist):
                         raise ValueError(
-                            'The value specified for size must be at least as '
-                            'large as for the smallest bit vector possible '
-                            'for intVal')
+                            'size must be >= the size for intVal')
                 else:
                     n = size - len(bitlist)
                     bitlist = [0]*n + bitlist
                     self.size = len(bitlist)
         elif size is not None:
             if bitlist or bitstring or hexstring or textstring or rawbytes:
-                raise ValueError(
-                    'When size is specified (without an intVal), you cannot '
-                    'give values to any other constructor args')
+                raise ValueError('size only works by itself or with intVal')
             self.size = size
             two_byte_ints_needed = (size + 15) // 16
             self.vector = array.array('H', [0]*two_byte_ints_needed)
             return
         elif bitstring or bitstring == '':
-            if size or bitlist or hexstring or textstring or rawbytes:
-                raise ValueError(
-                    'When a bitstring is specified, you cannot give '
-                    'values to any other constructor args')
+            if len(kwargs_set) > 1:
+                raise ValueError('bitstring cannot be used with other args')
             bitlist =  list(map(int, list(bitstring)))
             self.size = len(bitlist)
         elif bitlist:
-            if size or bitstring or hexstring or textstring or rawbytes:
-                raise ValueError(
-                    'When bits are specified, you cannot give values '
-                    'to any other constructor args')
+            if len(kwargs_set) > 1:
+                raise ValueError('bits cannot be used with other args')
             self.size = len(bitlist)
         elif textstring or textstring == '':
-            if size or bitlist or bitstring or hexstring or rawbytes:
-                raise ValueError(
-                    'When bits are specified through textstring, you '
-                    'cannot give values to any other constructor args')
+            if len(kwargs_set) > 1:
+                raise ValueError('textstring cannot be used with other args')
             hexlist = ''.join(map(lambda x: x[2:], map(lambda x: hex(x) if len(hex(x)[2:])==2
                                  else hex(x)[:2] + '0' + hex(x)[2:], map(ord, list(textstring)))))
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexlist))))))
             self.size = len(bitlist)
         elif hexstring or hexstring == '':
-            if size or bitlist or bitstring or textstring or rawbytes:
-                raise ValueError('When bits are specified through hexstring, you '
-                                 'cannot give values to any other constructor args')
+            if len(kwargs_set) > 1:
+                raise ValueError('hexstring cannot be used with other args')
             bitlist = list(map(int,list(''.join(map(lambda x: _hexdict[x], list(hexstring))))))
             self.size = len(bitlist)
         elif rawbytes:
             if size or bitlist or bitstring or textstring or hexstring:
-                raise ValueError(
-                    'When bits are specified through rawbytes, you '
-                    'cannot give values to any other constructor args')
+                raise ValueError('rawbytes cannot be used with other args')
             hexlist = binascii.hexlify(rawbytes)
             if sys.version_info[0] == 3:
                 bitlist = list(
