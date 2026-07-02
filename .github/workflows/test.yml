@@ -9,8 +9,11 @@ on:
 
 jobs:
   test:
-    name: Run tests (Python 3.13)
+    name: Run tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13", "3.14"]
 
     steps:
       - name: Checkout code
@@ -20,7 +23,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: uv sync
