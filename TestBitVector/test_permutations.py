@@ -26,7 +26,3 @@ class PermutationTestCase(unittest.TestCase):
             except Exception as e:
                 print(e)
                 print("Permutation test failed")
-
-
-def getTestSuites():
-    return unittest.TestLoader().loadTestsFromTestCase(PermutationTestCase)

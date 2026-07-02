@@ -41,7 +41,3 @@ class ComparisonTestCases(unittest.TestCase):
             except Exception as e:
                 print(e)
                 print("        COMPARISON TEST FAILED")
-
-
-def getTestSuites():
-    return unittest.TestLoader().loadTestsFromTestCase(ComparisonTestCases)

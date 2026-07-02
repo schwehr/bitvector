@@ -38,7 +38,3 @@ class BooleanLogicTestCase(unittest.TestCase):
                 if args[0].size == args[1].size:
                     print(e)
                     print("        BOOLEAN LOGIC TEST FAILED")
-
-
-def getTestSuites():
-    return unittest.TestLoader().loadTestsFromTestCase(BooleanLogicTestCase)

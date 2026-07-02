@@ -26,7 +26,3 @@ class CircularShiftTestCase(unittest.TestCase):
             except Exception as e:
                 print(e)
                 print("        CIRCULAR SHIFT TEST FAILED")
-
-
-def getTestSuites():
-    return unittest.TestLoader().loadTestsFromTestCase(CircularShiftTestCase)

@@ -43,7 +43,3 @@ class ConstructorTestCases(unittest.TestCase):
             except Exception as e:
                 print(e)
                 print("        CONSTRUCTOR TEST FAILED")
-
-
-def getTestSuites():
-    return unittest.TestLoader().loadTestsFromTestCase(ConstructorTestCases)
