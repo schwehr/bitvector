@@ -1,12 +1,14 @@
-import BitVector
 import unittest
 
-bv = BitVector.BitVector( bitstring = '00110011' )
+import BitVector
+
+bv = BitVector.BitVector(bitstring="00110011")
 
 circularShiftTests = [
-    ((3, '>>'), '01100110'),
-    ((3, '<<'), '10011001'),
-    ]
+    ((3, ">>"), "01100110"),
+    ((3, "<<"), "10011001"),
+]
+
 
 class CircularShiftTestCase(unittest.TestCase):
     def testCircularShifts(self):
@@ -14,16 +16,17 @@ class CircularShiftTestCase(unittest.TestCase):
         for args, expected in circularShiftTests:
             try:
                 op = args[1]
-                if (op == '>>'):
-                    actual = BitVector.BitVector( bitstring = str(bv) )
+                if op == ">>":
+                    actual = BitVector.BitVector(bitstring=str(bv))
                     actual >> args[0]
-                elif (op == '<<'):
-                    actual = BitVector.BitVector( bitstring = str(bv) )
+                elif op == "<<":
+                    actual = BitVector.BitVector(bitstring=str(bv))
                     actual << args[0]
-                assert actual == BitVector.BitVector( bitstring = expected )
+                assert actual == BitVector.BitVector(bitstring=expected)
             except Exception as e:
                 print(e)
                 print("        CIRCULAR SHIFT TEST FAILED")
+
 
 def getTestSuites():
     return unittest.TestLoader().loadTestsFromTestCase(CircularShiftTestCase)

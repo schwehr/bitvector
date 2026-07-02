@@ -35,7 +35,9 @@ default = true
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.6.0",
     "pytest>=8.0.0",
+    "ruff>=0.15.20",
 ]
 
 [tool.pytest.ini_options]
@@ -43,3 +45,11 @@ testpaths = ["TestBitVector"]
 python_files = ["Test*.py"]
 addopts = "-p no:doctest"
 pythonpath = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

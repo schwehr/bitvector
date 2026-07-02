@@ -10,7 +10,7 @@ directly in this directory prior to the installation of the
 module.  This will execute all of the example code in the
 module file.
 
-To see a working examples of the BitVector module, see 
+To see a working examples of the BitVector module, see
 the file
 
      Examples/BitVectorDemo.py
@@ -18,4 +18,3 @@ the file
 If there are any questions about this module, contact the
 author at 'kak@purdue.edu' with the string 'bitvector' in
 the subject line to get past his spam filter.
-
