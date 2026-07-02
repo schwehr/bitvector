@@ -9,12 +9,13 @@ authors = [
 maintainers = [
     { name = "Avinash Kak", email = "kak@purdue.edu" },
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.13"
 keywords = ["bit array", "bit vector", "bit string", "logical operations on bit fields"]
 license = { file = "LICENSE" }
 classifiers = [
     "Topic :: Utilities",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = []
 
