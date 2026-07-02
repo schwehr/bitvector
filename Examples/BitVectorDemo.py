@@ -23,7 +23,7 @@ print("\nConstructing a bit vector from a tuple of bits:")
 bv = BitVector(bitlist=(1, 0, 0, 1))
 print(bv)                                    # 1001
 
-# Construct a bit vector with a list of bits:    
+# Construct a bit vector with a list of bits:
 print("\nConstructing a bit vector from a list of bits:")
 bv = BitVector(bitlist=[1, 1, 0, 1])
 print(bv)                                    # 1101
@@ -60,14 +60,14 @@ print("The integer value of the above bit vector is:%d" % int(bv))
 import io
 x = "111100001111"
 x = ""
-if sys.version_info[0] == 3:    
+if sys.version_info[0] == 3:
     x = "111100001111"
-else:                           
+else:
     x = unicode("111100001111")
 fp_read = io.StringIO(x)
 bv = BitVector( fp = fp_read )
 print("\nBit vector constructed directly from a file like object:")
-print(bv)                                    # 111100001111 
+print(bv)                                    # 111100001111
 
 # Construct a bit vector directly from a bit string:
 bv = BitVector( bitstring = '00110011' )
@@ -94,7 +94,7 @@ mytext = bv3.get_bitvector_in_ascii()
 print("Text recovered from the previous bitvector:")
 print(mytext)                                         # hello
                                                       # jello
-# Construct a bit vector from a hex string:                                                      
+# Construct a bit vector from a hex string:
 print("\nConstructing a bit vector from the hexstring '68656c6c6f':")
 bv4 = BitVector(hexstring = "68656c6c6f")
 print(bv4)                # 0110100001100101011011000110110001101111
@@ -113,7 +113,7 @@ print(myhexstring)                                    # 68656c6c6f
 print("\nDemonstrating the raw bytes mode of constructing a bit vector (useful for reading public and private keys):")
 mypubkey = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA5amriY96HQS8Y/nKc8zu3zOylvpOn3vzMmWwrtyDy+aBvns4UC1RXoaD9rDKqNNMCBAQwWDsYwCAFsrBzbxRQONHePX8lRWgM87MseWGlu6WPzWGiJMclTAO9CTknplG9wlNzLQBj3dP1M895iLF6jvJ7GR+V3CRU6UUbMmRvgPcsfv6ec9RRPm/B8ftUuQICL0jt4tKdPG45PBJUylHs71FuE9FJNp01hrj1EMFObNTcsy9zuis0YPyzArTYSOUsGglleExAQYi7iLh17pAa+y6fZrGLsptgqryuftN9Q4NqPuTiFjlqRowCDU7sSxKDgU7bzhshyVx3+pzXO4D2Q== kak@pixie'
 import base64
-if sys.version_info[0] == 3:    
+if sys.version_info[0] == 3:
     import binascii
     keydata = base64.b64decode(bytes(mypubkey.split(None)[1], 'utf-8'))
 else:
@@ -134,7 +134,7 @@ print("\nBitstring for 1111:")
 print(bv)                                    # 1111
 
 print("\nReset individual bits of above vector:")
-bv[0]=0;bv[1]=0;bv[2]=0;bv[3]=0        
+bv[0]=0;bv[1]=0;bv[2]=0;bv[3]=0
 print(bv)                                    # 0000
 print("\nDo the same as above with negative indices:")
 bv[-1]=1;bv[-2]=1;bv[-4]=1
@@ -159,10 +159,10 @@ fp_write = io.StringIO()
 #bv.write_bits_to_fileobject( fp_write )
 bv.write_bits_to_stream_object( fp_write )
 print("\nGet bit vector written out to a file-like object:")
-print(fp_write.getvalue())                  # 1011 
+print(fp_write.getvalue())                  # 1011
 
 print("\nExperiments with bitwise logical operations:")
-bv3 = bv1 | bv2                              
+bv3 = bv1 | bv2
 print(bv3)                                  # 00110011
 bv3 = bv1 & bv2
 print(bv3)                                  # 00110011
@@ -198,12 +198,12 @@ print(bv8)                                   # 1111111011111111111
 print("\nConstruct a bit vector from what is in the file testinput1.txt:")
 bv = BitVector( filename = 'testinput1.txt' )
 #print bv                                    # nothing to show
-bv1 = bv.read_bits_from_file(64)    
+bv1 = bv.read_bits_from_file(64)
 print("\nPrint out the first 64 bits read from the file:")
 print(bv1)
      # 0100000100100000011010000111010101101110011001110111001001111001
 print("\nRead the next 64 bits from the same file:")
-bv2 = bv.read_bits_from_file(64)    
+bv2 = bv.read_bits_from_file(64)
 print(bv2)
      # 0010000001100010011100100110111101110111011011100010000001100110
 print("\nTake xor of the previous two bit vectors:")
@@ -226,8 +226,8 @@ print("\nPermuted and contracted form of the previous bit vector:")
 print(bv2)                                    # 1010
 
 print("\nExperiment with writing an internally generated bit vector out to a disk file:")
-#bv1 = BitVector( bitstring = '00001010' ) 
-bv1 = BitVector( bitstring = '11100111' ) 
+#bv1 = BitVector( bitstring = '00001010' )
+bv1 = BitVector( bitstring = '11100111' )
 FILEOUT = open( 'test.txt', 'wb' )
 bv1.write_to_file( FILEOUT )
 FILEOUT.close()
@@ -249,7 +249,7 @@ print("\n")
 print("\nExperiment with closing a file object and start extracting bit vectors from the file from the beginning again:")
 bv.close_file_object()
 bv = BitVector( filename = 'testinput4.txt' )
-bv1 = bv.read_bits_from_file(64)        
+bv1 = bv.read_bits_from_file(64)
 print("\nHere are all the first 64 bits read from the file again after the file object was closed and opened again:")
 print(bv1)
 FILEOUT = open( 'testinput5.txt', 'wb' )
@@ -272,7 +272,7 @@ bv3 = bv2.unpermute( [22, 47, 33, 36, 18, 6, 32, 29, 54, 62, 4,
                       15, 61, 55, 60, 0, 14, 38, 40, 23, 17, 41,
                       10, 57, 12, 30, 3, 52, 11, 26, 43, 21, 13,
                       58, 37, 48, 28, 1, 63, 2, 31, 53, 56, 44, 24,
-                      51, 19, 7, 5, 34, 27, 16, 46] )    
+                      51, 19, 7, 5, 34, 27, 16, 46] )
 print("Unpurmute the bit vector:")
 print(bv3)
 
@@ -316,9 +316,9 @@ except ValueError as arg:
 print("\nTest the size modifier when a bit vector is initialized with the intVal method:")
 bv = BitVector( intVal = 45, size = 16 )
 print(bv)                             # 0000000000101101
-bv = BitVector( intVal = 0, size = 8 )    
+bv = BitVector( intVal = 0, size = 8 )
 print(bv)                             # 00000000
-bv = BitVector( intVal = 1, size = 8 )    
+bv = BitVector( intVal = 1, size = 8 )
 print(bv)                             # 00000001
 
 print("\nTesting slice assignment:")
@@ -344,7 +344,7 @@ bv2 = BitVector( bitstring = '1010111' )
 print("bv2= " + str(bv2))             # 1010001
 bv1[2:5]  = bv2[-7:-4]
 print("bv1= " + str(bv1))             # 0010100000000000000000000
-bv1[2:5]  = bv2[-3:]                  
+bv1[2:5]  = bv2[-3:]
 print("bv1= " + str(bv1))             # 0011100000000000000000000
 bv1[6:9]  = bv2[:-4]
 print("bv1= " + str(bv1))             # 0011101010000000000000000
@@ -364,13 +364,13 @@ bv1[6:9]  = bv2[:3]
 print("bv1= " + str(bv1))             # 0000001110000000000011111
 bv1[:-20] = bv2[2:7]
 print("bv1= " + str(bv1))             # 1100101110000000000011111
-bv1[0:-20] = bv1[9:14]               
+bv1[0:-20] = bv1[9:14]
 print("bv1= " + str(bv1))             # 0000001110000000000011111
 #bv1[-15:-20] = bv2[2:7]              # error
 #bv1[3:-18] = bv2[2:7]                # error
 
 print("\nTesting reset function:")
-bv1.reset( 1 )             
+bv1.reset( 1 )
 print("bv1= " + str(bv1))             # 1111111111111111111111111
 print(bv1[3:9].reset(0))              # 000000
 print(bv1[:].reset(0))                # 0000000000000000000000000
@@ -430,7 +430,7 @@ print("\nTesting isPowerOf2():")
 bv = BitVector( bitstring = '10000000001110' )
 print("int value: " + str(int(bv)))                          # 826
 print(bv.isPowerOf2())                                       # False
-print("\nTesting isPowerOf2_sparse():")              
+print("\nTesting isPowerOf2_sparse():")
 print(bv.isPowerOf2_sparse())                                # False
 
 print("\nTesting reverse():")
@@ -441,7 +441,7 @@ print("reversed bv: " + str(bv.reverse()))   # 1000000000000011000
 print("\nTesting Greatest Common Divisor (gcd):")
 bv1 = BitVector( bitstring = '01100110' )
 print("first arg bv: " + str(bv1) + " of int value: " + str(int(bv1))) #102
-bv2 = BitVector( bitstring = '011010' ) 
+bv2 = BitVector( bitstring = '011010' )
 print("second arg bv: " + str(bv2) + " of int value: " + str(int(bv2)))# 26
 bv = bv1.gcd( bv2 )
 print("gcd bitvec is: " + str(bv) + " of int value: " + str(int(bv)))  # 2
@@ -449,7 +449,7 @@ print("gcd bitvec is: " + str(bv) + " of int value: " + str(int(bv)))  # 2
 print("\nTesting multiplicative_inverse:")
 bv_modulus = BitVector( intVal = 32 )
 print("modulus is bitvec: " + str(bv_modulus) + " of int value: " + str(int(bv_modulus)))
-bv = BitVector( intVal = 17 ) 
+bv = BitVector( intVal = 17 )
 print("bv: " + str(bv) + " of int value: " + str(int(bv)))
 result = bv.multiplicative_inverse( bv_modulus )
 if result is not None:
@@ -508,7 +508,7 @@ products = [ str(bitarrays[i].gf_multiply_modular(mi_list[i], mod, n)) \
 print("bit_array * multi_inv: " + str(products))
 
 # UNCOMMENT THE FOLLOWING LINES FOR
-# DISPLAYING ALL OF THE MULTIPLICATIVE 
+# DISPLAYING ALL OF THE MULTIPLICATIVE
 # INVERSES IN GF(2^8) WITH THE AES MODULUS:
 
 #    print("\nMultiplicative inverses in GF(2^8) with "  + \
@@ -574,9 +574,9 @@ print(bv)
 # UNCOMMENT THE FOLLOWING LINES TO TEST THE
 # PRIMALITY TESTING METHOD. IT SHOULD SHOW
 # THAT ALL OF THE FOLLOWING NUMBERS ARE PRIME:
-primes = [179, 233, 283, 353, 419, 467, 547, 607, 661, 739, 811, 877, \
-          947, 1019, 1087, 1153, 1229, 1297, 1381, 1453, 1523, 1597, \
-          1663, 1741, 1823, 1901, 7001, 7109, 7211, 7307, 7417, 7507, \
+primes = [179, 233, 283, 353, 419, 467, 547, 607, 661, 739, 811, 877,
+          947, 1019, 1087, 1153, 1229, 1297, 1381, 1453, 1523, 1597,
+          1663, 1741, 1823, 1901, 7001, 7109, 7211, 7307, 7417, 7507,
           7573, 7649, 7727, 7841]
 for p in primes:
     bv = BitVector( intVal = p )
@@ -588,11 +588,10 @@ bv = BitVector( intVal = 0 )
 bv = bv.gen_random_bits(32)
 print(bv)
 check = bv.test_for_primality()
-print("The primality test for " + str(int(bv)) + ": " + str(check))    
+print("The primality test for " + str(int(bv)) + ": " + str(check))
 
 print("\nTest generating min-canonical form of a BitVector instance:")
 for i in range(255,10000,1555):
     bv = BitVector(intVal = i, size = 14)
     print("\nbv:            %s" % str(bv))
     print("min canonical: %s" % str(bv.min_canonical()))
-
