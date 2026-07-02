@@ -37,12 +37,13 @@ default = true
 dev = [
     "pre-commit>=4.6.0",
     "pytest>=8.0.0",
+    "pytest-cov>=7.1.0",
     "ruff>=0.15.20",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["TestBitVector"]
-addopts = "-p no:doctest"
+addopts = "-p no:doctest --cov=BitVector --cov-report=term-missing --cov-report=xml"
 pythonpath = ["."]
 
 [tool.ruff]
@@ -52,3 +53,16 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
 ignore = ["E501"]
+
+[tool.coverage.run]
+source = ["BitVector"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]

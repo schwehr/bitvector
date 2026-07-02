@@ -15,3 +15,9 @@ dist/
 *.egg-info/
 *.egg
 .eggs/
+
+# Coverage
+.coverage
+*.cover
+coverage.xml
+htmlcov/
