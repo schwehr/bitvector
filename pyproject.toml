@@ -42,7 +42,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["TestBitVector"]
+testpaths = ["tests"]
 addopts = "-p no:doctest --cov=BitVector --cov-report=term-missing --cov-report=xml"
 pythonpath = ["."]
 

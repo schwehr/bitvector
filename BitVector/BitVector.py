@@ -3028,7 +3028,7 @@ if __name__ == "__main__":
     print(bv8)  # 1111111011111111111
 
     print("\nConstruct a bit vector from what is in the file testinput1.txt:")
-    bv = BitVector(filename="TestBitVector/testinput1.txt")
+    bv = BitVector(filename="tests/testinput1.txt")
     # print bv                                    # nothing to show
     bv1 = bv.read_bits_from_file(64)
     print("\nPrint out the first 64 bits read from the file:")
@@ -3061,10 +3061,10 @@ if __name__ == "__main__":
         "\nExperiment with writing an internally generated bit vector out to a disk file:"
     )
     bv1 = BitVector(bitstring="00001010")
-    FILEOUT = open("TestBitVector/test.txt", "wb")
+    FILEOUT = open("tests/test.txt", "wb")
     bv1.write_to_file(FILEOUT)
     FILEOUT.close()
-    bv2 = BitVector(filename="TestBitVector/test.txt")
+    bv2 = BitVector(filename="tests/test.txt")
     bv3 = bv2.read_bits_from_file(32)
     print(
         "\nDisplay bit vectors written out to file and read back from the file and their respective lengths:"
@@ -3073,7 +3073,7 @@ if __name__ == "__main__":
     print(str(len(bv1)) + " " + str(len(bv3)))
 
     print("\nExperiments with reading a file from the beginning to end:")
-    bv = BitVector(filename="TestBitVector/testinput4.txt")
+    bv = BitVector(filename="tests/testinput4.txt")
     print("\nHere are all the bits read from the file:")
     while bv.more_to_read:
         bv_read = bv.read_bits_from_file(64)
@@ -3084,13 +3084,13 @@ if __name__ == "__main__":
         "\nExperiment with closing a file object and start extracting bit vectors from the file from the beginning again:"
     )
     bv.close_file_object()
-    bv = BitVector(filename="TestBitVector/testinput4.txt")
+    bv = BitVector(filename="tests/testinput4.txt")
     bv1 = bv.read_bits_from_file(64)
     print(
         "\nHere are all the first 64 bits read from the file again after the file object was closed and opened again:"
     )
     print(bv1)
-    FILEOUT = open("TestBitVector/testinput5.txt", "wb")
+    FILEOUT = open("tests/testinput5.txt", "wb")
     bv1.write_to_file(FILEOUT)
     FILEOUT.close()
 
