@@ -28,4 +28,4 @@ class CircularShiftTestCase(unittest.TestCase):
 def getTestSuites(type):
     return unittest.TestSuite([
             unittest.makeSuite(CircularShiftTestCase, type)
-                ])                    
+                ])

@@ -1,59 +1,66 @@
-Metadata-Version: 1.1
+Metadata-Version: 1.2
 Name: BitVector
-Version: 3.3.2
-Summary: A pure-Python memory-efficient packed representation for bit arrays
-Home-page: https://engineering.purdue.edu/kak/dist/BitVector-3.3.2.html
+Version: 3.5.0
+Summary: A memory-efficient packed representation for bit arrays in pure Python
+Home-page: https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html
 Author: Avinash Kak
 Author-email: kak@purdue.edu
+Maintainer: Avinash Kak
+Maintainer-email: kak@purdue.edu
 License: Python Software Foundation License
-Download-URL: https://engineering.purdue.edu/kak/dist/BitVector-3.3.2.tar.gz
+Download-URL: https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.tar.gz
 Description: 
-        This class presents a pure-Python memory-efficient packed 
-        representation for bit arrays.
+        Consult the module API page at
         
-        **Version 3.3.2** has a bug fix for the case when you
-        construct a bit vector from a text string that includes
-        character escapes.
+            https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html
         
-        **Version 3.3.1** is a minor upgrade to make the syntax of
-        the API method declarations more uniform.  Previously, while
-        most of the method names used underscores to connect
-        multiple words, some used camelcasing.  Now all use
-        underscores.  For backward compatibility, the old calls will
-        continue to work.
+        for all information related to this module, including  
+        information regarding the latest changes to the code. The 
+        page at the URL shown above lists all of the module
+        functionality you can invoke in your own code.
         
-        **Version 3.3** includes one more constructor mode: You can
-        now construct a bit vector from the bytes data type.  This
-        version also includes a couple of bug fixes.
+        With regard to the basic purpose of the module, it defines
+        the BitVector class as a memory-efficient packed
+        representation for bit arrays. The class comes with a large
+        number of methods for using the representation in diverse
+        applications such as computer security, computer vision,
+        etc.
+        
+        **Version 3.5.0** makes the module compatible with Python 3.9 and
+        also reverts __add__ to its implementation in 3.4.8 to get around
+        a bug.
+        
+        **Version 3.4.9** includes significantly faster implementations 
+        for concatenating and extending bitvectors.
         
         The class is provided with the following operators/methods:
         
-        -      __getitem__
-        -      __setitem__
-        -      __len__
-        -      __iter__
-        -      __contains__
-        -      __getslice__
-        -      __str__
-        -      __int__
         -      __add__
-        -      __eq__, __ne__, __lt__, __le__, __gt__, __ge__
-        -      __or__
         -      __and__
-        -      __xor__
+        -      __contains__
+        -      __eq__, __ne__, __lt__, __le__, __gt__, __ge__
+        -      __getitem__
+        -      __iadd__
+        -      __int__
         -      __invert__
+        -      __iter__
+        -      __len__
         -      __lshift__
+        -      __or__
         -      __rshift__
-        -      __add__
+        -      __setitem__
+        -      __str__
+        -      __xor__
+        -      close_file_object
         -      count_bits 
         -      count_bits_sparse      (faster for sparse bit vectors)     
         -      deep_copy
         -      divide_into_two
-        -      gcd
-        -      gen_rand_bits_for_prime
-        -      get_hex_string_from_bitvector
-        -      get_text_from_bitvector
-        -      gf_divide              (for divisions in GF(2^n))
+        -      gcd                    (for greatest common divisor)
+        -      gen_random_bits 
+        -      get_bitvector_in_ascii
+        -      get_bitvector_in_hex
+        -      gf_divide_by_modulus   (for modular divisions in GF(2^n))
         -      gf_MI                  (for multiplicative inverse in GF(2^n))
         -      gf_multiply            (for multiplications in GF(2))
         -      gf_multiply_modular    (for multiplications in GF(2^n))
@@ -64,6 +71,7 @@ Description:
         -      jaccard_distance
         -      jaccard_similarity
         -      length                 
+        -      min_canonical
         -      multiplicative_inverse
         -      next_set_bit
         -      pad_from_left
@@ -74,18 +82,14 @@ Description:
         -      reset
         -      reverse
         -      runs
+        -      set_value
         -      shift_left             (for non-circular left shift)
         -      shift_right            (for non-circular right shift)
-        -      slice assignment
-        -      set_value
         -      test_for_primality
         -      unpermute
         -      write_to_file
-        -      write_bits_to_fileobject
+        -      write_bits_to_stream_object
         
                   
-Keywords: bit array,bit vector,bit string,logical operations on bit fields
-Platform: All platforms
 Classifier: Topic :: Utilities
-Classifier: Programming Language :: Python :: 2.7
-Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.6

@@ -12,7 +12,7 @@ class BitVectorTestCase( unittest.TestCase ):
         import BitVector
 
 
-testSuites = [unittest.makeSuite(BitVectorTestCase, 'check')] 
+testSuites = [unittest.makeSuite(BitVectorTestCase, 'check')]
 
 for test_type in [
             TestConstructors,

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from BitVector import *
+import sys
 
 # Construct an EMPTY bit vector (a bit vector of size 0):
 print("\nConstructing an EMPTY bit vector (a bit vector of size 0):")
@@ -13,17 +14,17 @@ bv2 = BitVector( size = 2 )
 print(bv2)                                   # 00
 
 # Joining two bit vectors:
-print("\nOutput concatenation of two previous bit vectors:")
+print("\nConcatenating two previously constructed bit vectors:")
 result = bv1 + bv2
 print(result)                                # 00
 
 # Construct a bit vector with a tuple of bits:
-print("\nThis is a bit vector from a tuple of bits:")
+print("\nConstructing a bit vector from a tuple of bits:")
 bv = BitVector(bitlist=(1, 0, 0, 1))
 print(bv)                                    # 1001
 
 # Construct a bit vector with a list of bits:    
-print("\nThis is a bit vector from a list of bits:")
+print("\nConstructing a bit vector from a list of bits:")
 bv = BitVector(bitlist=[1, 1, 0, 1])
 print(bv)                                    # 1101
 
@@ -65,7 +66,7 @@ else:
     x = unicode("111100001111")
 fp_read = io.StringIO(x)
 bv = BitVector( fp = fp_read )
-print("\nBit vector constructed directed from a file like object:")
+print("\nBit vector constructed directly from a file like object:")
 print(bv)                                    # 111100001111 
 
 # Construct a bit vector directly from a bit string:
@@ -79,26 +80,36 @@ print(bv)                                    # nothing
 print("\nInteger value of the previous bit vector:")
 print(bv.intValue())                         # 0
 
+# Construct a bit vector from a text string:
 print("\nConstructing a bit vector from the textstring 'hello':")
 bv3 = BitVector(textstring = "hello")
-print(bv3)
-mytext = bv3.getTextFromBitVector()
+print(bv3)                # 0110100001100101011011000110110001101111
+mytext = bv3.get_bitvector_in_ascii()
 print("Text recovered from the previous bitvector: ")
 print(mytext)                                         # hello
 print("\nConstructing a bit vector from the textstring 'hello\\njello':")
 bv3 = BitVector(textstring = "hello\njello")
-print(bv3)
-mytext = bv3.get_text_from_bitvector()
+print(bv3)   # 0110100001100101011011000110110001101111000010100110101001100101011011000110110001101111
+mytext = bv3.get_bitvector_in_ascii()
 print("Text recovered from the previous bitvector:")
 print(mytext)                                         # hello
                                                       # jello
+# Construct a bit vector from a hex string:                                                      
 print("\nConstructing a bit vector from the hexstring '68656c6c6f':")
 bv4 = BitVector(hexstring = "68656c6c6f")
-print(bv4)
-myhexstring = bv4.getHexStringFromBitVector()
+print(bv4)                # 0110100001100101011011000110110001101111
+myhexstring = bv4.get_bitvector_in_hex()
 print("Hex string recovered from the previous bitvector: ")
 print(myhexstring)                                    # 68656c6c6f
 
+print("\nConstructing a bit vector from the uppercase hexstring '68656C6C6F':")
+bv4 = BitVector(hexstring = "68656C6C6F")
+print(bv4)                # 0110100001100101011011000110110001101111
+myhexstring = bv4.get_bitvector_in_hex()
+print("Hex string recovered from the previous bitvector: ")
+print(myhexstring)                                    # 68656c6c6f
+
+# Construct a bit vector from a string of raw bytes:
 print("\nDemonstrating the raw bytes mode of constructing a bit vector (useful for reading public and private keys):")
 mypubkey = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA5amriY96HQS8Y/nKc8zu3zOylvpOn3vzMmWwrtyDy+aBvns4UC1RXoaD9rDKqNNMCBAQwWDsYwCAFsrBzbxRQONHePX8lRWgM87MseWGlu6WPzWGiJMclTAO9CTknplG9wlNzLQBj3dP1M895iLF6jvJ7GR+V3CRU6UUbMmRvgPcsfv6ec9RRPm/B8ftUuQICL0jt4tKdPG45PBJUylHs71FuE9FJNp01hrj1EMFObNTcsy9zuis0YPyzArTYSOUsGglleExAQYi7iLh17pAa+y6fZrGLsptgqryuftN9Q4NqPuTiFjlqRowCDU7sSxKDgU7bzhshyVx3+pzXO4D2Q== kak@pixie'
 import base64
@@ -117,8 +128,7 @@ print(bv[0], bv[1], bv[2], bv[3], bv[4], bv[5])       # 1 1 0 0 0 1
 print("\nSame as above but using negative array indexing:")
 print(bv[-1], bv[-2], bv[-3], bv[-4], bv[-5], bv[-6]) # 1 0 0 0 1 1
 
-# Test setting bit values with positive and negative
-# accessors:
+# Test setting bit values with positive and negative accessors:
 bv = BitVector( bitstring = '1111' )
 print("\nBitstring for 1111:")
 print(bv)                                    # 1111
@@ -139,14 +149,15 @@ print(bv1 < bv2)                            # False
 print(bv1 <= bv2)                           # True
 bv3 = BitVector( intVal = 5678 )
 print(bv3.intValue())                       # 5678
-print(bv3)                                  # 10110000101110
+print(bv3)                                  # 1011000101110
 print(bv1 == bv3)                           # False
 print(bv3 > bv1)                            # True
 print(bv3 >= bv1)                           # True
 
 # Write a bit vector to a file like object
 fp_write = io.StringIO()
-bv.write_bits_to_fileobject( fp_write )
+#bv.write_bits_to_fileobject( fp_write )
+bv.write_bits_to_stream_object( fp_write )
 print("\nGet bit vector written out to a file-like object:")
 print(fp_write.getvalue())                  # 1011 
 
@@ -196,7 +207,7 @@ bv2 = bv.read_bits_from_file(64)
 print(bv2)
      # 0010000001100010011100100110111101110111011011100010000001100110
 print("\nTake xor of the previous two bit vectors:")
-bv3 = bv1 ^ (bv2)
+bv3 = bv1 ^ bv2
 print(bv3)
      # 0110000101000010000110100001101000011001000010010101001000011111
 
@@ -215,10 +226,12 @@ print("\nPermuted and contracted form of the previous bit vector:")
 print(bv2)                                    # 1010
 
 print("\nExperiment with writing an internally generated bit vector out to a disk file:")
-bv1 = BitVector( bitstring = '00001010' ) 
+#bv1 = BitVector( bitstring = '00001010' ) 
+bv1 = BitVector( bitstring = '11100111' ) 
 FILEOUT = open( 'test.txt', 'wb' )
 bv1.write_to_file( FILEOUT )
 FILEOUT.close()
+
 bv2 = BitVector( filename = 'test.txt' )
 bv3 = bv2.read_bits_from_file( 32 )
 print("\nDisplay bit vectors written out to file and read back from the file and their respective lengths:")
@@ -276,10 +289,6 @@ print(bv3)   # 0100000100100000011010000111010101101110011001110111001001111001
 print("Test len() on the above bit vector:")
 print(len( bv3 ))                      # 64
 
-print("\nTest forming a [5:22] slice of the above bit vector:")
-bv4 = bv3[5:22]
-print(bv4)                             # 00100100000011010
-
 print("\nTest the iterator:")
 for bit in bv4:
     print(bit)                         # 0 0 1 0 0 1 0 0 0 0 0 0 1 1 0 1 0
@@ -327,6 +336,38 @@ bv1[:] = bv1[:]
 print("bv1= " + str(bv1))             # 0101001010000000000001010
 bv3 = bv1[:]
 print("bv3= " + str(bv3))             # 0101001010000000000001010
+
+print("\nTesting slice assignment with negative limits in RHS slice:")
+bv1 = BitVector( size = 25 )
+print("bv1= " + str(bv1))             # 0000000000000000000000000
+bv2 = BitVector( bitstring = '1010111' )
+print("bv2= " + str(bv2))             # 1010001
+bv1[2:5]  = bv2[-7:-4]
+print("bv1= " + str(bv1))             # 0010100000000000000000000
+bv1[2:5]  = bv2[-3:]                  
+print("bv1= " + str(bv1))             # 0011100000000000000000000
+bv1[6:9]  = bv2[:-4]
+print("bv1= " + str(bv1))             # 0011101010000000000000000
+
+print("\nTesting slice assignment with negative limits in the LHS slice:")
+bv1 = BitVector( size = 25 )
+print("bv1= " + str(bv1))             # 0000000000000000000000000
+bv2 = BitVector( bitstring = '1111001' )
+print("bv2= " + str(bv2))             # 1111001
+bv1[-5:-2]  = bv2[0:3]
+print("bv1= " + str(bv1))             # 0000000000000000000011100
+bv1[-5:] = bv2[2:7]
+print("bv1= " + str(bv1))             # 0000000000000000000011001
+bv1[-3:]  = bv2[:-4]
+print("bv1= " + str(bv1))             # 0000000000000000000011111
+bv1[6:9]  = bv2[:3]
+print("bv1= " + str(bv1))             # 0000001110000000000011111
+bv1[:-20] = bv2[2:7]
+print("bv1= " + str(bv1))             # 1100101110000000000011111
+bv1[0:-20] = bv1[9:14]               
+print("bv1= " + str(bv1))             # 0000001110000000000011111
+#bv1[-15:-20] = bv2[2:7]              # error
+#bv1[3:-18] = bv2[2:7]                # error
 
 print("\nTesting reset function:")
 bv1.reset( 1 )             
@@ -378,6 +419,8 @@ bv = BitVector( bitstring = '0000000000000001' )
 print(bv.next_set_bit(5))                                    # 15
 bv = BitVector( bitstring = '00000000000000001' )
 print(bv.next_set_bit(5))                                    # 16
+bv = BitVector( bitstring = '00000000000000000' )
+print(bv.next_set_bit(5))                                    # -1
 
 print("\nTesting rank_of_bit_set_at_index():")
 bv = BitVector( bitstring = '01010101011100' )
@@ -415,11 +458,14 @@ else: print("No multiplicative inverse in this case")
                                                   # 17
 
 print("\nTest multiplication in GF(2):")
-a = BitVector( bitstring='0110001' )
-b = BitVector( bitstring='0110' )
+#a = BitVector( bitstring='0110001' )
+a = BitVector( bitstring='00000010' )
+
+#b = BitVector( bitstring='0110' )
+b = BitVector( bitstring='000001111' )
+
 c = a.gf_multiply(b)
 print("Product of a=" + str(a) + " b=" + str(b) + " is " + str(c))
-                                                  # 10100110
 
 print("\nTest division in GF(2^n):")
 mod = BitVector( bitstring='100011011' )          # AES modulus
@@ -528,19 +574,25 @@ print(bv)
 # UNCOMMENT THE FOLLOWING LINES TO TEST THE
 # PRIMALITY TESTING METHOD. IT SHOULD SHOW
 # THAT ALL OF THE FOLLOWING NUMBERS ARE PRIME:
-#    primes = [179, 233, 283, 353, 419, 467, 547, 607, 661, 739, 811, 877, \
-#              947, 1019, 1087, 1153, 1229, 1297, 1381, 1453, 1523, 1597, \
-#              1663, 1741, 1823, 1901, 7001, 7109, 7211, 7307, 7417, 7507, \
-#              7573, 7649, 7727, 7841]
-#    for p in primes:
-#        bv = BitVector( intVal = p )
-#        check = bv.test_for_primality()
-#        print("The primality test for " + str(p) + ": " + str(check))
+primes = [179, 233, 283, 353, 419, 467, 547, 607, 661, 739, 811, 877, \
+          947, 1019, 1087, 1153, 1229, 1297, 1381, 1453, 1523, 1597, \
+          1663, 1741, 1823, 1901, 7001, 7109, 7211, 7307, 7417, 7507, \
+          7573, 7649, 7727, 7841]
+for p in primes:
+    bv = BitVector( intVal = p )
+    check = bv.test_for_primality()
+    print("The primality test for " + str(p) + ": " + str(check))
 
 print("\nGenerate 32-bit wide candidate for primality testing:")
 bv = BitVector( intVal = 0 )
-bv = bv.gen_rand_bits_for_prime(32)
+bv = bv.gen_random_bits(32)
 print(bv)
 check = bv.test_for_primality()
 print("The primality test for " + str(int(bv)) + ": " + str(check))    
+
+print("\nTest generating min-canonical form of a BitVector instance:")
+for i in range(255,10000,1555):
+    bv = BitVector(intVal = i, size = 14)
+    print("\nbv:            %s" % str(bv))
+    print("min canonical: %s" % str(bv.min_canonical()))
 

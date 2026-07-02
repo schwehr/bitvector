@@ -1,5 +1,3 @@
-
-
 The BitVector.py module is for a memory-efficient packed
 representation of bit vectors and for the processing of such
 vectors.

@@ -7,8 +7,6 @@ bv3 = BitVector.BitVector( bitstring = '00000000111111110000000' )
 bv4 = BitVector.BitVector( bitstring = '' )
 bv5 = BitVector.BitVector( size = 0 )
 
-
-
 logicTests = [
     ((bv1,bv2, '&'), '00110011'),
     ((bv1,bv3, '&'), ''),
@@ -23,8 +21,8 @@ logicTests = [
 
 class BooleanLogicTestCase(unittest.TestCase):
     def checkLogicOp(self):
-        print("\nTesting Boolean operators") 
-        for args, expected in logicTests:
+        print("\nTesting Boolean operators")
+        for args,expected in logicTests:
             try:
                 op = args[2]
                 if (op == '&'):
@@ -42,4 +40,4 @@ class BooleanLogicTestCase(unittest.TestCase):
 def getTestSuites(type):
     return unittest.TestSuite([
             unittest.makeSuite(BooleanLogicTestCase, type)
-                ])                    
+                ])
