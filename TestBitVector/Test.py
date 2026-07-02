@@ -8,11 +8,11 @@ import TestPermutations
 import TestCircularShifts
 
 class BitVectorTestCase( unittest.TestCase ):
-    def checkVersion(self):
+    def testVersion(self):
         import BitVector
 
 
-testSuites = [unittest.makeSuite(BitVectorTestCase, 'check')]
+testSuites = [unittest.TestLoader().loadTestsFromTestCase(BitVectorTestCase)]
 
 for test_type in [
             TestConstructors,
@@ -21,7 +21,7 @@ for test_type in [
             TestPermutations,
             TestCircularShifts,
     ]:
-    testSuites.append(test_type.getTestSuites('check'))
+    testSuites.append(test_type.getTestSuites())
 
 def getTestDirectory():
     try:

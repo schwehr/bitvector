@@ -15,7 +15,7 @@ constructorTests = [
     ]
 
 class ConstructorTestCases(unittest.TestCase):
-    def checkConstructors(self):
+    def testConstructors(self):
         print("\nTesting constructors")
         for args, expected in constructorTests:
             try:
@@ -44,7 +44,5 @@ class ConstructorTestCases(unittest.TestCase):
                 print(e)
                 print("        CONSTRUCTOR TEST FAILED")
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(ConstructorTestCases, type)
-                ])
+def getTestSuites():
+    return unittest.TestLoader().loadTestsFromTestCase(ConstructorTestCases)

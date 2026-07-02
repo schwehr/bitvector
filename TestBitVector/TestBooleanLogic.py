@@ -20,7 +20,7 @@ logicTests = [
     ]
 
 class BooleanLogicTestCase(unittest.TestCase):
-    def checkLogicOp(self):
+    def testLogicOp(self):
         print("\nTesting Boolean operators")
         for args,expected in logicTests:
             try:
@@ -37,7 +37,5 @@ class BooleanLogicTestCase(unittest.TestCase):
                     print(e)
                     print("        BOOLEAN LOGIC TEST FAILED")
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(BooleanLogicTestCase, type)
-                ])
+def getTestSuites():
+    return unittest.TestLoader().loadTestsFromTestCase(BooleanLogicTestCase)

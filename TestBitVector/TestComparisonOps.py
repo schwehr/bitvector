@@ -16,7 +16,7 @@ comparisonTests = [
     ]
 
 class ComparisonTestCases(unittest.TestCase):
-    def checkComparisons(self):
+    def testComparisons(self):
         print("\nTesting comparison operators")
         for args, expected in comparisonTests:
             try:
@@ -40,7 +40,5 @@ class ComparisonTestCases(unittest.TestCase):
                 print(e)
                 print("        COMPARISON TEST FAILED")
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(ComparisonTestCases, type)
-                             ])
+def getTestSuites():
+    return unittest.TestLoader().loadTestsFromTestCase(ComparisonTestCases)

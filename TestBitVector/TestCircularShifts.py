@@ -9,7 +9,7 @@ circularShiftTests = [
     ]
 
 class CircularShiftTestCase(unittest.TestCase):
-    def checkCircularShifts(self):
+    def testCircularShifts(self):
         print("\nTesting CircularShifts")
         for args, expected in circularShiftTests:
             try:
@@ -25,7 +25,5 @@ class CircularShiftTestCase(unittest.TestCase):
                 print(e)
                 print("        CIRCULAR SHIFT TEST FAILED")
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(CircularShiftTestCase, type)
-                ])
+def getTestSuites():
+    return unittest.TestLoader().loadTestsFromTestCase(CircularShiftTestCase)

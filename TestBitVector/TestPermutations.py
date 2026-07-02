@@ -10,7 +10,7 @@ permutationTests = [
     ]
 
 class PermutationTestCase(unittest.TestCase):
-    def checkPermutations(self):
+    def testPermutations(self):
         print("\nTesting permutations")
         for args, expected in permutationTests:
             try:
@@ -25,7 +25,5 @@ class PermutationTestCase(unittest.TestCase):
                 print(e)
                 print("Permutation test failed")
 
-def getTestSuites(type):
-    return unittest.TestSuite([
-            unittest.makeSuite(PermutationTestCase, type)
-                ])
+def getTestSuites():
+    return unittest.TestLoader().loadTestsFromTestCase(PermutationTestCase)

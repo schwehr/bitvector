@@ -1,0 +1,43 @@
+[project]
+name = "BitVector"
+version = "3.5.0"
+description = "A memory-efficient packed representation for bit arrays in pure Python"
+readme = { file = "README", content-type = "text/plain" }
+authors = [
+    { name = "Avinash Kak", email = "kak@purdue.edu" },
+]
+maintainers = [
+    { name = "Avinash Kak", email = "kak@purdue.edu" },
+]
+requires-python = ">=3.8"
+keywords = ["bit array", "bit vector", "bit string", "logical operations on bit fields"]
+license = { file = "LICENSE" }
+classifiers = [
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html"
+Download = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.tar.gz"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["TestBitVector"]
+python_files = ["Test*.py"]
+addopts = "-p no:doctest"
+pythonpath = ["."]
