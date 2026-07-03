@@ -5,7 +5,6 @@ __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import operator
-import sys
 
 _hexdict = {
     "0": "0000",
@@ -47,13 +46,7 @@ def _readblock(blocksize, bitvector):
             if len(bitstring) < blocksize:
                 bitvector.more_to_read = False
             return bitstring
-        if sys.version_info[0] == 3:
-            hexvalue = "%02x" % byte[0]
-        else:
-            hexvalue = hex(ord(byte))
-            hexvalue = hexvalue[2:]
-            if len(hexvalue) == 1:
-                hexvalue = "0" + hexvalue
+        hexvalue = "%02x" % byte[0]
         bitstring += _hexdict[hexvalue[0]]
         bitstring += _hexdict[hexvalue[1]]
     file_pos = bitvector.FILEIN.tell()
@@ -68,7 +61,7 @@ def _readblock(blocksize, bitvector):
     return bitstring
 
 
-class BitVector(object):
+class BitVector:
     def __init__(self, *args, **kwargs):
         if args:
             raise ValueError(
@@ -342,23 +335,16 @@ class BitVector(object):
             import binascii
 
             hexlist = binascii.hexlify(rawbytes)
-            if sys.version_info[0] == 3:
-                bitlist = list(
-                    map(
-                        int,
-                        list(
-                            "".join(
-                                map(
-                                    lambda x: _hexdict[x], list(map(chr, list(hexlist)))
-                                )
-                            )
-                        ),
-                    )
+            bitlist = list(
+                map(
+                    int,
+                    list(
+                        "".join(
+                            map(lambda x: _hexdict[x], list(map(chr, list(hexlist))))
+                        )
+                    ),
                 )
-            else:
-                bitlist = list(
-                    map(int, list("".join(map(lambda x: _hexdict[x], list(hexlist)))))
-                )
+            )
             self.size = len(bitlist)
         else:
             raise ValueError("wrong arg(s) for constructor")
@@ -781,10 +767,7 @@ class BitVector(object):
             value = 0
             for bit in range(8):
                 value += self._getbit(byte * 8 + (7 - bit)) << bit
-            if sys.version_info[0] == 3:
-                file_out.write(bytes([value]))
-            else:
-                file_out.write(chr(value))
+            file_out.write(bytes([value]))
 
     def close_file_object(self):
         """

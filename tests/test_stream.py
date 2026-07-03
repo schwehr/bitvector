@@ -1,9 +1,7 @@
 import io
-import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 import BitVector
 
@@ -60,22 +58,6 @@ class TestBitVectorStream(unittest.TestCase):
         finally:
             Path(tmp_path2).unlink(missing_ok=True)
 
-        # Test Python 2 branch in _readblock
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
-            tmp.write(b"\x05\xff")
-            tmp_path3 = tmp.name
-
-        try:
-            with patch.object(sys, "version_info", (2, 7, 18)):
-                bv_py2 = BitVector.BitVector(filename=tmp_path3)
-                bv_py2_1 = bv_py2.read_bits_from_file(8)
-                self.assertEqual(str(bv_py2_1), "00000101")
-                bv_py2_2 = bv_py2.read_bits_from_file(8)
-                self.assertEqual(str(bv_py2_2), "11111111")
-                bv_py2.close_file_object()
-        finally:
-            Path(tmp_path3).unlink(missing_ok=True)
-
     def test_read_bits_from_fileobject(self):
         fp = io.StringIO("11010011")
         bv = BitVector.BitVector(size=0)
@@ -106,13 +88,6 @@ class TestBitVectorStream(unittest.TestCase):
         # Calling again to test self.FILEOUT already set
         bv.write_to_file(out_stream)
         self.assertEqual(out_stream.getvalue(), b"ABAB")
-
-        # Test Python 2 branch in write_to_file
-        bv_py2 = BitVector.BitVector(bitstring="01000001")  # 'A'
-        out_str_stream = io.StringIO()
-        with patch.object(sys, "version_info", (2, 7, 18)):
-            bv_py2.write_to_file(out_str_stream)
-        self.assertEqual(out_str_stream.getvalue(), "A")
 
     def test_close_file_object(self):
         # Error: no associated open file

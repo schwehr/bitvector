@@ -1,9 +1,7 @@
 import io
 import os
-import sys
 import tempfile
 import unittest
-from unittest.mock import patch
 
 import BitVector
 
@@ -185,11 +183,6 @@ class TestBitVectorInit(unittest.TestCase):
 
         bv = BitVector.BitVector(rawbytes=b"\x00\xff")
         self.assertEqual(str(bv), "0000000011111111")
-
-        with patch.object(sys, "version_info", (2, 7, 18)):
-            with patch("binascii.hexlify", return_value="61"):
-                bv_py2 = BitVector.BitVector(rawbytes=b"a")
-                self.assertEqual(str(bv_py2), "01100001")
 
     def test_no_args_or_unmatched_constructor(self):
         with self.assertRaises(ValueError) as cm:
