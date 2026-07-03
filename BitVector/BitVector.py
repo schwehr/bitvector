@@ -30,7 +30,7 @@ _hexdict = {
 }
 
 
-def _readblock(blocksize, bitvector):
+def _readblock(blocksize: int, bitvector: BitVector) -> str:
     """
     If this function succeeds in reading all blocksize bits, it uses the
     tell-read-seek mechanism to peek ahead to see if there is anything more to be
@@ -40,7 +40,8 @@ def _readblock(blocksize, bitvector):
     Houghton, a similar feature could presumably be implemented for socket streams by
     using recv() or recvfrom() if you set the flags argument to MSG_PEEK.
     """
-    global _hexdict
+    assert bitvector.FILEIN is not None
+
     bitstring = ""
     i = 0
     while i < blocksize / 8:
@@ -765,7 +766,7 @@ class BitVector:
             raise SyntaxError("No associated open file")
         self.FILEIN.close()
 
-    def int_val(self):
+    def int_val(self) -> int:
         "Return the integer value of a bitvector"
         intVal = 0
         for i in range(self.size):
@@ -1084,7 +1085,7 @@ class BitVector:
             return ""
         return "".join(map(str, self))
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """
         Compare two bit vectors
         """
@@ -1097,19 +1098,19 @@ class BitVector:
             i += 1
         return True
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: Any) -> bool:
         return self.intValue() < other.intValue()
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: Any) -> bool:
         return self.intValue() <= other.intValue()
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Any) -> bool:
         return self.intValue() > other.intValue()
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: Any) -> bool:
         return self.intValue() >= other.intValue()
 
     def deep_copy(self) -> BitVector:
