@@ -59,6 +59,114 @@ class TestBitVectorOperations(unittest.TestCase):
         unpermuted = permuted.unpermute(p_list)
         self.assertEqual(str(unpermuted), str(bv_orig))
 
+    def test_circular_rot_left(self):
+        # Small vector (size <= 16)
+        bv = BitVector.BitVector(bitstring="1000")
+        bv.circular_rot_left()
+        self.assertEqual(str(bv), "0001")
+
+        # Large vector (size > 16)
+        bv_long = BitVector.BitVector(bitstring="10000000000000000001")
+        bv_long.circular_rot_left()
+        self.assertEqual(str(bv_long), "00000000000000000011")
+
+    def test_circular_rot_right(self):
+        # Small vector (size <= 16)
+        bv = BitVector.BitVector(bitstring="0001")
+        bv.circular_rot_right()
+        self.assertEqual(str(bv), "1000")
+
+        # Large vector (size > 16)
+        bv_long = BitVector.BitVector(bitstring="10000000000000000001")
+        bv_long.circular_rot_right()
+        self.assertEqual(str(bv_long), "11000000000000000000")
+
+    def test_shift_left_by_one(self):
+        # Small vector
+        bv = BitVector.BitVector(bitstring="1011")
+        bv.shift_left_by_one()
+        self.assertEqual(str(bv), "0110")
+
+        # Large vector (size > 16)
+        bv_long = BitVector.BitVector(bitstring="1" + "0" * 18 + "1")
+        bv_long.shift_left_by_one()
+        self.assertEqual(str(bv_long), "0" * 18 + "10")
+
+    def test_shift_right_by_one(self):
+        # Small vector
+        bv = BitVector.BitVector(bitstring="1101")
+        bv.shift_right_by_one()
+        self.assertEqual(str(bv), "0110")
+
+        # Large vector (size > 16)
+        bv_long = BitVector.BitVector(bitstring="1" + "0" * 18 + "1")
+        bv_long.shift_right_by_one()
+        self.assertEqual(str(bv_long), "01" + "0" * 18)
+
+    def test_shift_left(self):
+        bv = BitVector.BitVector(bitstring="101101")
+        res = bv.shift_left(2)
+        self.assertEqual(str(bv), "110100")
+        self.assertIs(res, bv)
+
+        bv.shift_left(0)
+        self.assertEqual(str(bv), "110100")
+
+    def test_shift_right(self):
+        bv = BitVector.BitVector(bitstring="101101")
+        res = bv.shift_right(2)
+        self.assertEqual(str(bv), "001011")
+        self.assertIs(res, bv)
+
+        bv.shift_right(0)
+        self.assertEqual(str(bv), "001011")
+
+    def test_pad_from_left(self):
+        bv = BitVector.BitVector(bitstring="101")
+        bv.pad_from_left(2)
+        self.assertEqual(str(bv), "00101")
+        self.assertEqual(bv.size, 5)
+
+        bv.pad_from_left(0)
+        self.assertEqual(str(bv), "00101")
+
+    def test_pad_from_right(self):
+        bv = BitVector.BitVector(bitstring="101")
+        bv.pad_from_right(2)
+        self.assertEqual(str(bv), "10100")
+        self.assertEqual(bv.size, 5)
+
+        bv.pad_from_right(0)
+        self.assertEqual(str(bv), "10100")
+
+    def test_reset(self):
+        bv = BitVector.BitVector(bitstring="101")
+        with self.assertRaises(ValueError) as cm:
+            bv.reset(2)
+        self.assertEqual("Incorrect reset argument", str(cm.exception))
+
+        res = bv.reset(1)
+        self.assertEqual(str(bv), "111")
+        self.assertIs(res, bv)
+
+        bv.reset(0)
+        self.assertEqual(str(bv), "000")
+
+    def test_count_bits(self):
+        bv = BitVector.BitVector(bitstring="100111")
+        self.assertEqual(bv.count_bits(), 4)
+
+        bv_empty = BitVector.BitVector(size=0)
+        self.assertEqual(bv_empty.count_bits(), 0)
+
+    def test_set_value(self):
+        bv = BitVector.BitVector(intVal=7, size=16)
+        bv.set_value(intVal=45)
+        self.assertEqual(str(bv), "101101")
+
+        bv.set_value(bitstring="1100")
+        self.assertEqual(str(bv), "1100")
+
 
 if __name__ == "__main__":
     unittest.main()
