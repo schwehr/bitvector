@@ -1182,14 +1182,6 @@ class BitVector(object):
         new_str = "0" * n + str(self)
         return BitVector(bitstring=new_str)
 
-    def _resize_pad_from_right(self, n):
-        """
-        Resize a bit vector by padding with n 0's from the right. Return the result
-        as a new bit vector.
-        """
-        new_str = str(self) + "0" * n
-        return BitVector(bitstring=new_str)
-
     def pad_from_left(self, n):
         """
         You can pad a bitvector at its the left end with a designated number of
