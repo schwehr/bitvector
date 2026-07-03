@@ -501,60 +501,56 @@ class BitVector:
             res.vector.append(lpb[i] & 0x0000FFFF)
         return res
 
-    #    def __add__(self, other):
-    #        '''
-    #        Because __add__ is supplied, you can always join two bitvectors by
-    #
-    #            bitvec3  =  bitvec1  +  bitvec2
-    #
-    #        bitvec3 is a new bitvector object that contains all the bits of bitvec1
-    #        followed by all the bits of bitvec2.  This is a faster implementation
-    #        supplied by Elliot James Edmunds as a replacement for the previous version
-    #        that you can find in Version 3.4.8.
-    #        '''
-    #        new_bv = BitVector( size=0 )
-    #        if isinstance(self.vector, array.array):
-    #            if sys.version_info[0] == 3:
-    #                new_bv.vector.frombytes( self.vector.tobytes() )
-    #            else:
-    #                #  The following does not work in Python 3.9
-    #                new_bv.vector.fromstring( self.vector.tostring() )
-    #        elif isinstance(self.vector, list) and sys.version_info[0] == 3:
-    #            new_bv.vector = self.vector.copy()
-    #        else:
-    #            out_str = str(self) + str(other)
-    #            return BitVector( bitstring = out_str )
-    #        new_bv.size = self.size
-    #        new_bv += other
-    #        return new_bv
-    #
-    #
-    #    def __iadd__(self, other):
-    #        '''
-    #        When extending an existing instance of a BitVector,  __iadd__ should be faster
-    #        than __add__ because we do not need to create a new BitVector. The call to
-    #        __iadd__ simply modifies the current bitvector.   __iadd__ is invoked when a
-    #        user calls:
-    #                                  bitvec1 += bitvec2
-    #        Supplied by Elliot James Edmunds.
-    #        '''
-    #        if not isinstance(other, type(self)):
-    #            raise TypeError("Can only join two BitVector objects, not {}".format(type(other)))
-    #        # Calculate number of two-byte ints we will need to add and extend the vector
-    #        two_byte_ints_to_add = (self.size + other.size + 15) // 16 - len(self.vector)
-    #        self.vector.extend([0] * two_byte_ints_to_add)
-    #        # Add the bits
-    #        curr_bit =          self.size %  16
-    #        curr_two_byte_int = self.size // 16
-    #        for bit in other:
-    #            self.vector[curr_two_byte_int] = self.vector[curr_two_byte_int] | (bit << curr_bit)
-    #            curr_bit += 1
-    #            curr_two_byte_int += curr_bit // 16
-    #            curr_bit %= 16
-    #        # Increase the size
-    #        self.size += other.size
-    #        return self
-    #
+    def _not_yet_ready__add__(self, other):
+        """
+        Because __add__ is supplied, you can always join two bitvectors by
+
+            bitvec3  =  bitvec1  +  bitvec2
+
+        bitvec3 is a new bitvector object that contains all the bits of bitvec1
+        followed by all the bits of bitvec2.
+        """
+        new_bv = BitVector(size=0)
+        if isinstance(self.vector, array.array) and isinstance(
+            new_bv.vector, array.array
+        ):
+            new_bv.vector.frombytes(self.vector.tobytes())
+        elif isinstance(self.vector, list):
+            new_bv.vector = self.vector.copy()
+        else:
+            out_str = str(self) + str(other)
+            return BitVector(bitstring=out_str)
+        new_bv.size = self.size
+        new_bv += other
+        return new_bv
+
+    def _not_yet_ready__iadd__(self, other):
+        """
+        When extending an existing instance of a BitVector,  __iadd__ should be faster
+        than __add__ because we do not need to create a new BitVector. The call to
+        __iadd__ simply modifies the current bitvector.   __iadd__ is invoked when a
+        user calls:
+
+            bitvec1 += bitvec2
+        """
+        if not isinstance(other, type(self)):
+            raise TypeError(f"Can only join two BitVector objects, not {type(other)}")
+        # Calculate number of two-byte ints we will need to add and extend the vector.
+        two_byte_ints_to_add = (self.size + other.size + 15) // 16 - len(self.vector)
+        self.vector.extend([0] * two_byte_ints_to_add)
+        # Add the bits
+        curr_bit = self.size % 16
+        curr_two_byte_int = self.size // 16
+        for bit in other:
+            self.vector[curr_two_byte_int] = self.vector[curr_two_byte_int] | (
+                bit << curr_bit
+            )
+            curr_bit += 1
+            curr_two_byte_int += curr_bit // 16
+            curr_bit %= 16
+        # Increase the size
+        self.size += other.size
+        return self
 
     def __add__(self, other):
         """
