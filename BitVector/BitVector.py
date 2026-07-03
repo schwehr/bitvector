@@ -1,11 +1,13 @@
 """A memory-efficient packed representation of bit arrays."""
 
+from __future__ import annotations
+
 __version__ = "3.5.0"
 __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import operator
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, Self
 
 _hexdict = {
     "0": "0000",
@@ -1742,16 +1744,16 @@ class BitVectorIterator:
     items: list[int]
     index: int
 
-    def __init__(self, bitvec):
+    def __init__(self, bitvec: BitVector) -> None:
         self.items = []
         for i in range(bitvec.size):
             self.items.append(bitvec._getbit(i))
         self.index = -1
 
-    def __iter__(self):
+    def __iter__(self) -> Self:
         return self
 
-    def next(self):
+    def next(self) -> int:
         self.index += 1
         if self.index < len(self.items):
             return self.items[self.index]
