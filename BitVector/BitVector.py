@@ -5,7 +5,7 @@ __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import operator
-from typing import Any
+from typing import Any, BinaryIO
 
 _hexdict = {
     "0": "0000",
@@ -65,67 +65,38 @@ def _readblock(blocksize, bitvector):
 class BitVector:
     filename: str | None
     size: int
-    FILEIN: Any
-    FILEOUT: Any
+    FILEIN: BinaryIO | None
+    FILEOUT: BinaryIO | None
     more_to_read: bool
     vector: array.array[int] | list[int]
 
-    def __init__(self, *args, **kwargs):
-        if args:
-            raise ValueError(
-                """BitVector constructor can only be called with keyword arguments for the following keywords: """
-                """filename, fp, size, intVal, bitlist, bitstring, hexstring, textstring, and rawbytes)"""
-            )
-        allowed_keys = (
-            "bitlist",
-            "bitstring",
-            "filename",
-            "fp",
-            "intVal",
-            "size",
-            "textstring",
-            "hexstring",
-            "rawbytes",
-        )
-        keywords_used = kwargs.keys()
-        for keyword in keywords_used:
-            if keyword not in allowed_keys:
-                raise ValueError("Wrong keyword used --- check spelling")
-        filename = fp = intVal = size = bitlist = bitstring = textstring = hexstring = (
-            rawbytes
-        ) = None
-        if "filename" in kwargs:
-            filename = kwargs.pop("filename")
-        if "fp" in kwargs:
-            fp = kwargs.pop("fp")
-        if "size" in kwargs:
-            size = kwargs.pop("size")
-        if "intVal" in kwargs:
-            intVal = kwargs.pop("intVal")
-        if "bitlist" in kwargs:
-            bitlist = kwargs.pop("bitlist")
-        if "bitstring" in kwargs:
-            bitstring = kwargs.pop("bitstring")
-        if "hexstring" in kwargs:
-            hexstring = kwargs.pop("hexstring")
-        if "textstring" in kwargs:
-            textstring = kwargs.pop("textstring")
-        if "rawbytes" in kwargs:
-            rawbytes = kwargs.pop("rawbytes")
+    def __init__(
+        self,
+        *,
+        filename: str | None = None,
+        fp: Any = None,
+        size: int | None = None,
+        intVal: int | None = None,
+        bitlist: Any = None,
+        bitstring: str | None = None,
+        hexstring: str | None = None,
+        textstring: str | None = None,
+        rawbytes: bytes | None = None,
+    ) -> None:
         self.filename = None
         self.size = 0
         self.FILEIN = None
         self.FILEOUT = None
-        if filename:
+        if filename is not None:
             if (
-                fp
-                or size
-                or intVal
-                or bitlist
-                or bitstring
-                or hexstring
-                or textstring
-                or rawbytes
+                fp is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When filename is specified, you cannot give values """
@@ -135,16 +106,16 @@ class BitVector:
             self.FILEIN = open(filename, "rb")
             self.more_to_read = True
             return
-        elif fp:
+        elif fp is not None:
             if (
-                filename
-                or size
-                or intVal
-                or bitlist
-                or bitstring
-                or hexstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When fileobject is specified, you cannot give """
@@ -153,15 +124,15 @@ class BitVector:
             bits = self.read_bits_from_fileobject(fp)
             bitlist = list(map(int, bits))
             self.size = len(bitlist)
-        elif intVal or intVal == 0:
+        elif intVal is not None:
             if (
-                filename
-                or fp
-                or bitlist
-                or bitstring
-                or hexstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or bitlist is not None
+                or bitstring is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When intVal is specified, you can only give a """
@@ -221,14 +192,14 @@ class BitVector:
                     self.size = len(bitlist)
         elif size is not None and size >= 0:
             if (
-                filename
-                or fp
-                or intVal
-                or bitlist
-                or bitstring
-                or hexstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When size is specified (without an intVal), you cannot """
@@ -238,16 +209,16 @@ class BitVector:
             two_byte_ints_needed = (size + 15) // 16
             self.vector = array.array("H", [0] * two_byte_ints_needed)
             return
-        elif bitstring or bitstring == "":
+        elif bitstring is not None:
             if (
-                filename
-                or fp
-                or size
-                or intVal
-                or bitlist
-                or hexstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When a bitstring is specified, you cannot give """
@@ -257,30 +228,30 @@ class BitVector:
             self.size = len(bitlist)
         elif bitlist is not None:
             if (
-                filename
-                or fp
-                or size
-                or intVal
-                or bitstring
-                or hexstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or size is not None
+                or intVal is not None
+                or bitstring is not None
+                or hexstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When bits are specified, you cannot give values """
                     """to any other constructor args"""
                 )
             self.size = len(bitlist)
-        elif textstring or textstring == "":
+        elif textstring is not None:
             if (
-                filename
-                or fp
-                or size
-                or intVal
-                or bitlist
-                or bitstring
-                or hexstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or hexstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When bits are specified through textstring, you """
@@ -303,16 +274,16 @@ class BitVector:
                 map(int, list("".join(map(lambda x: _hexdict[x], list(hexlist)))))
             )
             self.size = len(bitlist)
-        elif hexstring or hexstring == "":
+        elif hexstring is not None:
             if (
-                filename
-                or fp
-                or size
-                or intVal
-                or bitlist
-                or bitstring
-                or textstring
-                or rawbytes
+                filename is not None
+                or fp is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or textstring is not None
+                or rawbytes is not None
             ):
                 raise ValueError(
                     """When bits are specified through hexstring, you """
@@ -325,16 +296,16 @@ class BitVector:
                 )
             )
             self.size = len(bitlist)
-        elif rawbytes:
+        elif rawbytes is not None:
             if (
-                filename
-                or fp
-                or size
-                or intVal
-                or bitlist
-                or bitstring
-                or textstring
-                or hexstring
+                filename is not None
+                or fp is not None
+                or size is not None
+                or intVal is not None
+                or bitlist is not None
+                or bitstring is not None
+                or textstring is not None
+                or hexstring is not None
             ):
                 raise ValueError(
                     """When bits are specified through rawbytes, you """

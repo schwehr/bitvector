@@ -63,6 +63,7 @@ class ConstructorTestCases(unittest.TestCase):
             elif mode == "intVal":
                 bitvec = BitVector.BitVector(intVal=int(args[1]))
             elif mode == "bitstring":
+                assert isinstance(args[1], str)
                 bitvec = BitVector.BitVector(bitstring=args[1])
             elif mode == "streamobject":
                 assert isinstance(args[1], str)

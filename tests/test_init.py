@@ -9,23 +9,23 @@ import BitVector
 class ZeroHex:
     """Helper class to test intVal == 0 False branch (while loop exit without break and size == 0 branch)."""
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return False
 
-    def __index__(self):
+    def __index__(self) -> int:
         return 0
 
 
 class TestBitVectorInit(unittest.TestCase):
     def test_positional_args_error(self):
-        with self.assertRaises(ValueError) as cm:
-            BitVector.BitVector(123)
-        self.assertIn("BitVector constructor can only be called", str(cm.exception))
+        with self.assertRaises(TypeError) as cm:
+            BitVector.BitVector(123)  # type: ignore
+        self.assertIn("takes 1 positional argument", str(cm.exception))
 
     def test_invalid_keyword_error(self):
-        with self.assertRaises(ValueError) as cm:
-            BitVector.BitVector(invalid_param=123)
-        self.assertEqual("Wrong keyword used --- check spelling", str(cm.exception))
+        with self.assertRaises(TypeError) as cm:
+            BitVector.BitVector(invalid_param=123)  # type: ignore
+        self.assertIn("unexpected keyword argument", str(cm.exception))
 
     def test_filename_constructor(self):
         with tempfile.NamedTemporaryFile(delete=False) as tmp:
@@ -106,11 +106,17 @@ class TestBitVectorInit(unittest.TestCase):
         self.assertEqual(str(bv), "0000000101")
 
     def test_intVal_zero_hex_loop_and_size_zero_false(self):
-        bv = BitVector.BitVector(intVal=ZeroHex(), size=0)
+        bv = BitVector.BitVector(
+            intVal=ZeroHex(),  # ty: ignore[invalid-argument-type]
+            size=0,
+        )
         self.assertEqual(bv.size, 0)
         self.assertEqual(str(bv), "")
 
-        bv2 = BitVector.BitVector(intVal=ZeroHex(), size=5)
+        bv2 = BitVector.BitVector(
+            intVal=ZeroHex(),  # ty: ignore[invalid-argument-type]
+            size=5,
+        )
         self.assertEqual(bv2.size, 5)
         self.assertEqual(str(bv2), "00000")
 
@@ -189,9 +195,7 @@ class TestBitVectorInit(unittest.TestCase):
             BitVector.BitVector()
         self.assertEqual("wrong arg(s) for constructor", str(cm.exception))
 
-        with self.assertRaises(ValueError) as cm:
-            BitVector.BitVector(rawbytes=b"")
-        self.assertEqual("wrong arg(s) for constructor", str(cm.exception))
+        self.assertEqual(BitVector.BitVector(rawbytes=b"").size, 0)
 
 
 if __name__ == "__main__":
