@@ -65,9 +65,11 @@ class ConstructorTestCases(unittest.TestCase):
             elif mode == "bitstring":
                 bitvec = BitVector.BitVector(bitstring=args[1])
             elif mode == "streamobject":
+                assert isinstance(args[1], str)
                 fp_read = io.StringIO(args[1])
                 bitvec = BitVector.BitVector(fp=fp_read)
             elif mode == "filename":
+                assert isinstance(args[1], bytes)
                 with tempfile.NamedTemporaryFile(delete=False) as tmp:
                     tmp.write(args[1])
                     tmp_path = tmp.name

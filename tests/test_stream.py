@@ -102,6 +102,7 @@ class TestBitVectorStream(unittest.TestCase):
 
         try:
             bv = BitVector.BitVector(filename=tmp_path)
+            assert bv.FILEIN is not None
             self.assertFalse(bv.FILEIN.closed)
             bv.close_file_object()
             self.assertTrue(bv.FILEIN.closed)

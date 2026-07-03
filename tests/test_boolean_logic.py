@@ -35,6 +35,10 @@ class BooleanLogicTestCase(unittest.TestCase):
                     actual = ~args[0]
                 assert actual == BitVector.BitVector(bitstring=expected)
             except Exception as e:
-                if args[0].size == args[1].size:
+                if (
+                    hasattr(args[0], "size")
+                    and hasattr(args[1], "size")
+                    and args[0].size == args[1].size
+                ):
                     print(e)
                     print("        BOOLEAN LOGIC TEST FAILED")

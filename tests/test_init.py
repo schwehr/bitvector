@@ -40,7 +40,7 @@ class TestBitVectorInit(unittest.TestCase):
             bv = BitVector.BitVector(filename=tmp_path)
             self.assertEqual(bv.filename, tmp_path)
             self.assertTrue(bv.more_to_read)
-            bv.FILEIN.close()
+            bv.close_file_object()
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)

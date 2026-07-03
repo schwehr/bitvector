@@ -528,10 +528,10 @@ print(bv.count_bits())  # 1
 bv = BitVector(bitstring="00000000000000")
 print(bv.count_bits())  # 0
 
-print("\nTest setValue idea:")
+print("\nTest set_value idea:")
 bv = BitVector(intVal=7, size=16)
 print(bv)  # 0000000000000111
-bv.setValue(intVal=45)
+bv.set_value(intVal=45)
 print(bv)  # 101101
 
 print("\nTesting count_bits_sparse():")
@@ -566,12 +566,12 @@ print("\nTesting rank_of_bit_set_at_index():")
 bv = BitVector(bitstring="01010101011100")
 print(bv.rank_of_bit_set_at_index(10))  # 6
 
-print("\nTesting isPowerOf2():")
+print("\nTesting is_power_of_2():")
 bv = BitVector(bitstring="10000000001110")
 print("int value: " + str(int(bv)))  # 826
-print(bv.isPowerOf2())  # False
-print("\nTesting isPowerOf2_sparse():")
-print(bv.isPowerOf2_sparse())  # False
+print(bv.is_power_of_2())  # False
+print("\nTesting is_power_of_2_sparse():")
+print(bv.is_power_of_2_sparse())  # False
 
 print("\nTesting reverse():")
 bv = BitVector(bitstring="0001100000000000001")
@@ -614,7 +614,7 @@ print("\nTest division in GF(2^n):")
 mod = BitVector(bitstring="100011011")  # AES modulus
 n = 8
 a = BitVector(bitstring="11100010110001")
-quotient, remainder = a.gf_divide(mod, n)
+quotient, remainder = a.gf_divide_by_modulus(mod, n)
 print(
     "Dividing a="
     + str(a)
