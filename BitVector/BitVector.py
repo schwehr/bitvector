@@ -5,6 +5,7 @@ __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import operator
+from typing import Any
 
 _hexdict = {
     "0": "0000",
@@ -62,6 +63,13 @@ def _readblock(blocksize, bitvector):
 
 
 class BitVector:
+    filename: str | None
+    size: int
+    FILEIN: Any
+    FILEOUT: Any
+    more_to_read: bool
+    vector: array.array[int] | list[int]
+
     def __init__(self, *args, **kwargs):
         if args:
             raise ValueError(
@@ -1760,6 +1768,9 @@ class BitVector:
 
 
 class BitVectorIterator:
+    items: list[int]
+    index: int
+
     def __init__(self, bitvec):
         self.items = []
         for i in range(bitvec.size):
