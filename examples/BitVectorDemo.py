@@ -445,9 +445,9 @@ try:
     bv1 = BitVector(bitstring="0011001100")
     bv2 = BitVector(bitstring="110011")
     if bv2 in bv1:
-        print("%s is in %s" % (bv2, bv1))
+        print(f"{bv2} is in {bv1}")
     else:
-        print("%s is not in %s" % (bv2, bv1))
+        print(f"{bv2} is not in {bv1}")
 except ValueError as arg:
     print("Error Message: " + str(arg))
 
