@@ -277,6 +277,81 @@ class TestBitVectorOperations(unittest.TestCase):
         self.assertEqual(int(bv1.gcd(bv2)), 2)
         self.assertEqual(int(bv2.gcd(bv1)), 2)
 
+    def test_multiplicative_inverse(self):
+        bv_mod = BitVector.BitVector(intVal=32)
+        bv_has_mi = BitVector.BitVector(intVal=17)
+        res = bv_has_mi.multiplicative_inverse(bv_mod)
+        self.assertIsNotNone(res)
+        self.assertEqual(int(res), 17)
+
+        bv_no_mi = BitVector.BitVector(intVal=2)
+        res_none = bv_no_mi.multiplicative_inverse(bv_mod)
+        self.assertIsNone(res_none)
+
+    def test_gf_multiply(self):
+        a = BitVector.BitVector(bitstring="0110001")
+        b = BitVector.BitVector(bitstring="0110")
+        c = a.gf_multiply(b)
+        self.assertEqual(str(c), "00010100110")
+
+        # Zero multiply
+        b_zero = BitVector.BitVector(bitstring="0000")
+        c_zero = a.gf_multiply(b_zero)
+        self.assertEqual(int(c_zero), 0)
+
+    def test_gf_divide_by_modulus(self):
+        mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
+        n = 8
+        a = BitVector.BitVector(bitstring="11100010110001")
+
+        # Error: modulus too long
+        mod_long = BitVector.BitVector(bitstring="1" * 15)
+        with self.assertRaises(ValueError) as cm:
+            a.gf_divide_by_modulus(mod_long, n)
+        self.assertIn("Modulus bit pattern too long", str(cm.exception))
+
+        # Normal division and alias
+        quotient, remainder = a.gf_divide_by_modulus(mod, n)
+        self.assertEqual(str(quotient), "00000000111010")
+        self.assertEqual(str(remainder), "10001111")
+
+        q_alias, r_alias = a.gf_divide(mod, n)
+        self.assertEqual(str(q_alias), str(quotient))
+        self.assertEqual(str(r_alias), str(remainder))
+
+        # Test division where remainder becomes 0 (remainder.next_set_bit(0) == -1)
+        a_equal = mod.deep_copy()
+        q_eq, r_eq = a_equal.gf_divide_by_modulus(mod, n)
+        self.assertEqual(int(r_eq), 0)
+
+        # Test division where loop runs until i == num.length() without breaking earlier
+        q_zero, r_zero = BitVector.BitVector(bitstring="0").gf_divide_by_modulus(
+            BitVector.BitVector(bitstring="1"), 1
+        )
+        self.assertEqual(int(r_zero), 0)
+
+    def test_gf_multiply_modular(self):
+        mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
+        n = 8
+        a = BitVector.BitVector(bitstring="0110001")
+        b = BitVector.BitVector(bitstring="0110")
+        c = a.gf_multiply_modular(b, mod, n)
+        self.assertEqual(str(c), "10100110")
+
+    def test_gf_MI(self):
+        mod = BitVector.BitVector(bitstring="100011011")
+        n = 8
+        a = BitVector.BitVector(bitstring="00110011")
+        mi = a.gf_MI(mod, n)
+        self.assertEqual(str(mi), "01101100")
+
+        # Test case where no multiplicative inverse exists
+        mod_no_mi = BitVector.BitVector(bitstring="1010")
+        a_no_mi = BitVector.BitVector(bitstring="0010")
+        res_no_mi = a_no_mi.gf_MI(mod_no_mi, 3)
+        self.assertIsInstance(res_no_mi, tuple)
+        self.assertEqual(res_no_mi[0], "NO MI. However, the GCD of ")
+
 
 if __name__ == "__main__":
     unittest.main()
