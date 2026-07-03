@@ -15,10 +15,6 @@ class TestBitVectorString(unittest.TestCase):
         bv = BitVector.BitVector(textstring="hello")
         self.assertEqual(bv.get_bitvector_in_ascii(), "hello")
 
-        # Backward compatibility aliases
-        self.assertEqual(bv.get_text_from_bitvector(), "hello")
-        self.assertEqual(bv.getTextFromBitVector(), "hello")
-
         # Empty vector (0 is multiple of 8)
         bv_empty = BitVector.BitVector(size=0)
         self.assertEqual(bv_empty.get_bitvector_in_ascii(), "")
@@ -33,10 +29,6 @@ class TestBitVectorString(unittest.TestCase):
         # Normal hex conversion
         bv = BitVector.BitVector(hexstring="68656c6c6f")
         self.assertEqual(bv.get_bitvector_in_hex(), "68656c6c6f")
-
-        # Backward compatibility aliases
-        self.assertEqual(bv.get_hex_string_from_bitvector(), "68656c6c6f")
-        self.assertEqual(bv.getHexStringFromBitVector(), "68656c6c6f")
 
         # Empty vector (0 is multiple of 4)
         bv_empty = BitVector.BitVector(size=0)

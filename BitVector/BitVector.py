@@ -820,10 +820,6 @@ class BitVector:
             map(chr, map(int, [self[i : i + 8] for i in range(0, self.size, 8)]))
         )
 
-    # For backward compatibility:
-    get_text_from_bitvector = get_bitvector_in_ascii
-    getTextFromBitVector = get_bitvector_in_ascii
-
     def get_bitvector_in_hex(self):
         """
         You can directly convert a bit vector into a hex string (this is a
@@ -851,10 +847,6 @@ class BitVector:
                 map(hex, map(int, [self[i : i + 4] for i in range(0, self.size, 4)])),
             )
         )
-
-    # For backward compatibility:
-    get_hex_string_from_bitvector = get_bitvector_in_hex
-    getHexStringFromBitVector = get_bitvector_in_hex
 
     def __lshift__(self, n):
         """
@@ -1154,9 +1146,6 @@ class BitVector:
         copy = str(self)
         return BitVector(bitstring=copy)
 
-    # For backward compatibility:
-    _make_deep_copy = deep_copy
-
     def _resize_pad_from_left(self, n):
         """
         Resize a bit vector by padding with n 0's from the left. Return the result as
@@ -1253,9 +1242,6 @@ class BitVector:
         bit array for a bitvector are the same as for the constructor.
         """
         self.__init__(*args, **kwargs)
-
-    # For backward compatibility:
-    setValue = set_value
 
     def count_bits_sparse(self):
         """
@@ -1421,9 +1407,6 @@ class BitVector:
             return True
         return False
 
-    # For backward compatibility:
-    isPowerOf2 = is_power_of_2
-
     def is_power_of_2_sparse(self):
         """
         You can test whether the integer value of a bit vector is a power of
@@ -1439,9 +1422,6 @@ class BitVector:
         if self.count_bits_sparse() == 1:
             return True
         return False
-
-    # For backward compatibility:
-    isPowerOf2_sparse = is_power_of_2_sparse
 
     def reverse(self):
         """
@@ -1599,9 +1579,6 @@ class BitVector:
         if remainder.length() > n:
             remainder = remainder[remainder.length() - n :]
         return quotient, remainder
-
-    # For backward compatibility:
-    gf_divide = gf_divide_by_modulus
 
     def gf_multiply_modular(self, b, mod, n):
         """
@@ -1772,9 +1749,6 @@ class BitVector:
         candidate |= 1 << width - 1
         candidate |= 2 << width - 3
         return BitVector(intVal=candidate)
-
-    # For backward compatibility:
-    gen_rand_bits_for_prime = gen_random_bits
 
     def min_canonical(self):
         """

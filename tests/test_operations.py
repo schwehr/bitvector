@@ -254,14 +254,12 @@ class TestBitVectorOperations(unittest.TestCase):
 
         # True cases and alias
         self.assertTrue(BitVector.BitVector(bitstring="0010").is_power_of_2())
-        self.assertTrue(BitVector.BitVector(bitstring="0010").isPowerOf2())
 
         # False case
         self.assertFalse(BitVector.BitVector(bitstring="0011").is_power_of_2())
 
     def test_is_power_of_2_sparse(self):
         self.assertTrue(BitVector.BitVector(bitstring="0010").is_power_of_2_sparse())
-        self.assertTrue(BitVector.BitVector(bitstring="0010").isPowerOf2_sparse())
         self.assertFalse(BitVector.BitVector(bitstring="0011").is_power_of_2_sparse())
 
     def test_reverse(self):
@@ -310,14 +308,10 @@ class TestBitVectorOperations(unittest.TestCase):
             a.gf_divide_by_modulus(mod_long, n)
         self.assertIn("Modulus bit pattern too long", str(cm.exception))
 
-        # Normal division and alias
+        # Normal division
         quotient, remainder = a.gf_divide_by_modulus(mod, n)
         self.assertEqual(str(quotient), "00000000111010")
         self.assertEqual(str(remainder), "10001111")
-
-        q_alias, r_alias = a.gf_divide(mod, n)
-        self.assertEqual(str(q_alias), str(quotient))
-        self.assertEqual(str(r_alias), str(remainder))
 
         # Test division where remainder becomes 0 (remainder.next_set_bit(0) == -1)
         a_equal = mod.deep_copy()
@@ -391,10 +385,6 @@ class TestBitVectorOperations(unittest.TestCase):
         bv = BitVector.BitVector(size=0).gen_random_bits(32)
         self.assertEqual(bv.size, 32)
         self.assertEqual(int(bv) & 1, 1)
-
-        bv_alias = BitVector.BitVector(size=0).gen_rand_bits_for_prime(16)
-        self.assertEqual(bv_alias.size, 16)
-        self.assertEqual(int(bv_alias) & 1, 1)
 
     def test_min_canonical(self):
         bv = BitVector.BitVector(bitstring="1101")
