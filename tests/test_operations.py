@@ -352,6 +352,54 @@ class TestBitVectorOperations(unittest.TestCase):
         self.assertIsInstance(res_no_mi, tuple)
         self.assertEqual(res_no_mi[0], "NO MI. However, the GCD of ")
 
+    def test_runs(self):
+        bv_empty = BitVector.BitVector(size=0)
+        self.assertEqual(bv_empty.runs(), [])
+
+        bv1 = BitVector.BitVector(bitlist=(1, 1, 1, 0, 0, 1))
+        self.assertEqual(bv1.runs(), ["111", "00", "1"])
+
+        bv2 = BitVector.BitVector(bitstring="001100")
+        self.assertEqual(bv2.runs(), ["00", "11", "00"])
+
+        bv3 = BitVector.BitVector(bitstring="0101")
+        self.assertEqual(bv3.runs(), ["0", "1", "0", "1"])
+
+    def test_test_for_primality(self):
+        # p == 1
+        self.assertEqual(BitVector.BitVector(intVal=1, size=8).test_for_primality(), 0)
+
+        # p in probes [2, 3, 5, 7, 11, 13, 17]
+        self.assertEqual(BitVector.BitVector(intVal=2, size=8).test_for_primality(), 1)
+        self.assertEqual(BitVector.BitVector(intVal=17, size=8).test_for_primality(), 1)
+
+        # p divisible by a probe (e.g. 25 = 5 * 5)
+        self.assertEqual(BitVector.BitVector(intVal=25, size=8).test_for_primality(), 0)
+
+        # Miller-Rabin test on primes > 17 (e.g. 19, 41)
+        prob_19 = BitVector.BitVector(intVal=19, size=16).test_for_primality()
+        self.assertGreater(prob_19, 0.99)
+        prob_41 = BitVector.BitVector(intVal=41, size=16).test_for_primality()
+        self.assertGreater(prob_41, 0.99)
+
+        # Miller-Rabin test on composite not divisible by probes (e.g. 361 = 19 * 19)
+        self.assertEqual(
+            BitVector.BitVector(intVal=361, size=16).test_for_primality(), 0
+        )
+
+    def test_gen_random_bits(self):
+        bv = BitVector.BitVector(size=0).gen_random_bits(32)
+        self.assertEqual(bv.size, 32)
+        self.assertEqual(int(bv) & 1, 1)
+
+        bv_alias = BitVector.BitVector(size=0).gen_rand_bits_for_prime(16)
+        self.assertEqual(bv_alias.size, 16)
+        self.assertEqual(int(bv_alias) & 1, 1)
+
+    def test_min_canonical(self):
+        bv = BitVector.BitVector(bitstring="1101")
+        self.assertEqual(str(bv.min_canonical()), "0111")
+
 
 if __name__ == "__main__":
     unittest.main()
