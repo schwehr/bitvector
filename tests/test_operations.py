@@ -280,6 +280,7 @@ class TestBitVectorOperations(unittest.TestCase):
         bv_has_mi = BitVector.BitVector(intVal=17)
         res = bv_has_mi.multiplicative_inverse(bv_mod)
         self.assertIsNotNone(res)
+        assert res is not None
         self.assertEqual(int(res), 17)
 
         bv_no_mi = BitVector.BitVector(intVal=2)

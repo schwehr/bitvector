@@ -28,8 +28,10 @@ class BooleanLogicTestCase(unittest.TestCase):
             try:
                 op = args[2]
                 if op == "&":
+                    assert isinstance(args[1], BitVector.BitVector)
                     actual = args[0] & args[1]
                 elif op == "|":
+                    assert isinstance(args[1], BitVector.BitVector)
                     actual = args[0] | args[1]
                 elif op == "~":
                     actual = ~args[0]
