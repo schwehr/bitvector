@@ -331,7 +331,7 @@ class BitVector:
         self.vector = array.array("H", [0] * two_byte_ints_needed)
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
-    def _setbit(self, posn, val):
+    def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
         "Set the bit at the designated position to the value shown"
         if val not in (0, 1):
             raise ValueError("incorrect value for a bit")
@@ -347,7 +347,7 @@ class BitVector:
         if (cv >> shift) & 1 != val:
             self.vector[block_index] = cv ^ (1 << shift)
 
-    def _getbit(self, pos):
+    def _getbit(self, pos: int | slice | Any) -> Any:
         "Get the bit from the designated position"
         if not isinstance(pos, slice):
             if pos >= self.size or pos < -self.size:
@@ -552,7 +552,7 @@ class BitVector:
             i += 1
         return BitVector(bitlist=outlist)
 
-    def _getsize(self):
+    def _getsize(self) -> int:
         "Return the number of bits in a bit vector."
         return self.size
 
@@ -1003,7 +1003,7 @@ class BitVector:
     # Allow array like subscripting for getting and setting:
     __getitem__ = _getbit
 
-    def __setitem__(self, pos, item):
+    def __setitem__(self, pos, item) -> None:
         """
         This is needed for both slice assignments and for index assignments.  It
         checks the types of pos and item to see if the call is for slice assignment.
@@ -1075,13 +1075,13 @@ class BitVector:
         """
         return BitVectorIterator(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         "To create a print representation"
         if self.size == 0:
             return ""
         return "".join(map(str, self))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """
         Compare two bit vectors
         """
@@ -1094,19 +1094,19 @@ class BitVector:
             i += 1
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         return not self == other
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self.intValue() < other.intValue()
 
-    def __le__(self, other):
+    def __le__(self, other) -> bool:
         return self.intValue() <= other.intValue()
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         return self.intValue() > other.intValue()
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bool:
         return self.intValue() >= other.intValue()
 
     def deep_copy(self):
@@ -1145,7 +1145,7 @@ class BitVector:
         self.vector = array.array("H", [0] * two_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
-    def pad_from_right(self, n):
+    def pad_from_right(self, n) -> None:
         """
         You can pad a bitvector at its right end with a designated number of
         zeros with this method. This method returns the bitvector object on
@@ -1161,7 +1161,7 @@ class BitVector:
         self.vector = array.array("H", [0] * two_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
-    def __contains__(self, otherBitVec):
+    def __contains__(self, otherBitVec) -> bool:
         """
         This supports 'if x in y' and 'if x not in y' syntax for bit vectors.
         """
@@ -1189,7 +1189,7 @@ class BitVector:
         list(map(self._setbit, enumerate(bitlist), bitlist))
         return self
 
-    def count_bits(self):
+    def count_bits(self) -> int:
         """
         You can count the number of bits set in a BitVector instance by
 
@@ -1201,7 +1201,7 @@ class BitVector:
         """
         return sum(self)
 
-    def set_value(self, *args, **kwargs):
+    def set_value(self, *args, **kwargs) -> None:
         """
         You can call set_value() to change the bit pattern associated with
         a previously constructed bitvector object:
@@ -1218,7 +1218,7 @@ class BitVector:
         """
         self.__init__(*args, **kwargs)
 
-    def count_bits_sparse(self):
+    def count_bits_sparse(self) -> int:
         """
         For folks who use bit vectors with millions of bits in them but
         with only a few bits set, your bit counting will go much, much
@@ -1306,7 +1306,7 @@ class BitVector:
         diff = self ^ other
         return diff.count_bits_sparse()
 
-    def next_set_bit(self, from_index=0):
+    def next_set_bit(self, from_index: int = 0) -> int:
         """
         Starting from a given bit position, you can find the position index
         of the next set bit by
@@ -1344,7 +1344,7 @@ class BitVector:
             o += 1
         return -1
 
-    def rank_of_bit_set_at_index(self, position):
+    def rank_of_bit_set_at_index(self, position: int) -> int:
         """
         You can measure the "rank" of a bit that is set at a given
         position.  Rank is the number of bits that are set up to the
@@ -1363,7 +1363,7 @@ class BitVector:
         bv = self[0 : position + 1]
         return bv.count_bits()
 
-    def is_power_of_2(self):
+    def is_power_of_2(self) -> bool:
         """
         You can test whether the integer value of a bit vector is a power of
         two.  (The sparse version of this method works much faster for very
@@ -1382,7 +1382,7 @@ class BitVector:
             return True
         return False
 
-    def is_power_of_2_sparse(self):
+    def is_power_of_2_sparse(self) -> bool:
         """
         You can test whether the integer value of a bit vector is a power of
         two.  This sparse version works much faster for very long bit
@@ -1476,7 +1476,7 @@ class BitVector:
             MI = (x_old + MOD) % MOD
             return BitVector(intVal=MI)
 
-    def length(self):
+    def length(self) -> int:
         return self.size
 
     def gf_multiply(self, b):
