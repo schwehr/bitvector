@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.13"
 
 [[package]]
-name = "bitvector"
+name = "bitvector-modern"
 version = "3.5.0"
 source = { editable = "." }
 
