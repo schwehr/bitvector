@@ -17,6 +17,7 @@ dist/
 .eggs/
 
 # Coverage
+.benchmarks/
 .coverage
 *.cover
 coverage.xml
