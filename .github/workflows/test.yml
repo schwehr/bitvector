@@ -35,7 +35,11 @@ jobs:
 
       - name: Run test suite with pytest and check coverage
         if: success() || failure()
-        run: uv run pytest
+        run: uv run pytest --benchmark-skip
+
+      - name: Run benchmark tests
+        if: (success() || failure()) && matrix.python-version == '3.14'
+        run: uv run pytest --benchmark-only
 
       - name: Run type checks with ty
         if: success() || failure()
