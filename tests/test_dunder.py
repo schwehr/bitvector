@@ -34,6 +34,27 @@ class TestBitVectorDunder(unittest.TestCase):
         self.assertEqual(str(bv1 + bv_empty), "101")
         self.assertEqual(str(bv_empty + bv_empty), "")
 
+        # Test __add__ when self.vector is a list (lines 500-501)
+        bv_list = BitVector.BitVector(bitstring="1100")
+        bv_list.vector = list(bv_list.vector)
+        self.assertEqual(str(bv_list + bv2), "1100010")
+
+        # Test __add__ when self.vector is neither array.array nor list (lines 502-504)
+        bv_tuple = BitVector.BitVector(bitstring="1001")
+        bv_tuple.vector = tuple(bv_tuple.vector)  # ty: ignore[invalid-assignment]
+        self.assertEqual(str(bv_tuple + bv2), "1001010")
+
+    def test_iadd(self):
+        bv1 = BitVector.BitVector(bitstring="101")
+        bv2 = BitVector.BitVector(bitstring="010")
+        bv1 += bv2
+        self.assertEqual(str(bv1), "101010")
+
+        # Test __iadd__ with non-BitVector argument (line 519)
+        with self.assertRaises(TypeError) as cm:
+            bv1 += "010"  # ty: ignore[unsupported-operator]
+        self.assertIn("Can only join two BitVector objects, not", str(cm.exception))
+
     def test_or(self):
         bv_short = BitVector.BitVector(bitstring="10")
         bv_long = BitVector.BitVector(bitstring="0100")

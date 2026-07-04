@@ -483,7 +483,7 @@ class BitVector:
             res.vector.append(lpb[i] & 0x0000FFFF)
         return res
 
-    def _not_yet_ready__add__(self, other: BitVector) -> BitVector:
+    def __add__(self, other: BitVector) -> BitVector:
         """
         Because __add__ is supplied, you can always join two bitvectors by
 
@@ -506,7 +506,7 @@ class BitVector:
         new_bv += other
         return new_bv
 
-    def _not_yet_ready__iadd__(self, other: BitVector) -> Self:
+    def __iadd__(self, other: BitVector) -> Self:
         """
         When extending an existing instance of a BitVector,  __iadd__ should be faster
         than __add__ because we do not need to create a new BitVector. The call to
@@ -530,30 +530,9 @@ class BitVector:
             curr_bit += 1
             curr_two_byte_int += curr_bit // 16
             curr_bit %= 16
-        # Increase the size
+
         self.size += other.size
         return self
-
-    def __add__(self, other: BitVector) -> BitVector:
-        """
-        Restored from BitVector 3.4.5
-        Because __add__ is supplied, you can always join two bitvectors by
-
-            bitvec3  =  bitvec1  +  bitvec2
-
-        bitvec3 is a new bitvector object that contains all the bits of
-        bitvec1 followed by all the bits of bitvec2.
-        """
-        i = 0
-        outlist = []
-        while i < self.size:
-            outlist.append(self[i])
-            i += 1
-        i = 0
-        while i < other.size:
-            outlist.append(other[i])
-            i += 1
-        return BitVector(bitlist=outlist)
 
     def _getsize(self) -> int:
         "Return the number of bits in a bit vector."
