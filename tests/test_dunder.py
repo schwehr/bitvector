@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import BitVector
@@ -71,6 +72,31 @@ class TestBitVectorDunder(unittest.TestCase):
 
         bv_empty = BitVector.BitVector(size=0)
         self.assertEqual(str(~bv_empty), "")
+
+    def test_deepcopy(self):
+        bv = BitVector.BitVector(bitstring="10110")
+        bv_copy = copy.deepcopy(bv)
+        self.assertEqual(str(bv_copy), "10110")
+        self.assertIsNot(bv_copy, bv)
+        self.assertIsNot(bv_copy.vector, bv.vector)
+
+        # Test with memo provided
+        memo = {}
+        bv_memo = copy.deepcopy(bv, memo)
+        self.assertEqual(str(bv_memo), "10110")
+        self.assertEqual(str(bv.__deepcopy__()), "10110")
+
+        # Test list fallback branch in __deepcopy__
+        bv_list = BitVector.BitVector(bitstring="1100")
+        bv_list.vector = list(bv_list.vector)
+        bv_list_copy = copy.deepcopy(bv_list)
+        self.assertEqual(str(bv_list_copy), "1100")
+
+        # Test generic fallback branch in __deepcopy__
+        bv_tuple = BitVector.BitVector(bitstring="1001")
+        bv_tuple.vector = tuple(bv_tuple.vector)  # ty: ignore[invalid-assignment]
+        bv_tuple_copy = copy.deepcopy(bv_tuple)
+        self.assertEqual(str(bv_tuple_copy), "1001")
 
     def test_lshift(self):
         bv = BitVector.BitVector(bitstring="1000")

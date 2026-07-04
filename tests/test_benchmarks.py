@@ -6,6 +6,7 @@ Note:
     _not_yet_ready__iadd__.
 """
 
+import copy
 import operator
 
 import pytest
@@ -95,7 +96,7 @@ def test_bench_iadd(benchmark, sample_bv1, sample_bv2):
     # Tests __iadd__, avoiding _not_yet_ready__iadd__.
     # Uses pedantic with a setup function so self is not mutated across rounds.
     def setup():
-        return (sample_bv1.deep_copy(), sample_bv2), {}
+        return (copy.deepcopy(sample_bv1), sample_bv2), {}
 
     def target(a, b):
         a += b
@@ -187,7 +188,7 @@ def test_bench_min_canonical(benchmark, sample_bv_small):
         return (), {}
 
     def target():
-        bv = sample_bv_small.deep_copy()
+        bv = copy.deepcopy(sample_bv_small)
         return bv.min_canonical()
 
     benchmark.pedantic(target, setup=setup, rounds=50)
@@ -229,7 +230,7 @@ def test_bench_ge(benchmark, sample_bv1, sample_bv2):
 
 def test_bench_setitem_index(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv[50] = 1
@@ -239,7 +240,7 @@ def test_bench_setitem_index(benchmark, sample_bv1):
 
 def test_bench_setitem_slice(benchmark, sample_bv1, sample_bv_small):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv[10:74] = sample_bv_small
@@ -272,7 +273,7 @@ def test_bench_get_bitvector_in_ascii(benchmark, sample_bv1):
 
 
 def test_bench_deep_copy(benchmark, sample_bv1):
-    benchmark(sample_bv1.deep_copy)
+    benchmark(copy.deepcopy, sample_bv1)
 
 
 # --- Group 6: Alternative Shifting & Rotation Methods ---
@@ -280,7 +281,7 @@ def test_bench_deep_copy(benchmark, sample_bv1):
 
 def test_bench_shift_left_method(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.shift_left(10)
@@ -290,7 +291,7 @@ def test_bench_shift_left_method(benchmark, sample_bv1):
 
 def test_bench_shift_right_method(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.shift_right(10)
@@ -300,7 +301,7 @@ def test_bench_shift_right_method(benchmark, sample_bv1):
 
 def test_bench_shift_left_by_one(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.shift_left_by_one()
@@ -310,7 +311,7 @@ def test_bench_shift_left_by_one(benchmark, sample_bv1):
 
 def test_bench_shift_right_by_one(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.shift_right_by_one()
@@ -320,7 +321,7 @@ def test_bench_shift_right_by_one(benchmark, sample_bv1):
 
 def test_bench_circular_rot_left(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.circular_rot_left()
@@ -330,7 +331,7 @@ def test_bench_circular_rot_left(benchmark, sample_bv1):
 
 def test_bench_circular_rot_right(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.circular_rot_right()
@@ -340,7 +341,7 @@ def test_bench_circular_rot_right(benchmark, sample_bv1):
 
 def test_bench_circular_rotate_left_by_one(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.circular_rotate_left_by_one()
@@ -350,7 +351,7 @@ def test_bench_circular_rotate_left_by_one(benchmark, sample_bv1):
 
 def test_bench_circular_rotate_right_by_one(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.circular_rotate_right_by_one()
@@ -363,7 +364,7 @@ def test_bench_circular_rotate_right_by_one(benchmark, sample_bv1):
 
 def test_bench_pad_from_left(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.pad_from_left(10)
@@ -373,7 +374,7 @@ def test_bench_pad_from_left(benchmark, sample_bv1):
 
 def test_bench_pad_from_right(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.pad_from_right(10)
@@ -383,7 +384,7 @@ def test_bench_pad_from_right(benchmark, sample_bv1):
 
 def test_bench_reset(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.reset(0)
@@ -393,7 +394,7 @@ def test_bench_reset(benchmark, sample_bv1):
 
 def test_bench_reverse(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.reverse()
@@ -403,7 +404,7 @@ def test_bench_reverse(benchmark, sample_bv1):
 
 def test_bench_set_value(benchmark, sample_bv1):
     def setup():
-        return (sample_bv1.deep_copy(),), {}
+        return (copy.deepcopy(sample_bv1),), {}
 
     def target(bv):
         bv.set_value(intVal=0x1234567890ABCDEF, size=64)

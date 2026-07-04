@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import BitVector
@@ -315,7 +316,7 @@ class TestBitVectorOperations(unittest.TestCase):
         self.assertEqual(str(remainder), "10001111")
 
         # Test division where remainder becomes 0 (remainder.next_set_bit(0) == -1)
-        a_equal = mod.deep_copy()
+        a_equal = copy.deepcopy(mod)
         q_eq, r_eq = a_equal.gf_divide_by_modulus(mod, n)
         self.assertEqual(int(r_eq), 0)
 

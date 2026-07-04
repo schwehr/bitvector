@@ -7,6 +7,7 @@ __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import binascii
+import copy
 import operator
 import random
 from typing import Any, BinaryIO, Self, Sequence
@@ -362,7 +363,7 @@ class BitVector:
             slicebits = []
             i, j = pos.start, pos.stop
             if i is None and j is None:
-                return self.deep_copy()
+                return copy.deepcopy(self)
             if i is None:
                 if j >= 0:
                     if j > len(self):
@@ -999,7 +1000,7 @@ class BitVector:
                     "For slice assignment, the right hand side must be a BitVector"
                 )
             if pos.start is None and pos.stop is None:
-                return item.deep_copy()
+                return copy.deepcopy(item)
             if pos.start is None:
                 if pos.stop >= 0:
                     if pos.stop != len(item):
@@ -1091,6 +1092,20 @@ class BitVector:
     def __ge__(self, other: Any) -> bool:
         return self.intValue() >= other.intValue()
 
+    def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
+        if memo is None:
+            memo = {}
+        new_bv = self.__class__(size=0)
+        memo[id(self)] = new_bv
+        if isinstance(self.vector, array.array):
+            new_bv.vector = array.array("H", self.vector)
+        elif isinstance(self.vector, list):
+            new_bv.vector = self.vector.copy()
+        else:
+            new_bv.vector = copy.deepcopy(self.vector, memo)
+        new_bv.size = self.size
+        return new_bv
+
     def deep_copy(self) -> BitVector:
         """
         You can make a deep copy of a bitvector by
@@ -1100,8 +1115,7 @@ class BitVector:
         Subsequently, any alterations to either of the bitvector objects
         bitvec and bitvec_copy will not affect the other.
         """
-        copy = str(self)
-        return BitVector(bitstring=copy)
+        return copy.deepcopy(self)
 
     def _resize_pad_from_left(self, n: int) -> BitVector:
         """
@@ -1474,15 +1488,15 @@ class BitVector:
         method is longer than the two operand bitvectors. A call to
         gf_multiply() returns a bitvector object.
         """
-        a = self.deep_copy()
-        b_copy = b.deep_copy()
+        a = copy.deepcopy(self)
+        b_copy = copy.deepcopy(b)
         result = BitVector(size=a.length() + b_copy.length())
         a.pad_from_left(result.length() - a.length())
         b_copy.pad_from_left(result.length() - b_copy.length())
         for i, bit in enumerate(b_copy):
             if bit == 1:
                 power = b_copy.length() - i - 1
-                a_copy = a.deep_copy()
+                a_copy = copy.deepcopy(a)
                 a_copy.shift_left(power)
                 result ^= a_copy
         return result
@@ -1513,7 +1527,7 @@ class BitVector:
         if mod.length() > n + 1:
             raise ValueError("Modulus bit pattern too long")
         quotient = BitVector(intVal=0, size=num.length())
-        remainder = num.deep_copy()
+        remainder = copy.deepcopy(num)
         i = 0
         while 1:
             i = i + 1
@@ -1531,7 +1545,7 @@ class BitVector:
             else:
                 exponent_shift = remainder_highest_power - mod_highest_power
                 quotient[quotient.length() - exponent_shift - 1] = 1
-                quotient_mod_product = mod.deep_copy()
+                quotient_mod_product = copy.deepcopy(mod)
                 quotient_mod_product.pad_from_left(remainder.length() - mod.length())
                 quotient_mod_product.shift_left(exponent_shift)
                 remainder = remainder ^ quotient_mod_product
@@ -1558,8 +1572,8 @@ class BitVector:
         to gf_multiply_modular() returns is a bitvector object.
         """
         a = self
-        a_copy = a.deep_copy()
-        b_copy = b.deep_copy()
+        a_copy = copy.deepcopy(a)
+        b_copy = copy.deepcopy(b)
         product = a_copy.gf_multiply(b_copy)
         quotient, remainder = product.gf_divide_by_modulus(mod, n)
         return remainder
@@ -1579,8 +1593,8 @@ class BitVector:
         A call to gf_MI() returns a bitvector object.
         """
         num = self
-        NUM = num.deep_copy()
-        MOD = mod.deep_copy()
+        NUM = copy.deepcopy(num)
+        MOD = copy.deepcopy(mod)
         x = BitVector(size=mod.length())
         x_old = BitVector(intVal=1, size=mod.length())
         y = BitVector(intVal=1, size=mod.length())
