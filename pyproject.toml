@@ -42,6 +42,7 @@ dev = [
     "codespell>=2.4.0",
     "conventional-pre-commit>=4.4.0",
     "pre-commit>=4.6.0",
+    "pytest-benchmark>=4.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.20",
