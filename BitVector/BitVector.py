@@ -6,6 +6,7 @@ __version__ = "3.5.0"
 __copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
+import binascii
 import operator
 import random
 from typing import Any, BinaryIO, Self, Sequence
@@ -315,8 +316,6 @@ class BitVector:
                     """When bits are specified through rawbytes, you """
                     """cannot give values to any other constructor args"""
                 )
-            import binascii
-
             hexlist = binascii.hexlify(rawbytes)
             bitlist = list(
                 map(
