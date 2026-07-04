@@ -13,7 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.13", "3.14"]
+        python-version:
+          - "3.13"
+          - "3.14"
 
     steps:
       - name: Checkout code
@@ -28,5 +30,9 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run test suite with pytest
+      - name: Run test suite with pytest and check coverage
         run: uv run pytest
+
+      - name: Run type checks with ty
+        if: success() || failure()
+        run: uv run ty check --output-format github
