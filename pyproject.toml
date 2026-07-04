@@ -39,6 +39,7 @@ default = true
 
 [dependency-groups]
 dev = [
+    "codespell>=2.4.0",
     "pre-commit>=4.6.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
@@ -71,3 +72,6 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "raise NotImplementedError",
 ]
+
+[tool.codespell]
+ignore-words-list = "bu,mis,whet,wit"
