@@ -6,11 +6,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   test:
     name: ${{ matrix.name }}
@@ -50,22 +45,7 @@ jobs:
 
       - name: Run test suite with pytest and check coverage
         if: success() || failure()
-        run: uv run pytest --benchmark-skip --junitxml=pytest.xml
-
-      - name: Report test coverage to PR and Job Summary (Linux only)
-        if: >-
-          (success() || failure()) &&
-          matrix.os == 'ubuntu-latest' &&
-          matrix.python-version == '3.14'
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-xml-coverage-path: ./coverage.xml
-          junitxml-path: ./pytest.xml
-          title: Coverage Report (Python 3.14)
-          badge-title: Coverage
-          hide-badge: false
-          hide-report: false
-          create-new-comment: false
+        run: uv run pytest --benchmark-skip
 
       - name: Run benchmark tests (Linux only)
         if: >-
