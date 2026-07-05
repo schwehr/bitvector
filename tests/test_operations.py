@@ -1,397 +1,561 @@
+"""Tests BitVector operations (math, shifts, distance, GF arithmetic)."""
+
 import copy
-import unittest
+
+import pytest
 
 import BitVector
 
 
-class TestBitVectorOperations(unittest.TestCase):
-    def test_divide_into_two(self):
-        # Error: odd number of bits
-        bv_odd = BitVector.BitVector(bitstring="101")
-        with self.assertRaises(ValueError) as cm:
-            bv_odd.divide_into_two()
-        self.assertEqual("must have even num bits", str(cm.exception))
+def test_divide_into_two_raises_error() -> None:
+    """Verifies dividing a vector with an odd number of bits raises ValueError."""
+    bv_odd = BitVector.BitVector(bitstring="101")
+    with pytest.raises(ValueError, match="must have even num bits"):
+        bv_odd.divide_into_two()
 
-        # Normal division
-        bv = BitVector.BitVector(bitstring="11001011")
-        left, right = bv.divide_into_two()
-        self.assertEqual(str(left), "1100")
-        self.assertEqual(str(right), "1011")
 
-        # Empty vector division (0 is even)
-        bv_empty = BitVector.BitVector(size=0)
-        left_empty, right_empty = bv_empty.divide_into_two()
-        self.assertEqual(str(left_empty), "")
-        self.assertEqual(str(right_empty), "")
+@pytest.mark.parametrize(
+    ("bitstring", "expected_left", "expected_right"),
+    [
+        ("11001011", "1100", "1011"),
+        ("", "", ""),
+    ],
+)
+def test_divide_into_two(
+    bitstring: str, expected_left: str, expected_right: str
+) -> None:
+    """Tests divide_into_two on even-length and empty vectors.
 
-    def test_permute(self):
-        # Error: bad permutation index
-        bv = BitVector.BitVector(bitstring="1010")
-        with self.assertRaises(ValueError) as cm:
-            bv.permute([0, 1, 2, 4])
-        self.assertEqual("Bad permutation index", str(cm.exception))
+    Args:
+        bitstring: Input vector bitstring representation.
+        expected_left: Expected bitstring of the left half vector.
+        expected_right: Expected bitstring of the right half vector.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    left, right = bv.divide_into_two()
+    assert str(left) == expected_left
+    assert str(right) == expected_right
 
-        # Normal permutation
-        bv2 = BitVector.BitVector(bitstring="1011")
-        permuted = bv2.permute([3, 2, 1, 0])
-        self.assertEqual(str(permuted), "1101")
 
-        # Permutation to different size
-        perm_extended = bv2.permute([0, 1, 0, 1, 2, 3])
-        self.assertEqual(str(perm_extended), "101011")
+@pytest.mark.parametrize(
+    ("bitstring", "perm_list", "err_match"),
+    [
+        ("1010", [0, 1, 2, 4], "Bad permutation index"),
+    ],
+)
+def test_permute_raises_error(
+    bitstring: str, perm_list: list[int], err_match: str
+) -> None:
+    """Verifies invalid permutation indices raise ValueError.
 
-    def test_unpermute(self):
-        bv = BitVector.BitVector(bitstring="1010")
+    Args:
+        bitstring: Input vector bitstring representation.
+        perm_list: List of target bit indices for permutation.
+        err_match: Expected error message pattern.
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    with pytest.raises(ValueError, match=err_match):
+        bv.permute(perm_list)
 
-        # Error: bad permutation index
-        with self.assertRaises(ValueError) as cm:
-            bv.unpermute([0, 1, 2, 4])
-        self.assertEqual("Bad permutation index", str(cm.exception))
 
-        # Error: bad size for permute list
-        with self.assertRaises(ValueError) as cm:
-            bv.unpermute([0, 1, 2])
-        self.assertEqual("Bad size for permute list", str(cm.exception))
+@pytest.mark.parametrize(
+    ("bitstring", "perm_list", "expected"),
+    [
+        ("1011", [3, 2, 1, 0], "1101"),
+        ("1011", [0, 1, 0, 1, 2, 3], "101011"),
+    ],
+)
+def test_permute(bitstring: str, perm_list: list[int], expected: str) -> None:
+    """Tests bit permutation across identical and extended sizes.
 
-        # Normal unpermute
-        bv_orig = BitVector.BitVector(bitstring="11001010")
-        p_list = [7, 6, 5, 4, 3, 2, 1, 0]
-        permuted = bv_orig.permute(p_list)
-        unpermuted = permuted.unpermute(p_list)
-        self.assertEqual(str(unpermuted), str(bv_orig))
+    Args:
+        bitstring: Input vector bitstring representation.
+        perm_list: List of target bit indices for permutation.
+        expected: Expected output vector bitstring.
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    permuted = bv.permute(perm_list)
+    assert str(permuted) == expected
 
-    def test_circular_rot_left(self):
-        # Small vector (size <= 16)
-        bv = BitVector.BitVector(bitstring="1000")
-        bv.circular_rot_left()
-        self.assertEqual(str(bv), "0001")
 
-        # Large vector (size > 16)
-        bv_long = BitVector.BitVector(bitstring="10000000000000000001")
-        bv_long.circular_rot_left()
-        self.assertEqual(str(bv_long), "00000000000000000011")
+@pytest.mark.parametrize(
+    ("bitstring", "perm_list", "err_match"),
+    [
+        ("1010", [0, 1, 2, 4], "Bad permutation index"),
+        ("1010", [0, 1, 2], "Bad size for permute list"),
+    ],
+)
+def test_unpermute_raises_error(
+    bitstring: str, perm_list: list[int], err_match: str
+) -> None:
+    """Verifies invalid unpermute indices or lengths raise ValueError.
 
-    def test_circular_rot_right(self):
-        # Small vector (size <= 16)
-        bv = BitVector.BitVector(bitstring="0001")
-        bv.circular_rot_right()
-        self.assertEqual(str(bv), "1000")
+    Args:
+        bitstring: Input vector bitstring representation.
+        perm_list: List of permutation indices.
+        err_match: Expected error message pattern.
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    with pytest.raises(ValueError, match=err_match):
+        bv.unpermute(perm_list)
 
-        # Large vector (size > 16)
-        bv_long = BitVector.BitVector(bitstring="10000000000000000001")
-        bv_long.circular_rot_right()
-        self.assertEqual(str(bv_long), "11000000000000000000")
 
-    def test_shift_left_by_one(self):
-        # Small vector
-        bv = BitVector.BitVector(bitstring="1011")
-        bv.shift_left_by_one()
-        self.assertEqual(str(bv), "0110")
+def test_unpermute() -> None:
+    """Tests round-trip permutation and unpermutation."""
+    bv_orig = BitVector.BitVector(bitstring="11001010")
+    p_list = [7, 6, 5, 4, 3, 2, 1, 0]
+    permuted = bv_orig.permute(p_list)
+    unpermuted = permuted.unpermute(p_list)
+    assert str(unpermuted) == str(bv_orig)
 
-        # Large vector (size > 16)
-        bv_long = BitVector.BitVector(bitstring="1" + "0" * 18 + "1")
-        bv_long.shift_left_by_one()
-        self.assertEqual(str(bv_long), "0" * 18 + "10")
 
-    def test_shift_right_by_one(self):
-        # Small vector
-        bv = BitVector.BitVector(bitstring="1101")
-        bv.shift_right_by_one()
-        self.assertEqual(str(bv), "0110")
+@pytest.mark.parametrize(
+    ("method_name", "bitstring", "expected"),
+    [
+        ("circular_rot_left", "1000", "0001"),
+        ("circular_rot_left", "10000000000000000001", "00000000000000000011"),
+        ("circular_rot_right", "0001", "1000"),
+        ("circular_rot_right", "10000000000000000001", "11000000000000000000"),
+        ("shift_left_by_one", "1011", "0110"),
+        ("shift_left_by_one", "1" + "0" * 18 + "1", "0" * 18 + "10"),
+        ("shift_right_by_one", "1101", "0110"),
+        ("shift_right_by_one", "1" + "0" * 18 + "1", "01" + "0" * 18),
+    ],
+)
+def test_rotations_and_one_bit_shifts(
+    method_name: str, bitstring: str, expected: str
+) -> None:
+    """Tests circular rotations and 1-bit shifts on short and long vectors.
 
-        # Large vector (size > 16)
-        bv_long = BitVector.BitVector(bitstring="1" + "0" * 18 + "1")
-        bv_long.shift_right_by_one()
-        self.assertEqual(str(bv_long), "01" + "0" * 18)
+    Args:
+        method_name: Name of the BitVector rotation or shift method.
+        bitstring: Initial vector bitstring representation.
+        expected: Expected output vector bitstring after mutation.
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    method = getattr(bv, method_name)
+    method()
+    assert str(bv) == expected
 
-    def test_shift_left(self):
-        bv = BitVector.BitVector(bitstring="101101")
-        res = bv.shift_left(2)
-        self.assertEqual(str(bv), "110100")
-        self.assertIs(res, bv)
 
-        bv.shift_left(0)
-        self.assertEqual(str(bv), "110100")
+@pytest.mark.parametrize(
+    ("direction", "shift_amount", "expected"),
+    [
+        ("left", 2, "110100"),
+        ("left", 0, "101101"),
+        ("right", 2, "001011"),
+        ("right", 0, "101101"),
+    ],
+)
+def test_shift_left_right(direction: str, shift_amount: int, expected: str) -> None:
+    """Tests shift_left and shift_right in-place mutations and chaining.
 
-    def test_shift_right(self):
-        bv = BitVector.BitVector(bitstring="101101")
-        res = bv.shift_right(2)
-        self.assertEqual(str(bv), "001011")
-        self.assertIs(res, bv)
+    Args:
+        direction: Shift direction ('left' or 'right').
+        shift_amount: Number of bit positions to shift.
+        expected: Expected output vector bitstring.
+    """
+    bv = BitVector.BitVector(bitstring="101101")
+    if direction == "left":
+        res = bv.shift_left(shift_amount)
+    else:
+        res = bv.shift_right(shift_amount)
+    assert str(bv) == expected
+    assert res is bv
 
-        bv.shift_right(0)
-        self.assertEqual(str(bv), "001011")
 
-    def test_pad_from_left(self):
-        bv = BitVector.BitVector(bitstring="101")
-        bv.pad_from_left(2)
-        self.assertEqual(str(bv), "00101")
-        self.assertEqual(bv.size, 5)
+@pytest.mark.parametrize(
+    ("direction", "pad_count", "expected_str", "expected_size"),
+    [
+        ("left", 2, "00101", 5),
+        ("left", 0, "101", 3),
+        ("right", 2, "10100", 5),
+        ("right", 0, "101", 3),
+    ],
+)
+def test_padding(
+    direction: str, pad_count: int, expected_str: str, expected_size: int
+) -> None:
+    """Tests pad_from_left and pad_from_right across positive and zero pads.
 
-        bv.pad_from_left(0)
-        self.assertEqual(str(bv), "00101")
+    Args:
+        direction: Padding direction ('left' or 'right').
+        pad_count: Number of zero bits to prepend or append.
+        expected_str: Expected output vector bitstring.
+        expected_size: Expected integer bit vector size after padding.
+    """
+    bv = BitVector.BitVector(bitstring="101")
+    if direction == "left":
+        bv.pad_from_left(pad_count)
+    else:
+        bv.pad_from_right(pad_count)
+    assert str(bv) == expected_str
+    assert bv.size == expected_size
 
-    def test_pad_from_right(self):
-        bv = BitVector.BitVector(bitstring="101")
-        bv.pad_from_right(2)
-        self.assertEqual(str(bv), "10100")
-        self.assertEqual(bv.size, 5)
 
-        bv.pad_from_right(0)
-        self.assertEqual(str(bv), "10100")
+def test_reset_raises_error() -> None:
+    """Verifies calling reset with an invalid bit value raises ValueError."""
+    bv = BitVector.BitVector(bitstring="101")
+    with pytest.raises(ValueError, match="Incorrect reset argument"):
+        bv.reset(2)
 
-    def test_reset(self):
-        bv = BitVector.BitVector(bitstring="101")
-        with self.assertRaises(ValueError) as cm:
-            bv.reset(2)
-        self.assertEqual("Incorrect reset argument", str(cm.exception))
 
-        res = bv.reset(1)
-        self.assertEqual(str(bv), "111")
-        self.assertIs(res, bv)
+@pytest.mark.parametrize(
+    ("val", "expected"),
+    [
+        (1, "111"),
+        (0, "000"),
+    ],
+)
+def test_reset(val: int, expected: str) -> None:
+    """Tests setting all bits in a vector to 0 or 1 via reset.
 
-        bv.reset(0)
-        self.assertEqual(str(bv), "000")
+    Args:
+        val: The bit value (0 or 1) to reset all bits to.
+        expected: Expected output vector bitstring.
+    """
+    bv = BitVector.BitVector(bitstring="101")
+    res = bv.reset(val)
+    assert str(bv) == expected
+    assert res is bv
 
-    def test_count_bits(self):
-        bv = BitVector.BitVector(bitstring="100111")
-        self.assertEqual(bv.count_bits(), 4)
 
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(bv_empty.count_bits(), 0)
+@pytest.mark.parametrize(
+    ("bitstring", "expected_count"),
+    [
+        ("100111", 4),
+        ("", 0),
+    ],
+)
+def test_count_bits(bitstring: str, expected_count: int) -> None:
+    """Tests standard bit counting across normal and empty vectors.
 
-    def test_set_value(self):
-        bv = BitVector.BitVector(intVal=7, size=16)
-        bv.set_value(intVal=45)
-        self.assertEqual(str(bv), "101101")
+    Args:
+        bitstring: Initial vector bitstring representation.
+        expected_count: Expected number of bits set to 1.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert bv.count_bits() == expected_count
 
-        bv.set_value(bitstring="1100")
-        self.assertEqual(str(bv), "1100")
 
-    def test_count_bits_sparse(self):
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(bv_empty.count_bits_sparse(), 0)
+@pytest.mark.parametrize(
+    ("bitstring", "expected_count"),
+    [
+        ("", 0),
+        ("100111" + "0" * 20, 4),
+    ],
+)
+def test_count_bits_sparse(bitstring: str, expected_count: int) -> None:
+    """Tests sparse bit counting across empty and zero-padded vectors.
 
-        bv = BitVector.BitVector(bitstring="100111" + "0" * 20)
-        self.assertEqual(bv.count_bits_sparse(), 4)
+    Args:
+        bitstring: Initial vector bitstring representation.
+        expected_count: Expected number of bits set to 1.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert bv.count_bits_sparse() == expected_count
 
-    def test_jaccard_similarity(self):
-        # Error: both zero vectors
-        bv_zero1 = BitVector.BitVector(bitstring="000")
-        bv_zero2 = BitVector.BitVector(bitstring="000")
-        with self.assertRaises(AssertionError) as cm:
-            bv_zero1.jaccard_similarity(bv_zero2)
-        self.assertIn("Jaccard called on two zero vectors", str(cm.exception))
 
-        # Error: unequal length
-        with self.assertRaises(AssertionError) as cm:
-            BitVector.BitVector(bitstring="1").jaccard_similarity(
-                BitVector.BitVector(bitstring="10")
-            )
-        self.assertIn("must be of equal length", str(cm.exception))
+def test_set_value() -> None:
+    """Tests mutating an existing BitVector via set_value."""
+    bv = BitVector.BitVector(intVal=7, size=16)
+    bv.set_value(intVal=45)
+    assert str(bv) == "101101"
 
-        # Normal similarity
-        bv1 = BitVector.BitVector(bitstring="11111111")
-        bv2 = BitVector.BitVector(bitstring="00101011")
-        self.assertAlmostEqual(bv1.jaccard_similarity(bv2), 0.5)
+    bv.set_value(bitstring="1100")
+    assert str(bv) == "1100"
 
-    def test_jaccard_distance(self):
-        # Error: unequal length
-        with self.assertRaises(AssertionError) as cm:
-            BitVector.BitVector(bitstring="1").jaccard_distance(
-                BitVector.BitVector(bitstring="10")
-            )
-        self.assertIn("vectors of unequal length", str(cm.exception))
 
-        # Normal distance
-        bv1 = BitVector.BitVector(bitstring="11111111")
-        bv2 = BitVector.BitVector(bitstring="00101011")
-        self.assertAlmostEqual(bv1.jaccard_distance(bv2), 0.5)
+@pytest.mark.parametrize(
+    ("method_name", "bv1_str", "bv2_str", "err_match"),
+    [
+        ("jaccard_similarity", "000", "000", "Jaccard called on two zero vectors"),
+        ("jaccard_similarity", "1", "10", "must be of equal length"),
+        ("jaccard_distance", "1", "10", "vectors of unequal length"),
+        ("hamming_distance", "1", "10", "vectors of unequal length"),
+    ],
+)
+def test_distance_metrics_raise_error(
+    method_name: str, bv1_str: str, bv2_str: str, err_match: str
+) -> None:
+    """Verifies distance metrics raise AssertionError on invalid inputs.
 
-    def test_hamming_distance(self):
-        # Error: unequal length
-        with self.assertRaises(AssertionError) as cm:
-            BitVector.BitVector(bitstring="1").hamming_distance(
-                BitVector.BitVector(bitstring="10")
-            )
-        self.assertIn("vectors of unequal length", str(cm.exception))
+    Args:
+        method_name: Metric method name ('jaccard_similarity', etc.).
+        bv1_str: Bitstring for the first vector.
+        bv2_str: Bitstring for the second vector.
+        err_match: Expected error message substring.
+    """
+    bv1 = BitVector.BitVector(bitstring=bv1_str)
+    bv2 = BitVector.BitVector(bitstring=bv2_str)
+    method = getattr(bv1, method_name)
+    with pytest.raises(AssertionError, match=err_match):
+        method(bv2)
 
-        # Normal hamming distance
-        bv1 = BitVector.BitVector(bitstring="11111111")
-        bv2 = BitVector.BitVector(bitstring="00101011")
-        self.assertEqual(bv1.hamming_distance(bv2), 4)
 
-    def test_next_set_bit(self):
-        # Error: negative index
-        bv = BitVector.BitVector(bitstring="00000000000001")
-        with self.assertRaises(AssertionError) as cm:
-            bv.next_set_bit(-1)
-        self.assertIn("from_index must be nonnegative", str(cm.exception))
+@pytest.mark.parametrize(
+    ("method_name", "bv1_str", "bv2_str", "expected"),
+    [
+        ("jaccard_similarity", "11111111", "00101011", 0.5),
+        ("jaccard_distance", "11111111", "00101011", 0.5),
+        ("hamming_distance", "11111111", "00101011", 4),
+    ],
+)
+def test_distance_metrics(
+    method_name: str, bv1_str: str, bv2_str: str, expected: float | int
+) -> None:
+    """Tests similarity and distance metrics on equal-length vectors.
 
-        # Found bit
-        self.assertEqual(bv.next_set_bit(5), 13)
+    Args:
+        method_name: Metric method name ('jaccard_similarity', etc.).
+        bv1_str: Bitstring for the first vector.
+        bv2_str: Bitstring for the second vector.
+        expected: Expected distance or similarity numerical result.
+    """
+    bv1 = BitVector.BitVector(bitstring=bv1_str)
+    bv2 = BitVector.BitVector(bitstring=bv2_str)
+    method = getattr(bv1, method_name)
+    res = method(bv2)
+    if isinstance(expected, float):
+        assert abs(res - expected) < 1e-9
+    else:
+        assert res == expected
 
-        # Not found bit
-        bv_zeros = BitVector.BitVector(bitstring="0" * 20)
-        self.assertEqual(bv_zeros.next_set_bit(0), -1)
 
-        # Start from non-zero block, then no more bits found
-        bv_short = BitVector.BitVector(bitstring="0100000000000000")
-        self.assertEqual(bv_short.next_set_bit(2), -1)
+def test_next_set_bit_raises_error() -> None:
+    """Verifies calling next_set_bit with a negative index raises AssertionError."""
+    bv = BitVector.BitVector(bitstring="00000000000001")
+    with pytest.raises(AssertionError, match="from_index must be nonnegative"):
+        bv.next_set_bit(-1)
 
-    def test_rank_of_bit_set_at_index(self):
-        # Error: arg bit not set
-        bv = BitVector.BitVector(bitstring="01010101011100")
-        with self.assertRaises(AssertionError) as cm:
-            bv.rank_of_bit_set_at_index(0)
-        self.assertIn("the arg bit not set", str(cm.exception))
 
-        # Normal rank
-        self.assertEqual(bv.rank_of_bit_set_at_index(10), 6)
+@pytest.mark.parametrize(
+    ("bitstring", "start_idx", "expected_idx"),
+    [
+        ("00000000000001", 5, 13),
+        ("0" * 20, 0, -1),
+        ("0100000000000000", 2, -1),
+    ],
+)
+def test_next_set_bit(bitstring: str, start_idx: int, expected_idx: int) -> None:
+    """Tests scanning forward for the next bit set to 1.
 
-    def test_is_power_of_2(self):
-        # Zero is false
-        self.assertFalse(BitVector.BitVector(bitstring="0000").is_power_of_2())
+    Args:
+        bitstring: Initial vector bitstring representation.
+        start_idx: The starting index for scanning.
+        expected_idx: Expected index of the next set bit (-1 if none found).
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    assert bv.next_set_bit(start_idx) == expected_idx
 
-        # True cases and alias
-        self.assertTrue(BitVector.BitVector(bitstring="0010").is_power_of_2())
 
-        # False case
-        self.assertFalse(BitVector.BitVector(bitstring="0011").is_power_of_2())
+def test_rank_of_bit_set_at_index_raises_error() -> None:
+    """Verifies rank query on an unset bit raises AssertionError."""
+    bv = BitVector.BitVector(bitstring="01010101011100")
+    with pytest.raises(AssertionError, match="the arg bit not set"):
+        bv.rank_of_bit_set_at_index(0)
 
-    def test_is_power_of_2_sparse(self):
-        self.assertTrue(BitVector.BitVector(bitstring="0010").is_power_of_2_sparse())
-        self.assertFalse(BitVector.BitVector(bitstring="0011").is_power_of_2_sparse())
 
-    def test_reverse(self):
-        bv = BitVector.BitVector(bitstring="0001100000000000001")
-        self.assertEqual(str(bv.reverse()), "1000000000000011000")
+def test_rank_of_bit_set_at_index() -> None:
+    """Tests calculating the rank (number of preceding 1 bits) of a set bit."""
+    bv = BitVector.BitVector(bitstring="01010101011100")
+    assert bv.rank_of_bit_set_at_index(10) == 6
 
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(str(bv_empty.reverse()), "")
 
-    def test_gcd(self):
-        bv1 = BitVector.BitVector(bitstring="01100110")  # 102
-        bv2 = BitVector.BitVector(bitstring="011010")  # 26
-        self.assertEqual(int(bv1.gcd(bv2)), 2)
-        self.assertEqual(int(bv2.gcd(bv1)), 2)
+@pytest.mark.parametrize(
+    ("bitstring", "sparse", "expected"),
+    [
+        ("0000", False, False),
+        ("0010", False, True),
+        ("0011", False, False),
+        ("0010", True, True),
+        ("0011", True, False),
+    ],
+)
+def test_is_power_of_2(bitstring: str, sparse: bool, expected: bool) -> None:
+    """Tests power-of-two verification across standard and sparse evaluators.
 
-    def test_multiplicative_inverse(self):
-        bv_mod = BitVector.BitVector(intVal=32)
-        bv_has_mi = BitVector.BitVector(intVal=17)
-        res = bv_has_mi.multiplicative_inverse(bv_mod)
-        self.assertIsNotNone(res)
-        assert res is not None
-        self.assertEqual(int(res), 17)
+    Args:
+        bitstring: Initial vector bitstring representation.
+        sparse: Whether to use is_power_of_2_sparse.
+        expected: Expected boolean result.
+    """
+    bv = BitVector.BitVector(bitstring=bitstring)
+    res = bv.is_power_of_2_sparse() if sparse else bv.is_power_of_2()
+    assert res is expected
 
-        bv_no_mi = BitVector.BitVector(intVal=2)
-        res_none = bv_no_mi.multiplicative_inverse(bv_mod)
-        self.assertIsNone(res_none)
 
-    def test_gf_multiply(self):
-        a = BitVector.BitVector(bitstring="0110001")
-        b = BitVector.BitVector(bitstring="0110")
-        c = a.gf_multiply(b)
-        self.assertEqual(str(c), "00010100110")
+@pytest.mark.parametrize(
+    ("bitstring", "expected"),
+    [
+        ("0001100000000000001", "1000000000000011000"),
+        ("", ""),
+    ],
+)
+def test_reverse(bitstring: str, expected: str) -> None:
+    """Tests vector reversal on populated and empty vectors.
 
-        # Zero multiply
-        b_zero = BitVector.BitVector(bitstring="0000")
-        c_zero = a.gf_multiply(b_zero)
-        self.assertEqual(int(c_zero), 0)
+    Args:
+        bitstring: Initial vector bitstring representation.
+        expected: Expected bitstring representation after reversal.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert str(bv.reverse()) == expected
 
-    def test_gf_divide_by_modulus(self):
-        mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
-        n = 8
-        a = BitVector.BitVector(bitstring="11100010110001")
 
-        # Error: modulus too long
-        mod_long = BitVector.BitVector(bitstring="1" * 15)
-        with self.assertRaises(ValueError) as cm:
-            a.gf_divide_by_modulus(mod_long, n)
-        self.assertIn("Modulus bit pattern too long", str(cm.exception))
+def test_gcd() -> None:
+    """Tests greatest common divisor calculation between two vectors."""
+    bv1 = BitVector.BitVector(bitstring="01100110")  # 102
+    bv2 = BitVector.BitVector(bitstring="011010")  # 26
+    assert int(bv1.gcd(bv2)) == 2
+    assert int(bv2.gcd(bv1)) == 2
 
-        # Normal division
-        quotient, remainder = a.gf_divide_by_modulus(mod, n)
-        self.assertEqual(str(quotient), "00000000111010")
-        self.assertEqual(str(remainder), "10001111")
 
-        # Test division where remainder becomes 0 (remainder.next_set_bit(0) == -1)
-        a_equal = copy.deepcopy(mod)
-        q_eq, r_eq = a_equal.gf_divide_by_modulus(mod, n)
-        self.assertEqual(int(r_eq), 0)
+def test_multiplicative_inverse() -> None:
+    """Tests modular multiplicative inverse existence and calculation."""
+    bv_mod = BitVector.BitVector(intVal=32)
+    bv_has_mi = BitVector.BitVector(intVal=17)
+    res = bv_has_mi.multiplicative_inverse(bv_mod)
+    assert res is not None
+    assert int(res) == 17
 
-        # Test division where loop runs until i == num.length() without breaking earlier
-        q_zero, r_zero = BitVector.BitVector(bitstring="0").gf_divide_by_modulus(
-            BitVector.BitVector(bitstring="1"), 1
+    bv_no_mi = BitVector.BitVector(intVal=2)
+    res_none = bv_no_mi.multiplicative_inverse(bv_mod)
+    assert res_none is None
+
+
+def test_gf_multiply() -> None:
+    """Tests polynomial multiplication over GF(2)."""
+    a = BitVector.BitVector(bitstring="0110001")
+    b = BitVector.BitVector(bitstring="0110")
+    c = a.gf_multiply(b)
+    assert str(c) == "00010100110"
+
+    b_zero = BitVector.BitVector(bitstring="0000")
+    c_zero = a.gf_multiply(b_zero)
+    assert int(c_zero) == 0
+
+
+def test_gf_divide_by_modulus() -> None:
+    """Tests polynomial division by modulus over GF(2^n) and error checking."""
+    mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
+    n = 8
+    a = BitVector.BitVector(bitstring="11100010110001")
+
+    mod_long = BitVector.BitVector(bitstring="1" * 15)
+    with pytest.raises(ValueError, match="Modulus bit pattern too long"):
+        a.gf_divide_by_modulus(mod_long, n)
+
+    quotient, remainder = a.gf_divide_by_modulus(mod, n)
+    assert str(quotient) == "00000000111010"
+    assert str(remainder) == "10001111"
+
+    a_equal = copy.deepcopy(mod)
+    _, r_eq = a_equal.gf_divide_by_modulus(mod, n)
+    assert int(r_eq) == 0
+
+    _, r_zero = BitVector.BitVector(bitstring="0").gf_divide_by_modulus(
+        BitVector.BitVector(bitstring="1"), 1
+    )
+    assert int(r_zero) == 0
+
+
+def test_gf_multiply_modular() -> None:
+    """Tests modular polynomial multiplication over GF(2^8)."""
+    mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
+    n = 8
+    a = BitVector.BitVector(bitstring="0110001")
+    b = BitVector.BitVector(bitstring="0110")
+    c = a.gf_multiply_modular(b, mod, n)
+    assert str(c) == "10100110"
+
+
+def test_gf_mi() -> None:
+    """Tests multiplicative inverse over GF(2^n) and non-existent fallback."""
+    mod = BitVector.BitVector(bitstring="100011011")
+    n = 8
+    a = BitVector.BitVector(bitstring="00110011")
+    mi = a.gf_MI(mod, n)
+    assert str(mi) == "01101100"
+
+    mod_no_mi = BitVector.BitVector(bitstring="1010")
+    a_no_mi = BitVector.BitVector(bitstring="0010")
+    res_no_mi = a_no_mi.gf_MI(mod_no_mi, 3)
+    assert isinstance(res_no_mi, tuple)
+    assert res_no_mi[0] == "NO MI. However, the GCD of "
+
+
+@pytest.mark.parametrize(
+    ("bitstring", "bitlist", "expected"),
+    [
+        ("", None, []),
+        (None, (1, 1, 1, 0, 0, 1), ["111", "00", "1"]),
+        ("001100", None, ["00", "11", "00"]),
+        ("0101", None, ["0", "1", "0", "1"]),
+    ],
+)
+def test_runs(
+    bitstring: str | None, bitlist: tuple[int, ...] | None, expected: list[str]
+) -> None:
+    """Tests extracting consecutive bit runs from vectors.
+
+    Args:
+        bitstring: Optional vector bitstring representation.
+        bitlist: Optional vector bitlist representation.
+        expected: Expected list of bit run strings.
+    """
+    if bitstring is not None:
+        bv = (
+            BitVector.BitVector(bitstring=bitstring)
+            if bitstring
+            else BitVector.BitVector(size=0)
         )
-        self.assertEqual(int(r_zero), 0)
-
-    def test_gf_multiply_modular(self):
-        mod = BitVector.BitVector(bitstring="100011011")  # AES modulus
-        n = 8
-        a = BitVector.BitVector(bitstring="0110001")
-        b = BitVector.BitVector(bitstring="0110")
-        c = a.gf_multiply_modular(b, mod, n)
-        self.assertEqual(str(c), "10100110")
-
-    def test_gf_MI(self):
-        mod = BitVector.BitVector(bitstring="100011011")
-        n = 8
-        a = BitVector.BitVector(bitstring="00110011")
-        mi = a.gf_MI(mod, n)
-        self.assertEqual(str(mi), "01101100")
-
-        # Test case where no multiplicative inverse exists
-        mod_no_mi = BitVector.BitVector(bitstring="1010")
-        a_no_mi = BitVector.BitVector(bitstring="0010")
-        res_no_mi = a_no_mi.gf_MI(mod_no_mi, 3)
-        self.assertIsInstance(res_no_mi, tuple)
-        self.assertEqual(res_no_mi[0], "NO MI. However, the GCD of ")
-
-    def test_runs(self):
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(bv_empty.runs(), [])
-
-        bv1 = BitVector.BitVector(bitlist=(1, 1, 1, 0, 0, 1))
-        self.assertEqual(bv1.runs(), ["111", "00", "1"])
-
-        bv2 = BitVector.BitVector(bitstring="001100")
-        self.assertEqual(bv2.runs(), ["00", "11", "00"])
-
-        bv3 = BitVector.BitVector(bitstring="0101")
-        self.assertEqual(bv3.runs(), ["0", "1", "0", "1"])
-
-    def test_test_for_primality(self):
-        # p == 1
-        self.assertEqual(BitVector.BitVector(intVal=1, size=8).test_for_primality(), 0)
-
-        # p in probes [2, 3, 5, 7, 11, 13, 17]
-        self.assertEqual(BitVector.BitVector(intVal=2, size=8).test_for_primality(), 1)
-        self.assertEqual(BitVector.BitVector(intVal=17, size=8).test_for_primality(), 1)
-
-        # p divisible by a probe (e.g. 25 = 5 * 5)
-        self.assertEqual(BitVector.BitVector(intVal=25, size=8).test_for_primality(), 0)
-
-        # Miller-Rabin test on primes > 17 (e.g. 19, 41)
-        prob_19 = BitVector.BitVector(intVal=19, size=16).test_for_primality()
-        self.assertGreater(prob_19, 0.99)
-        prob_41 = BitVector.BitVector(intVal=41, size=16).test_for_primality()
-        self.assertGreater(prob_41, 0.99)
-
-        # Miller-Rabin test on composite not divisible by probes (e.g. 361 = 19 * 19)
-        self.assertEqual(
-            BitVector.BitVector(intVal=361, size=16).test_for_primality(), 0
-        )
-
-    def test_gen_random_bits(self):
-        bv = BitVector.BitVector(size=0).gen_random_bits(32)
-        self.assertEqual(bv.size, 32)
-        self.assertEqual(int(bv) & 1, 1)
-
-    def test_min_canonical(self):
-        bv = BitVector.BitVector(bitstring="1101")
-        self.assertEqual(str(bv.min_canonical()), "0111")
+    elif bitlist is not None:
+        bv = BitVector.BitVector(bitlist=list(bitlist))
+    else:
+        bv = BitVector.BitVector(size=0)
+    assert bv.runs() == expected
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_test_for_primality() -> None:
+    """Tests Miller-Rabin and small-probe primality verification."""
+    assert BitVector.BitVector(intVal=1, size=8).test_for_primality() == 0
+    assert BitVector.BitVector(intVal=2, size=8).test_for_primality() == 1
+    assert BitVector.BitVector(intVal=17, size=8).test_for_primality() == 1
+    assert BitVector.BitVector(intVal=25, size=8).test_for_primality() == 0
+
+    prob_19 = BitVector.BitVector(intVal=19, size=16).test_for_primality()
+    assert prob_19 > 0.99
+    prob_41 = BitVector.BitVector(intVal=41, size=16).test_for_primality()
+    assert prob_41 > 0.99
+
+    assert BitVector.BitVector(intVal=361, size=16).test_for_primality() == 0
+
+
+def test_gen_random_bits() -> None:
+    """Tests random bit vector generation with forced odd integer result."""
+    bv = BitVector.BitVector(size=0).gen_random_bits(32)
+    assert bv.size == 32
+    assert int(bv) & 1 == 1
+
+
+def test_min_canonical() -> None:
+    """Tests finding the lexicographically smallest circular rotation."""
+    bv = BitVector.BitVector(bitstring="1101")
+    assert str(bv.min_canonical()) == "0111"

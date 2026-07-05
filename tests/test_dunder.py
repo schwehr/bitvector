@@ -1,263 +1,475 @@
+"""Tests for BitVector dunder methods (__xor__, __and__, __add__, etc.)."""
+
 import copy
-import unittest
+from typing import Any, Literal
+
+import pytest
 
 import BitVector
 
 
-class TestBitVectorDunder(unittest.TestCase):
-    def test_xor(self):
-        bv_short = BitVector.BitVector(bitstring="10")
-        bv_long = BitVector.BitVector(bitstring="1100")
-        self.assertEqual(str(bv_short ^ bv_long), "1110")
-        self.assertEqual(str(bv_long ^ bv_short), "1110")
+@pytest.mark.parametrize(
+    ("left_str", "right_str", "op", "expected"),
+    [
+        ("10", "1100", "^", "1110"),
+        ("1100", "10", "^", "1110"),
+        ("1010", "1100", "^", "0110"),
+        ("11", "0110", "&", "0010"),
+        ("0110", "11", "&", "0010"),
+        ("1010", "1100", "&", "1000"),
+        ("10", "0100", "|", "0110"),
+        ("0100", "10", "|", "0110"),
+        ("1010", "0101", "|", "1111"),
+    ],
+)
+def test_bitwise_dunder_operators(
+    left_str: str, right_str: str, op: Literal["^", "&", "|"], expected: str
+) -> None:
+    """Tests dunder bitwise operators (__xor__, __and__, __or__) across lengths.
 
-        bv1 = BitVector.BitVector(bitstring="1010")
-        bv2 = BitVector.BitVector(bitstring="1100")
-        self.assertEqual(str(bv1 ^ bv2), "0110")
+    Args:
+        left_str: Bitstring representation for the left operand.
+        right_str: Bitstring representation for the right operand.
+        op: The bitwise operator string ('^', '&', or '|').
+        expected: Expected output bitstring after applying the operator.
+    """
+    bv_left = BitVector.BitVector(bitstring=left_str)
+    bv_right = BitVector.BitVector(bitstring=right_str)
+    if op == "^":
+        res = bv_left ^ bv_right
+    elif op == "&":
+        res = bv_left & bv_right
+    elif op == "|":
+        res = bv_left | bv_right
+    else:
+        raise ValueError(f"Unsupported operator: {op}")
+    assert str(res) == expected
 
-    def test_and(self):
-        bv_short = BitVector.BitVector(bitstring="11")
-        bv_long = BitVector.BitVector(bitstring="0110")
-        self.assertEqual(str(bv_short & bv_long), "0010")
-        self.assertEqual(str(bv_long & bv_short), "0010")
 
-        bv1 = BitVector.BitVector(bitstring="1010")
-        bv2 = BitVector.BitVector(bitstring="1100")
-        self.assertEqual(str(bv1 & bv2), "1000")
+@pytest.mark.parametrize(
+    ("left_str", "right_str", "expected"),
+    [
+        ("101", "010", "101010"),
+        ("", "101", "101"),
+        ("101", "", "101"),
+        ("", "", ""),
+    ],
+)
+def test_add(left_str: str, right_str: str, expected: str) -> None:
+    """Tests concatenation dunder (__add__) across normal and empty vectors.
 
-    def test_add(self):
-        bv1 = BitVector.BitVector(bitstring="101")
-        bv2 = BitVector.BitVector(bitstring="010")
-        self.assertEqual(str(bv1 + bv2), "101010")
+    Args:
+        left_str: Bitstring for the left operand (empty string creates size=0).
+        right_str: Bitstring for the right operand.
+        expected: Expected output bitstring after concatenation.
+    """
+    left = (
+        BitVector.BitVector(bitstring=left_str)
+        if left_str
+        else BitVector.BitVector(size=0)
+    )
+    right = (
+        BitVector.BitVector(bitstring=right_str)
+        if right_str
+        else BitVector.BitVector(size=0)
+    )
+    assert str(left + right) == expected
 
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(str(bv_empty + bv1), "101")
-        self.assertEqual(str(bv1 + bv_empty), "101")
-        self.assertEqual(str(bv_empty + bv_empty), "")
 
-        # Test __add__ when self.vector is a list (lines 500-501)
-        bv_list = BitVector.BitVector(bitstring="1100")
-        bv_list.vector = list(bv_list.vector)
-        self.assertEqual(str(bv_list + bv2), "1100010")
+def test_add_vector_type_fallback() -> None:
+    """Tests __add__ fallback branches when self.vector is a list or tuple."""
+    bv2 = BitVector.BitVector(bitstring="010")
 
-        # Test __add__ when self.vector is neither array.array nor list (lines 502-504)
-        bv_tuple = BitVector.BitVector(bitstring="1001")
-        bv_tuple.vector = tuple(bv_tuple.vector)  # ty: ignore[invalid-assignment]
-        self.assertEqual(str(bv_tuple + bv2), "1001010")
+    bv_list = BitVector.BitVector(bitstring="1100")
+    bv_list.vector = list(bv_list.vector)
+    assert str(bv_list + bv2) == "1100010"
 
-    def test_iadd(self):
-        bv1 = BitVector.BitVector(bitstring="101")
-        bv2 = BitVector.BitVector(bitstring="010")
-        bv1 += bv2
-        self.assertEqual(str(bv1), "101010")
+    bv_tuple = BitVector.BitVector(bitstring="1001")
+    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
+    assert str(bv_tuple + bv2) == "1001010"
 
-        # Test __iadd__ with non-BitVector argument (line 519)
-        with self.assertRaises(TypeError) as cm:
-            bv1 += "010"  # ty: ignore[unsupported-operator]
-        self.assertIn("Can only join two BitVector objects, not", str(cm.exception))
 
-    def test_or(self):
-        bv_short = BitVector.BitVector(bitstring="10")
-        bv_long = BitVector.BitVector(bitstring="0100")
-        self.assertEqual(str(bv_short | bv_long), "0110")
-        self.assertEqual(str(bv_long | bv_short), "0110")
+def test_iadd() -> None:
+    """Tests in-place concatenation dunder (__iadd__) and type validation."""
+    bv1 = BitVector.BitVector(bitstring="101")
+    bv2 = BitVector.BitVector(bitstring="010")
+    bv1 += bv2
+    assert str(bv1) == "101010"
 
-        bv1 = BitVector.BitVector(bitstring="1010")
-        bv2 = BitVector.BitVector(bitstring="0101")
-        self.assertEqual(str(bv1 | bv2), "1111")
+    with pytest.raises(TypeError, match="Can only join two BitVector objects, not"):
+        bv1 += "010"  # type: ignore[arg-type]  # ty: ignore[unsupported-operator]
 
-    def test_invert(self):
-        bv = BitVector.BitVector(bitstring="10100111")
-        self.assertEqual(str(~bv), "01011000")
 
-        bv_empty = BitVector.BitVector(size=0)
-        self.assertEqual(str(~bv_empty), "")
+@pytest.mark.parametrize(
+    ("bitstring", "expected"),
+    [
+        ("10100111", "01011000"),
+        ("", ""),
+    ],
+)
+def test_invert(bitstring: str, expected: str) -> None:
+    """Tests bitwise inversion dunder (__invert__ / ~) on vectors.
 
-    def test_deepcopy(self):
-        bv = BitVector.BitVector(bitstring="10110")
-        bv_copy = copy.deepcopy(bv)
-        self.assertEqual(str(bv_copy), "10110")
-        self.assertIsNot(bv_copy, bv)
-        self.assertIsNot(bv_copy.vector, bv.vector)
+    Args:
+        bitstring: Input bitstring to invert (empty string creates size=0).
+        expected: Expected output bitstring after inversion.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert str(~bv) == expected
 
-        # Test with memo provided
-        memo = {}
-        bv_memo = copy.deepcopy(bv, memo)
-        self.assertEqual(str(bv_memo), "10110")
-        self.assertEqual(str(bv.__deepcopy__()), "10110")
 
-        # Test list fallback branch in __deepcopy__
-        bv_list = BitVector.BitVector(bitstring="1100")
-        bv_list.vector = list(bv_list.vector)
-        bv_list_copy = copy.deepcopy(bv_list)
-        self.assertEqual(str(bv_list_copy), "1100")
+def test_deepcopy() -> None:
+    """Tests deep copying via copy.deepcopy, memoization, and fallbacks."""
+    bv = BitVector.BitVector(bitstring="10110")
+    bv_copy = copy.deepcopy(bv)
+    assert str(bv_copy) == "10110"
+    assert bv_copy is not bv
+    assert bv_copy.vector is not bv.vector
 
-        # Test generic fallback branch in __deepcopy__
-        bv_tuple = BitVector.BitVector(bitstring="1001")
-        bv_tuple.vector = tuple(bv_tuple.vector)  # ty: ignore[invalid-assignment]
-        bv_tuple_copy = copy.deepcopy(bv_tuple)
-        self.assertEqual(str(bv_tuple_copy), "1001")
+    memo: dict[int, Any] = {}
+    bv_memo = copy.deepcopy(bv, memo)
+    assert str(bv_memo) == "10110"
+    assert str(bv.__deepcopy__()) == "10110"
 
-    def test_lshift(self):
-        bv = BitVector.BitVector(bitstring="1000")
-        self.assertEqual(str(bv << 1), "0001")
-        self.assertEqual(str(bv << 2), "0100")
-        self.assertEqual(str(bv << 0), "0100")
-        self.assertEqual(str(bv << -1), "0010")
+    bv_list = BitVector.BitVector(bitstring="1100")
+    bv_list.vector = list(bv_list.vector)
+    bv_list_copy = copy.deepcopy(bv_list)
+    assert str(bv_list_copy) == "1100"
 
-        bv_empty = BitVector.BitVector(size=0)
-        with self.assertRaises(ValueError) as cm:
+    bv_tuple = BitVector.BitVector(bitstring="1001")
+    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
+    bv_tuple_copy = copy.deepcopy(bv_tuple)
+    assert str(bv_tuple_copy) == "1001"
+
+
+@pytest.mark.parametrize(
+    ("shift", "expected"),
+    [
+        (1, "0001"),
+        (2, "0010"),
+        (0, "1000"),
+        (-1, "0100"),
+    ],
+)
+def test_lshift(shift: int, expected: str) -> None:
+    """Tests circular left shift dunder (__lshift__ / <<).
+
+    Args:
+        shift: Number of bit positions to rotate left.
+        expected: Expected output bitstring.
+    """
+    bv = BitVector.BitVector(bitstring="1000")
+    assert str(bv << shift) == expected
+
+
+@pytest.mark.parametrize("op", ["<<", ">>"])
+def test_shift_empty_vector_raises_error(op: Literal["<<", ">>"]) -> None:
+    """Verifies that circular shifting an empty vector raises ValueError.
+
+    Args:
+        op: The shift operator ('<<' or '>>').
+    """
+    bv_empty = BitVector.BitVector(size=0)
+    with pytest.raises(ValueError, match="Circular shift of an empty vector"):
+        if op == "<<":
             _ = bv_empty << 1
-        self.assertIn("Circular shift of an empty vector", str(cm.exception))
-
-    def test_rshift(self):
-        bv = BitVector.BitVector(bitstring="1000")
-        self.assertEqual(str(bv >> 1), "0100")
-        self.assertEqual(str(bv >> 2), "0001")
-        self.assertEqual(str(bv >> 0), "0001")
-        self.assertEqual(str(bv >> -1), "0010")
-
-        bv_empty = BitVector.BitVector(size=0)
-        with self.assertRaises(ValueError) as cm:
+        elif op == ">>":
             _ = bv_empty >> 1
-        self.assertIn("Circular shift of an empty vector", str(cm.exception))
-
-    def test_setitem(self):
-        # Index assignment
-        bv = BitVector.BitVector(bitstring="000")
-        bv[1] = 1
-        bv[-1] = 1
-        self.assertEqual(str(bv), "011")
-        bv[0] = 0
-        self.assertEqual(str(bv), "011")
-
-        # Slice assignment error: item not a BitVector
-        with self.assertRaises(TypeError) as cm:
-            bv[0:1] = [1]
-        self.assertIn(
-            "For slice assignment, the right hand side must be a BitVector",
-            str(cm.exception),
-        )
-
-        # Slice assignment: start is None and stop is None
-        bv2 = BitVector.BitVector(bitstring="1010")
-        bv2[:] = BitVector.BitVector(bitstring="0101")
-        self.assertEqual(str(bv2), "1010")
-
-        # Slice assignment: start is None, stop >= 0
-        bv3 = BitVector.BitVector(bitstring="0000")
-        with self.assertRaises(ValueError) as cm:
-            bv3[:2] = BitVector.BitVector(size=1)
-        self.assertIn("incompatible lengths for slice assignment 1", str(cm.exception))
-        bv3[:2] = BitVector.BitVector(bitstring="11")
-        self.assertEqual(str(bv3), "1100")
-
-        # Slice assignment: start is None, stop < 0
-        bv4 = BitVector.BitVector(bitstring="0000")
-        with self.assertRaises(ValueError) as cm:
-            bv4[:-1] = BitVector.BitVector(size=2)
-        self.assertIn("incompatible lengths for slice assignment 2", str(cm.exception))
-        bv4[:-1] = BitVector.BitVector(bitstring="111")
-        self.assertEqual(str(bv4), "1110")
-
-        # Slice assignment: stop is None, start >= 0
-        bv5 = BitVector.BitVector(bitstring="0000")
-        with self.assertRaises(ValueError) as cm:
-            bv5[2:] = BitVector.BitVector(size=1)
-        self.assertIn("incompatible lengths for slice assignment 3", str(cm.exception))
-        bv5[2:] = BitVector.BitVector(bitstring="11")
-        self.assertEqual(str(bv5), "0011")
-
-        # Slice assignment: stop is None, start < 0
-        bv6 = BitVector.BitVector(bitstring="0000")
-        with self.assertRaises(ValueError) as cm:
-            bv6[-2:] = BitVector.BitVector(size=1)
-        self.assertIn("incompatible lengths for slice assignment 4", str(cm.exception))
-        bv6[-2:] = BitVector.BitVector(bitstring="11")
-        self.assertEqual(str(bv6), "0011")
-
-        # Slice assignment: start >= 0 and stop < 0
-        bv7 = BitVector.BitVector(bitstring="000000")
-        with self.assertRaises(ValueError) as cm:
-            bv7[1:-1] = BitVector.BitVector(size=2)
-        self.assertIn("incompatible lengths for slice assignment 5", str(cm.exception))
-        bv7[1:-1] = BitVector.BitVector(bitstring="1111")
-        self.assertEqual(str(bv7), "011110")
-
-        # Slice assignment: start < 0 and stop >= 0
-        bv8 = BitVector.BitVector(bitstring="0000000000")
-        with self.assertRaises(ValueError) as cm:
-            bv8[-8:6] = BitVector.BitVector(size=3)
-        self.assertIn("incompatible lengths for slice assignment 6", str(cm.exception))
-        bv8[-2:6] = BitVector.BitVector(size=2)
-
-        # Slice assignment: start >= 0 and stop >= 0 (normal slice)
-        bv9 = BitVector.BitVector(bitstring="0000")
-        with self.assertRaises(ValueError) as cm:
-            bv9[1:3] = BitVector.BitVector(size=1)
-        self.assertIn("incompatible lengths for slice assignment 7", str(cm.exception))
-        bv9[1:3] = BitVector.BitVector(bitstring="11")
-        self.assertEqual(str(bv9), "0110")
-
-    def test_str(self):
-        self.assertEqual(str(BitVector.BitVector(size=0)), "")
-        self.assertEqual(str(BitVector.BitVector(bitstring="10110")), "10110")
-
-    def test_eq(self):
-        bv1 = BitVector.BitVector(bitstring="1010")
-        self.assertFalse(bv1 == BitVector.BitVector(bitstring="10100"))
-        self.assertFalse(bv1 == BitVector.BitVector(bitstring="1011"))
-        self.assertTrue(bv1 == BitVector.BitVector(bitstring="1010"))
-        self.assertTrue(BitVector.BitVector(size=0) == BitVector.BitVector(size=0))
-
-    def test_ne(self):
-        bv1 = BitVector.BitVector(bitstring="1010")
-        self.assertFalse(bv1 != BitVector.BitVector(bitstring="1010"))
-        self.assertTrue(bv1 != BitVector.BitVector(bitstring="0101"))
-
-    def test_lt(self):
-        bv_small = BitVector.BitVector(intVal=3, size=8)
-        bv_large = BitVector.BitVector(intVal=5, size=8)
-        self.assertTrue(bv_small < bv_large)
-        self.assertFalse(bv_large < bv_small)
-        self.assertFalse(bv_small < BitVector.BitVector(intVal=3, size=8))
-
-    def test_le(self):
-        bv_small = BitVector.BitVector(intVal=3, size=8)
-        bv_large = BitVector.BitVector(intVal=5, size=8)
-        self.assertTrue(bv_small <= bv_large)
-        self.assertTrue(bv_small <= BitVector.BitVector(intVal=3, size=8))
-        self.assertFalse(bv_large <= bv_small)
-
-    def test_gt(self):
-        bv_small = BitVector.BitVector(intVal=3, size=8)
-        bv_large = BitVector.BitVector(intVal=5, size=8)
-        self.assertTrue(bv_large > bv_small)
-        self.assertFalse(bv_small > bv_large)
-        self.assertFalse(bv_small > BitVector.BitVector(intVal=3, size=8))
-
-    def test_ge(self):
-        bv_small = BitVector.BitVector(intVal=3, size=8)
-        bv_large = BitVector.BitVector(intVal=5, size=8)
-        self.assertTrue(bv_large >= bv_small)
-        self.assertTrue(bv_small >= BitVector.BitVector(intVal=3, size=8))
-        self.assertFalse(bv_small >= bv_large)
-
-    def test_contains(self):
-        bv_empty = BitVector.BitVector(size=0)
-        bv = BitVector.BitVector(bitstring="110100")
-
-        with self.assertRaises(ValueError) as cm:
-            _ = BitVector.BitVector(bitstring="1") in bv_empty
-        self.assertIn("First arg bitvec has no bits", str(cm.exception))
-
-        with self.assertRaises(ValueError) as cm:
-            _ = BitVector.BitVector(bitstring="1101000") in bv
-        self.assertIn("First arg bitvec too short", str(cm.exception))
-
-        self.assertTrue(BitVector.BitVector(bitstring="010") in bv)
-        self.assertFalse(BitVector.BitVector(bitstring="111") in bv)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize(
+    ("shift", "expected"),
+    [
+        (1, "0100"),
+        (2, "0010"),
+        (0, "1000"),
+        (-1, "0001"),
+    ],
+)
+def test_rshift(shift: int, expected: str) -> None:
+    """Tests circular right shift dunder (__rshift__ / >>).
+
+    Args:
+        shift: Number of bit positions to rotate right.
+        expected: Expected output bitstring.
+    """
+    bv = BitVector.BitVector(bitstring="1000")
+    assert str(bv >> shift) == expected
+
+
+@pytest.mark.parametrize(
+    ("initial", "sl", "err_size", "err_match", "valid_str", "expected"),
+    [
+        (
+            "0000",
+            slice(None, 2),
+            1,
+            "incompatible lengths for slice assignment 1",
+            "11",
+            "1100",
+        ),
+        (
+            "0000",
+            slice(None, -1),
+            2,
+            "incompatible lengths for slice assignment 2",
+            "111",
+            "1110",
+        ),
+        (
+            "0000",
+            slice(2, None),
+            1,
+            "incompatible lengths for slice assignment 3",
+            "11",
+            "0011",
+        ),
+        (
+            "0000",
+            slice(-2, None),
+            1,
+            "incompatible lengths for slice assignment 4",
+            "11",
+            "0011",
+        ),
+        (
+            "000000",
+            slice(1, -1),
+            2,
+            "incompatible lengths for slice assignment 5",
+            "1111",
+            "011110",
+        ),
+        (
+            "0000000000",
+            slice(-2, 6),
+            3,
+            "incompatible lengths for slice assignment 6",
+            "11",
+            "0000000000",
+        ),
+        (
+            "0000",
+            slice(1, 3),
+            1,
+            "incompatible lengths for slice assignment 7",
+            "11",
+            "0110",
+        ),
+    ],
+)
+def test_setitem_slice_assignment(
+    initial: str,
+    sl: slice,
+    err_size: int,
+    err_match: str,
+    valid_str: str,
+    expected: str,
+) -> None:
+    """Tests __setitem__ slice assignment validation and success.
+
+    Args:
+        initial: Initial bitstring representation for the vector.
+        sl: The slice object defining the target range.
+        err_size: A vector size that triggers an incompatible length error.
+        err_match: The expected error message substring.
+        valid_str: A bitstring of valid length for assignment.
+        expected: Expected vector bitstring after assignment.
+    """
+    bv = BitVector.BitVector(bitstring=initial)
+    with pytest.raises(ValueError, match=err_match):
+        bv[sl] = BitVector.BitVector(size=err_size)
+    bv[sl] = BitVector.BitVector(bitstring=valid_str)
+    assert str(bv) == expected
+
+
+def test_setitem_index_assignment() -> None:
+    """Tests __setitem__ with positive and negative integer indices."""
+    bv = BitVector.BitVector(bitstring="000")
+    bv[1] = 1
+    bv[-1] = 1
+    assert str(bv) == "011"
+    bv[0] = 0
+    assert str(bv) == "011"
+
+
+def test_setitem_slice_type_error() -> None:
+    """Verifies slice assignment with a non-BitVector raises TypeError."""
+    bv = BitVector.BitVector(bitstring="000")
+    with pytest.raises(
+        TypeError,
+        match="For slice assignment, the right hand side must be a BitVector",
+    ):
+        bv[0:1] = [1]
+
+
+def test_setitem_full_slice() -> None:
+    """Tests __setitem__ when replacing the entire slice ([:])."""
+    bv = BitVector.BitVector(bitstring="1010")
+    bv[:] = BitVector.BitVector(bitstring="0101")
+    assert str(bv) == "1010"
+
+
+@pytest.mark.parametrize(
+    ("bitstring", "expected"),
+    [
+        ("", ""),
+        ("10110", "10110"),
+    ],
+)
+def test_str(bitstring: str, expected: str) -> None:
+    """Tests __str__ representation on empty and non-empty vectors.
+
+    Args:
+        bitstring: Initial bitstring representation.
+        expected: Expected string representation.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert str(bv) == expected
+
+
+@pytest.mark.parametrize(
+    ("left_str", "right_str", "expected"),
+    [
+        ("1010", "10100", False),
+        ("1010", "1011", False),
+        ("1010", "1010", True),
+        ("", "", True),
+    ],
+)
+def test_eq(left_str: str, right_str: str, expected: bool) -> None:
+    """Tests equality dunder (__eq__ / ==) across various lengths and values.
+
+    Args:
+        left_str: Bitstring for the left operand.
+        right_str: Bitstring for the right operand.
+        expected: Expected boolean equality result.
+    """
+    left = (
+        BitVector.BitVector(bitstring=left_str)
+        if left_str
+        else BitVector.BitVector(size=0)
+    )
+    right = (
+        BitVector.BitVector(bitstring=right_str)
+        if right_str
+        else BitVector.BitVector(size=0)
+    )
+    assert (left == right) is expected
+
+
+@pytest.mark.parametrize(
+    ("left_str", "right_str", "expected"),
+    [
+        ("1010", "1010", False),
+        ("1010", "0101", True),
+    ],
+)
+def test_ne(left_str: str, right_str: str, expected: bool) -> None:
+    """Tests inequality dunder (__ne__ / !=) across various bitstrings.
+
+    Args:
+        left_str: Bitstring for the left operand.
+        right_str: Bitstring for the right operand.
+        expected: Expected boolean inequality result.
+    """
+    left = BitVector.BitVector(bitstring=left_str)
+    right = BitVector.BitVector(bitstring=right_str)
+    assert (left != right) is expected
+
+
+@pytest.mark.parametrize(
+    ("val1", "val2", "op", "expected"),
+    [
+        (3, 5, "<", True),
+        (5, 3, "<", False),
+        (3, 3, "<", False),
+        (3, 5, "<=", True),
+        (3, 3, "<=", True),
+        (5, 3, "<=", False),
+        (5, 3, ">", True),
+        (3, 5, ">", False),
+        (3, 3, ">", False),
+        (5, 3, ">=", True),
+        (3, 3, ">=", True),
+        (3, 5, ">=", False),
+    ],
+)
+def test_relational_operators(
+    val1: int, val2: int, op: Literal["<", "<=", ">", ">="], expected: bool
+) -> None:
+    """Tests relational dunder operators (__lt__, __le__, __gt__, __ge__).
+
+    Args:
+        val1: Integer value for the left operand.
+        val2: Integer value for the right operand.
+        op: Relational operator string ('<', '<=', '>', '>=').
+        expected: Expected boolean comparison result.
+    """
+    bv1 = BitVector.BitVector(intVal=val1, size=8)
+    bv2 = BitVector.BitVector(intVal=val2, size=8)
+    if op == "<":
+        res = bv1 < bv2
+    elif op == "<=":
+        res = bv1 <= bv2
+    elif op == ">":
+        res = bv1 > bv2
+    elif op == ">=":
+        res = bv1 >= bv2
+    else:
+        raise ValueError(f"Unsupported operator: {op}")
+    assert res is expected
+
+
+@pytest.mark.parametrize(
+    ("pattern", "expected_in"),
+    [
+        ("010", True),
+        ("111", False),
+    ],
+)
+def test_contains(pattern: str, expected_in: bool) -> None:
+    """Tests substring search dunder (__contains__ / in).
+
+    Args:
+        pattern: The bitstring pattern to search for.
+        expected_in: True if pattern is found in the vector, otherwise False.
+    """
+    bv = BitVector.BitVector(bitstring="110100")
+    sub_bv = BitVector.BitVector(bitstring=pattern)
+    assert (sub_bv in bv) is expected_in
+
+
+@pytest.mark.parametrize(
+    ("target_str", "pattern_str", "err_match"),
+    [
+        ("", "1", "First arg bitvec has no bits"),
+        ("110100", "1101000", "First arg bitvec too short"),
+    ],
+)
+def test_contains_invalid_args_raises_error(
+    target_str: str, pattern_str: str, err_match: str
+) -> None:
+    """Verifies that invalid __contains__ lookups raise ValueError.
+
+    Args:
+        target_str: The bitstring for the container vector.
+        pattern_str: The bitstring for the substring pattern vector.
+        err_match: The expected error message substring.
+    """
+    target = (
+        BitVector.BitVector(bitstring=target_str)
+        if target_str
+        else BitVector.BitVector(size=0)
+    )
+    pattern = BitVector.BitVector(bitstring=pattern_str)
+    with pytest.raises(ValueError, match=err_match):
+        _ = pattern in target
