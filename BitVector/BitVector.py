@@ -35,14 +35,24 @@ _hexdict = {
 
 
 def _readblock(blocksize: int, bitvector: BitVector) -> str:
-    """
-    If this function succeeds in reading all blocksize bits, it uses the
-    tell-read-seek mechanism to peek ahead to see if there is anything more to be
-    read in the file. If there is nothing further to be read, it sets the more_to_read
-    attribute of the BitVector instance to False.  Obviously, this can only be done for
-    seekable streams such as those connected with disk files.  According to Blair
-    Houghton, a similar feature could presumably be implemented for socket streams by
-    using recv() or recvfrom() if you set the flags argument to MSG_PEEK.
+    """Reads a block of bits from a file stream into a binary bitstring.
+
+    If this function succeeds in reading all blocksize bits, it uses a
+    tell-read-seek mechanism to peek ahead and check if any data remains in
+    the file. If there is nothing further to read, it sets the more_to_read
+    attribute of the bitvector instance to False. This peek mechanism is
+    supported on seekable streams such as disk files. A similar feature could
+    be implemented for socket streams using recv() with MSG_PEEK.
+
+    Args:
+        blocksize: The requested number of bits to read from the stream. Must
+            be a multiple of 8.
+        bitvector: The target BitVector instance whose FILEIN file stream is
+            read and whose more_to_read state is updated.
+
+    Returns:
+        A string of binary characters ('0's and '1's) representing the read
+        bits, up to blocksize in length.
     """
     assert bitvector.FILEIN is not None
 
@@ -58,15 +68,16 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
         hexvalue = "%02x" % byte[0]
         bitstring += _hexdict[hexvalue[0]]
         bitstring += _hexdict[hexvalue[1]]
+
     file_pos = bitvector.FILEIN.tell()
-    # peek at the next byte; moves file position only if a
-    # byte is read
+    # Peek at the next byte; moves file position only if a byte is read.
     next_byte = bitvector.FILEIN.read(1)
     if next_byte:
         # pretend we never read the byte
         bitvector.FILEIN.seek(file_pos)
     else:
         bitvector.more_to_read = False
+
     return bitstring
 
 
