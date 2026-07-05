@@ -21,6 +21,11 @@ jobs:
         python-version:
           - "3.13"
           - "3.14"
+        exclude:
+          - os: macos-latest
+            python-version: "3.13"
+          - os: windows-latest
+            python-version: "3.13"
 
     steps:
       - name: Checkout code

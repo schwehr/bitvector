@@ -141,8 +141,8 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
   ```
 - **Cross-Platform CI**: Automated matrix testing in GitHub Actions executes
   across Linux (`ubuntu-latest`), macOS (`macos-latest`), and Windows
-  (`windows-latest`) for Python 3.13 and 3.14. Benchmarks and type checks are
-  scoped to Linux.
+  (`windows-latest`) for Python 3.14, while Python 3.13 testing is scoped to
+  Linux. Benchmarks and type checks are also scoped to Linux.
 - **Best Pytest Form**:
   - **CRITICAL RULE**: Write all new and refactored tests in the **best modern
     `pytest` form** using standard Python `assert` statements (e.g.,
