@@ -470,7 +470,7 @@ class BitVector:
                 slicebits.append(self[x])
             return BitVector(bitlist=slicebits)
 
-    def __xor__(self, other: BitVector) -> BitVector:
+    def __xor__(self, other: BitVector) -> Self:
         """Performs a bitwise exclusive OR (XOR) with another bit vector.
 
         If the two bit vectors are not of equal length, the shorter vector is
@@ -492,12 +492,12 @@ class BitVector:
         else:
             bv1 = self
             bv2 = other
-        res = BitVector(size=bv1.size)
+        res = self.__class__(size=bv1.size)
         lpb = map(operator.__xor__, bv1.vector, bv2.vector)
         res.vector = array.array("H", lpb)
         return res
 
-    def __and__(self, other: BitVector) -> BitVector:
+    def __and__(self, other: BitVector) -> Self:
         """Performs a bitwise AND with another bit vector.
 
         If the two bit vectors are not of equal length, the shorter vector is
@@ -519,12 +519,12 @@ class BitVector:
         else:
             bv1 = self
             bv2 = other
-        res = BitVector(size=bv1.size)
+        res = self.__class__(size=bv1.size)
         lpb = map(operator.__and__, bv1.vector, bv2.vector)
         res.vector = array.array("H", lpb)
         return res
 
-    def __or__(self, other: BitVector) -> BitVector:
+    def __or__(self, other: BitVector) -> Self:
         """Performs a bitwise inclusive OR with another bit vector.
 
         If the two bit vectors are not of equal length, the shorter vector is
@@ -546,26 +546,26 @@ class BitVector:
         else:
             bv1 = self
             bv2 = other
-        res = BitVector(size=bv1.size)
+        res = self.__class__(size=bv1.size)
         lpb = map(operator.__or__, bv1.vector, bv2.vector)
         res.vector = array.array("H", lpb)
         return res
 
-    def __invert__(self) -> BitVector:
+    def __invert__(self) -> Self:
         """Inverts all bits in the bit vector (bitwise NOT).
 
         Returns:
             A new BitVector instance where each 0 bit is replaced by 1 and
             each 1 bit is replaced by 0.
         """
-        res = BitVector(size=self.size)
+        res = self.__class__(size=self.size)
         lpb = list(map(operator.__inv__, self.vector))
         res.vector = array.array("H")
         for i in range(len(lpb)):
             res.vector.append(lpb[i] & 0x0000FFFF)
         return res
 
-    def __add__(self, other: BitVector) -> BitVector:
+    def __add__(self, other: BitVector) -> Self:
         """Concatenates this bit vector with another bit vector.
 
         Creates a new bit vector containing all bits from this vector followed
@@ -577,7 +577,7 @@ class BitVector:
         Returns:
             A new BitVector instance representing the concatenated bit string.
         """
-        new_bv = BitVector(size=0)
+        new_bv = self.__class__(size=0)
         if isinstance(self.vector, array.array) and isinstance(
             new_bv.vector, array.array
         ):
@@ -586,7 +586,7 @@ class BitVector:
             new_bv.vector = self.vector.copy()
         else:
             out_str = str(self) + str(other)
-            return BitVector(bitstring=out_str)
+            return self.__class__(bitstring=out_str)
         new_bv.size = self.size
         new_bv += other
         return new_bv
@@ -633,7 +633,7 @@ class BitVector:
         """
         return self.size
 
-    def read_bits_from_file(self, blocksize: int) -> BitVector:
+    def read_bits_from_file(self, blocksize: int) -> Self:
         """Reads a block of bits from the associated disk file.
 
         The BitVector instance must have been initialized with a filename. Reads up
@@ -660,9 +660,9 @@ class BitVector:
             raise ValueError("block size must be a multiple of 8")
         bitstr = _readblock(blocksize, self)
         if len(bitstr) == 0:
-            return BitVector(size=0)
+            return self.__class__(size=0)
         else:
-            return BitVector(bitstring=bitstr)
+            return self.__class__(bitstring=bitstr)
 
     def read_bits_from_fileobject(self, fp: Any) -> Any:
         """Reads characters sequentially from a text or stream file object.
@@ -696,7 +696,7 @@ class BitVector:
             else:
                 fp.write("1")
 
-    def divide_into_two(self) -> list[BitVector]:
+    def divide_into_two(self) -> list[Self]:
         """Splits an even-length bit vector into two equal halves.
 
         Returns:
@@ -716,9 +716,9 @@ class BitVector:
         while i < self.size:
             outlist2.append(self[i])
             i += 1
-        return [BitVector(bitlist=outlist1), BitVector(bitlist=outlist2)]
+        return [self.__class__(bitlist=outlist1), self.__class__(bitlist=outlist2)]
 
-    def permute(self, permute_list: Sequence[int] | Any) -> BitVector:
+    def permute(self, permute_list: Sequence[int] | Any) -> Self:
         """Permutes the bits of the vector according to a permutation list.
 
         Args:
@@ -738,9 +738,9 @@ class BitVector:
         while i < len(permute_list):
             outlist.append(self[permute_list[i]])
             i += 1
-        return BitVector(bitlist=outlist)
+        return self.__class__(bitlist=outlist)
 
-    def unpermute(self, permute_list: Sequence[int] | Any) -> BitVector:
+    def unpermute(self, permute_list: Sequence[int] | Any) -> Self:
         """Restores the original bit ordering of a previously permuted vector.
 
         Args:
@@ -757,7 +757,7 @@ class BitVector:
             raise ValueError("Bad permutation index")
         if self.size != len(permute_list):
             raise ValueError("Bad size for permute list")
-        out_bv = BitVector(size=self.size)
+        out_bv = self.__class__(size=self.size)
         i = 0
         while i < len(permute_list):
             out_bv[permute_list[i]] = self[i]
@@ -1223,7 +1223,7 @@ class BitVector:
         new_bv.size = self.size
         return new_bv
 
-    def _resize_pad_from_left(self, n: int) -> BitVector:
+    def _resize_pad_from_left(self, n: int) -> Self:
         """Resizes the bit vector by padding with n zeros from the left.
 
         Args:
@@ -1233,7 +1233,7 @@ class BitVector:
             A new BitVector instance containing the left-padded bits.
         """
         new_str = "0" * n + str(self)
-        return BitVector(bitstring=new_str)
+        return self.__class__(bitstring=new_str)
 
     def pad_from_left(self, n: int) -> None:
         """Pads the bit vector with n zeros from the left in-place.
@@ -1472,7 +1472,7 @@ class BitVector:
             return True
         return False
 
-    def reverse(self) -> BitVector:
+    def reverse(self) -> Self:
         """Reverses the order of bits in the vector (left-to-right becomes right-to-left).
 
         Returns:
@@ -1483,9 +1483,9 @@ class BitVector:
         while i < self.size + 1:
             reverseList.append(self[-i])
             i += 1
-        return BitVector(bitlist=reverseList)
+        return self.__class__(bitlist=reverseList)
 
-    def gcd(self, other: BitVector) -> BitVector:
+    def gcd(self, other: BitVector) -> Self:
         """Calculates the greatest common divisor (GCD) using Euclid's algorithm.
 
         Args:
@@ -1500,9 +1500,9 @@ class BitVector:
             a, b = b, a
         while b != 0:
             a, b = b, a % b
-        return BitVector(intVal=a)
+        return self.__class__(intVal=a)
 
-    def multiplicative_inverse(self, modulus: BitVector) -> BitVector | None:
+    def multiplicative_inverse(self, modulus: BitVector) -> Self | None:
         """Calculates the modular multiplicative inverse using integer arithmetic.
 
         Uses the Extended Euclidean Algorithm. For field inverses in GF(2^n),
@@ -1528,7 +1528,7 @@ class BitVector:
             return None
         else:
             MI = (x_old + MOD) % MOD
-            return BitVector(intVal=MI)
+            return self.__class__(intVal=MI)
 
     def length(self) -> int:
         """Returns the number of bits stored in the vector.
@@ -1538,7 +1538,7 @@ class BitVector:
         """
         return self.size
 
-    def gf_multiply(self, b: BitVector) -> BitVector:
+    def gf_multiply(self, b: BitVector) -> Self:
         """Multiplies two polynomials in Galois Field GF(2).
 
         Args:
@@ -1549,7 +1549,7 @@ class BitVector:
         """
         a = copy.deepcopy(self)
         b_copy = copy.deepcopy(b)
-        result = BitVector(size=a.length() + b_copy.length())
+        result = self.__class__(size=a.length() + b_copy.length())
         a.pad_from_left(result.length() - a.length())
         b_copy.pad_from_left(result.length() - b_copy.length())
         for i, bit in enumerate(b_copy):
@@ -1560,9 +1560,7 @@ class BitVector:
                 result ^= a_copy
         return result
 
-    def gf_divide_by_modulus(
-        self, mod: BitVector, n: int
-    ) -> tuple[BitVector, BitVector]:
+    def gf_divide_by_modulus(self, mod: BitVector, n: int) -> tuple[Self, Self]:
         """Divides this polynomial by a modulus polynomial in GF(2^n).
 
         Args:
@@ -1578,7 +1576,7 @@ class BitVector:
         num = self
         if mod.length() > n + 1:
             raise ValueError("Modulus bit pattern too long")
-        quotient = BitVector(intVal=0, size=num.length())
+        quotient = self.__class__(intVal=0, size=num.length())
         remainder = copy.deepcopy(num)
         i = 0
         while 1:
@@ -1605,9 +1603,7 @@ class BitVector:
             remainder = remainder[remainder.length() - n :]
         return quotient, remainder
 
-    def gf_multiply_modular(
-        self, b: BitVector | Any, mod: BitVector, n: int
-    ) -> BitVector:
+    def gf_multiply_modular(self, b: BitVector | Any, mod: BitVector, n: int) -> Self:
         """Performs modular polynomial multiplication in Galois Field GF(2^n).
 
         Args:
@@ -1625,7 +1621,7 @@ class BitVector:
         quotient, remainder = product.gf_divide_by_modulus(mod, n)
         return remainder
 
-    def gf_MI(self, mod: BitVector, n: int) -> BitVector | tuple[str, ...]:
+    def gf_MI(self, mod: BitVector, n: int) -> Self | tuple[str, ...]:
         """Calculates the multiplicative inverse in Galois Field GF(2^n).
 
         Args:
@@ -1636,13 +1632,13 @@ class BitVector:
             A new BitVector with the multiplicative inverse in GF(2^n), or a
             tuple of descriptive strings if no inverse exists.
         """
-        num = self
+        num: BitVector = self
         NUM = copy.deepcopy(num)
         MOD = copy.deepcopy(mod)
-        x = BitVector(size=mod.length())
-        x_old = BitVector(intVal=1, size=mod.length())
-        y = BitVector(intVal=1, size=mod.length())
-        y_old = BitVector(size=mod.length())
+        x = self.__class__(size=mod.length())
+        x_old = self.__class__(intVal=1, size=mod.length())
+        y = self.__class__(intVal=1, size=mod.length())
+        y_old = self.__class__(size=mod.length())
         while int(mod):
             quotient, remainder = num.gf_divide_by_modulus(mod, n)
             num, mod = mod, remainder
@@ -1729,7 +1725,7 @@ class BitVector:
         probability_of_prime = 1 - 1.0 / (4 ** len(probes))
         return probability_of_prime
 
-    def gen_random_bits(self, width: int) -> BitVector:
+    def gen_random_bits(self, width: int) -> Self:
         """Generates a random odd integer bit vector of specified bit width.
 
         Ensures the number spans the full width by setting the two most
@@ -1745,9 +1741,9 @@ class BitVector:
         candidate |= 1
         candidate |= 1 << width - 1
         candidate |= 2 << width - 3
-        return BitVector(intVal=candidate)
+        return self.__class__(intVal=candidate)
 
-    def min_canonical(self) -> BitVector:
+    def min_canonical(self) -> Self:
         """Finds the minimum canonical circular rotation of the bit vector.
 
         Evaluates all circular shifts and selects the rotation with the minimum
@@ -1757,7 +1753,7 @@ class BitVector:
             A new BitVector instance representing the minimum canonical rotation.
         """
         intvals_for_circular_shifts = [int(self << 1) for _ in range(len(self))]
-        return BitVector(intVal=min(intvals_for_circular_shifts), size=len(self))
+        return self.__class__(intVal=min(intvals_for_circular_shifts), size=len(self))
 
 
 class BitVectorIterator:
