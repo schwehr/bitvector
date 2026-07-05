@@ -37,8 +37,7 @@ The project repository is structured as a modern Python package:
   (`ruff`, `pytest`, `ty`, `codespell`, `coverage`).
 * **`uv.lock`**: Exact locked dependency resolution file managed by `uv`.
 * **`.pre-commit-config.yaml`**: Configuration for pre-commit git hooks.
-* **`AGENTS.md` & `.agents/AGENTS.md`**: AI assistant and developer guidelines
-  (this document).
+* **`AGENTS.md`**: AI assistant and developer guidelines (this document).
 * **`README.md` & `LICENSE`**: Project documentation and PSF-2.0 license file.
 
 ## 3. BitVector Structure & API Summary
