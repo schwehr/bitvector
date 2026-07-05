@@ -157,7 +157,8 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
     of manual cleanup or `tempfile`.
 - **Coverage & Performance**: Maintain 100% test coverage for new features and
   bug fixes. Ensure benchmark suites (`test_benchmarks.py`) remain functional
-  and non-regressing.
+  and non-regressing. Continuous integration automatically posts coverage and
+  test execution summaries to PR comments and job summaries.
 
 ## 6. Code & Docstring Style
 

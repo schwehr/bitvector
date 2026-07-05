@@ -1,5 +1,8 @@
 # BitVector
 
+[![Test](https://github.com/schwehr/bitvector-modern/actions/workflows/test.yml/badge.svg)](https://github.com/schwehr/bitvector-modern/actions/workflows/test.yml)
+[![Check Links](https://github.com/schwehr/bitvector-modern/actions/workflows/lychee.yml/badge.svg)](https://github.com/schwehr/bitvector-modern/actions/workflows/lychee.yml)
+
 The `BitVector.py` module is for a memory-efficient packed representation of bit
 vectors and for the processing of such vectors.
 
