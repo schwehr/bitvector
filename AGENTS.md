@@ -92,7 +92,7 @@ The core functionality of `bitvector-modern` is implemented in
   `gf_MI`), greatest common divisor (`gcd`), multiplicative inverse
   (`multiplicative_inverse`), and primality testing (`test_for_primality`).
 - **Utilities**: Random bit vector generation (`gen_random_bits`) and deep
-  copying (`deep_copy` / `__deepcopy__`).
+  copying (`__deepcopy__`).
 
 ## 4. Development Environment & Tooling
 
@@ -182,6 +182,10 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
 
 ## 7. Version Control & Commit Messages
 
+- **Feature Branches**:
+  - **CRITICAL RULE**: All code changes and refactoring work MUST be performed
+    on dedicated git feature branches (e.g., `git checkout -b <branch-name>`).
+  - Never make direct commits on the `main` branch.
 - **Code Review**:
   - Always do a code review before committing. In addition to finding and
     suggesting fixes to issues, try to create 1-3 suggestions for improvement to

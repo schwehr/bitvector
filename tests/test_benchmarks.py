@@ -272,7 +272,7 @@ def test_bench_get_bitvector_in_ascii(benchmark, sample_bv1):
     benchmark(sample_bv1.get_bitvector_in_ascii)
 
 
-def test_bench_deep_copy(benchmark, sample_bv1):
+def test_bench_deepcopy(benchmark, sample_bv1):
     benchmark(copy.deepcopy, sample_bv1)
 
 
@@ -415,10 +415,6 @@ def test_bench_set_value(benchmark, sample_bv1):
 def test_bench_unpermute(benchmark, sample_bv1):
     perm = list(reversed(range(1000)))
     benchmark(sample_bv1.unpermute, perm)
-
-
-def test_bench_int_value_legacy(benchmark, sample_bv1):
-    benchmark(sample_bv1.intValue)
 
 
 # --- Group 2: Galois Field (GF) & Advanced Cryptographic Math ---
