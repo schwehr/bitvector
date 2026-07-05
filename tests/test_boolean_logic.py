@@ -1,46 +1,103 @@
-import unittest
+"""Tests for bitwise boolean logic operators (&, |, ^, ~) on BitVector."""
+
+import operator
+from typing import Any, Callable, Literal
+
+import pytest
 
 import BitVector
 
-bv1 = BitVector.BitVector(bitstring="00110011")
-bv2 = BitVector.BitVector(bitlist=[1, 1, 1, 1, 0, 0, 1, 1])
-bv3 = BitVector.BitVector(bitstring="00000000111111110000000")
-bv4 = BitVector.BitVector(bitstring="")
-bv5 = BitVector.BitVector(size=0)
+BinaryOp = Literal["&", "|", "^"]
 
-logicTests = [
-    ((bv1, bv2, "&"), "00110011"),
-    ((bv1, bv3, "&"), ""),
-    ((bv1, bv4, "&"), ""),
-    ((bv1, bv5, "&"), ""),
-    ((bv1, bv2, "|"), "11110011"),
-    ((bv1, bv3, "|"), ""),
-    ((bv1, bv4, "|"), ""),
-    ((bv1, bv5, "|"), ""),
-    ((bv1, "", "~"), "11001100"),
-]
+BINARY_OP_MAP: dict[BinaryOp, Callable[[Any, Any], Any]] = {
+    "&": operator.and_,
+    "|": operator.or_,
+    "^": operator.xor,
+}
 
 
-class BooleanLogicTestCase(unittest.TestCase):
-    def testLogicOp(self):
-        print("\nTesting Boolean operators")
-        for args, expected in logicTests:
-            try:
-                op = args[2]
-                if op == "&":
-                    assert isinstance(args[1], BitVector.BitVector)
-                    actual = args[0] & args[1]
-                elif op == "|":
-                    assert isinstance(args[1], BitVector.BitVector)
-                    actual = args[0] | args[1]
-                elif op == "~":
-                    actual = ~args[0]
-                assert actual == BitVector.BitVector(bitstring=expected)
-            except Exception as e:
-                if (
-                    hasattr(args[0], "size")
-                    and hasattr(args[1], "size")
-                    and args[0].size == args[1].size
-                ):
-                    print(e)
-                    print("        BOOLEAN LOGIC TEST FAILED")
+@pytest.fixture
+def bv1() -> BitVector.BitVector:
+    """Returns an 8-bit vector constructed from a bitstring ('00110011')."""
+    return BitVector.BitVector(bitstring="00110011")
+
+
+@pytest.fixture
+def bv2() -> BitVector.BitVector:
+    """Returns an 8-bit vector constructed from a bitlist ('11110011')."""
+    return BitVector.BitVector(bitlist=[1, 1, 1, 1, 0, 0, 1, 1])
+
+
+@pytest.fixture
+def bv3() -> BitVector.BitVector:
+    """Returns a 23-bit vector constructed from a bitstring."""
+    return BitVector.BitVector(bitstring="00000000111111110000000")
+
+
+@pytest.fixture
+def bv_empty() -> BitVector.BitVector:
+    """Returns an empty 0-bit vector."""
+    return BitVector.BitVector(size=0)
+
+
+@pytest.mark.parametrize(
+    ("left_name", "right_name", "op", "expected"),
+    [
+        ("bv1", "bv2", "&", "00110011"),
+        ("bv1", "bv2", "|", "11110011"),
+        ("bv1", "bv2", "^", "11000000"),
+        ("bv1", "bv3", "&", "00000000000000000000000"),
+        ("bv1", "bv3", "|", "00000000111111110110011"),
+        ("bv1", "bv3", "^", "00000000111111110110011"),
+        ("bv1", "bv_empty", "&", "00000000"),
+        ("bv1", "bv_empty", "|", "00110011"),
+        ("bv1", "bv_empty", "^", "00110011"),
+        ("bv_empty", "bv_empty", "&", ""),
+        ("bv_empty", "bv_empty", "|", ""),
+        ("bv_empty", "bv_empty", "^", ""),
+    ],
+)
+def test_binary_logic_operators(
+    request: pytest.FixtureRequest,
+    left_name: str,
+    right_name: str,
+    op: BinaryOp,
+    expected: str,
+) -> None:
+    """Tests binary boolean operators (&, |, ^) across BitVector instances.
+
+    Args:
+        request: The pytest fixture request object used for dynamic lookup.
+        left_name: The fixture name of the left-hand operand.
+        right_name: The fixture name of the right-hand operand.
+        op: The binary logic operator string ('&', '|', '^').
+        expected: The expected bitstring representation of the result.
+    """
+    left: BitVector.BitVector = request.getfixturevalue(left_name)
+    right: BitVector.BitVector = request.getfixturevalue(right_name)
+    op_func = BINARY_OP_MAP[op]
+    result = op_func(left, right)
+    assert result == BitVector.BitVector(bitstring=expected)
+
+
+@pytest.mark.parametrize(
+    ("bv_name", "expected"),
+    [
+        ("bv1", "11001100"),
+        ("bv2", "00001100"),
+        ("bv_empty", ""),
+    ],
+)
+def test_unary_not_operator(
+    request: pytest.FixtureRequest, bv_name: str, expected: str
+) -> None:
+    """Tests the bitwise NOT (~ / __invert__) operator on BitVector instances.
+
+    Args:
+        request: The pytest fixture request object used for dynamic lookup.
+        bv_name: The fixture name of the target BitVector instance.
+        expected: The expected bitstring representation after bitwise inversion.
+    """
+    bv: BitVector.BitVector = request.getfixturevalue(bv_name)
+    result = ~bv
+    assert result == BitVector.BitVector(bitstring=expected)
