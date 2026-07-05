@@ -1,0 +1,6 @@
+# Ignore mailto links
+mailto:.*
+
+# Ignore local file links or placeholder URIs
+file://.*
+http://go/.*

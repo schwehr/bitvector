@@ -20,6 +20,14 @@ repos:
     hooks:
       - id: ty
 
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.21
+    hooks:
+      - id: mdformat
+        args: [ "--wrap", "80" ]
+        additional_dependencies:
+          - mdformat-gfm
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
