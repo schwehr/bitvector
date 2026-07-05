@@ -155,9 +155,10 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
     without repetitive boilerplate.
   - Use standard pytest fixtures (like `tmp_path` for temporary files) instead
     of manual cleanup or `tempfile`.
-- **Coverage & Performance**: Maintain 100% test coverage for new features and
-  bug fixes. Ensure benchmark suites (`test_benchmarks.py`) remain functional
-  and non-regressing. Continuous integration automatically formats and outputs
+- **Coverage & Performance**: Maintain high test coverage for new features and
+  bug fixes (enforced with a 95% minimum threshold via `--fail-under=95`).
+  Ensure benchmark suites (`test_benchmarks.py`) remain functional and
+  non-regressing. Continuous integration automatically formats and outputs
   read-only Markdown coverage reports to GitHub Actions job summaries.
 
 ## 6. Code & Docstring Style
