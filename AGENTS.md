@@ -31,7 +31,7 @@ The project repository is structured as a modern Python package:
   - **`test_benchmarks.py`**: Performance regression benchmarks executed via
     `pytest-benchmark`.
 - **`examples/`**: Reference usage scripts.
-  - **`BitVectorDemo.py`**: Working demo script illustrating package features.
+  - **`demo.py`**: Working demo script illustrating package features.
 - **`.github/`**: CI/CD automation and templates, including GitHub Actions
   workflows (`test.yml`, `lychee.yml`) and `PULL_REQUEST_TEMPLATE.md`.
 - **`pyproject.toml`**: Modern project configuration defining package metadata,

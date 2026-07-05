@@ -12,7 +12,7 @@ example code in the module file.
 
 To see a working example of the `BitVector` module, see the file:
 
-- [`examples/BitVectorDemo.py`](examples/BitVectorDemo.py)
+- [`examples/demo.py`](examples/demo.py)
 
 This is a fork from Avi Kak's BitVector 3.5.0.
 
