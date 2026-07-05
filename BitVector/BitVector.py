@@ -12,7 +12,7 @@ import binascii
 import copy
 import operator
 import random
-from typing import Any, BinaryIO, Self, Sequence
+from typing import Any, BinaryIO, Iterator, Self, Sequence
 
 _hexdict = {
     "0": "0000",
@@ -1100,13 +1100,13 @@ class BitVector:
     # Allow int() to work:
     __int__ = int_val
 
-    def __iter__(self) -> BitVectorIterator:
-        """Returns an iterator over the individual bits in the vector.
+    def __iter__(self) -> Iterator[int]:
+        """Yields individual bits sequentially from the vector.
 
-        Returns:
-            A BitVectorIterator instance stepping through bits sequentially.
+        Yields:
+            The integer bit value (0 or 1) at each position from left to right.
         """
-        return BitVectorIterator(self)
+        yield from (self._getbit(i) for i in range(self.size))
 
     def __str__(self) -> str:
         """Returns an ASCII string representation of the bit vector ('0's and '1's).
@@ -1754,44 +1754,3 @@ class BitVector:
         """
         intvals_for_circular_shifts = [int(self << 1) for _ in range(len(self))]
         return self.__class__(intVal=min(intvals_for_circular_shifts), size=len(self))
-
-
-class BitVectorIterator:
-    items: list[int]
-    index: int
-
-    def __init__(self, bitvec: BitVector) -> None:
-        """Initializes the iterator with a copy of the target vector's bits.
-
-        Args:
-            bitvec: The BitVector instance to iterate over.
-        """
-        self.items = []
-        for i in range(bitvec.size):
-            self.items.append(bitvec._getbit(i))
-        self.index = -1
-
-    def __iter__(self) -> Self:
-        """Returns the iterator object itself.
-
-        Returns:
-            This BitVectorIterator instance (self).
-        """
-        return self
-
-    def next(self) -> int:
-        """Retrieves the next bit in the iteration sequence.
-
-        Returns:
-            The integer bit value (0 or 1) at the next position.
-
-        Raises:
-            StopIteration: When there are no remaining bits to iterate over.
-        """
-        self.index += 1
-        if self.index < len(self.items):
-            return self.items[self.index]
-        else:
-            raise StopIteration
-
-    __next__ = next

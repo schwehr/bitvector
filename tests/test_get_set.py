@@ -1,9 +1,10 @@
 """Tests bit retrieval and assignment (_getbit, _setbit, slicing, iteration)."""
 
+from collections.abc import Iterator
+
 import pytest
 
 import BitVector
-from BitVector.BitVector import BitVectorIterator
 
 
 @pytest.mark.parametrize(
@@ -139,9 +140,10 @@ def test_getitem_slice_raises_error(sl: slice) -> None:
 
 
 def test_bitvector_iterator() -> None:
-    """Tests iteration over a BitVector using BitVectorIterator."""
+    """Tests sequential iteration over bits in a BitVector."""
     bv = BitVector.BitVector(bitstring="101")
     it = iter(bv)
-    assert isinstance(it, BitVectorIterator)
+    assert isinstance(it, Iterator)
     assert iter(it) is it
     assert list(it) == [1, 0, 1]
+    assert list(iter(BitVector.BitVector(size=0))) == []

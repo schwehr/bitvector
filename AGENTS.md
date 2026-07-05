@@ -22,8 +22,7 @@ representation of bit arrays and bit vectors.
 The project repository is structured as a modern Python package:
 
 - **`BitVector/`**: Core package directory.
-  - **`BitVector.py`**: Primary module implementing `BitVector` and
-    `BitVectorIterator`.
+  - **`BitVector.py`**: Primary module implementing `BitVector`.
   - **`__init__.py`**: Package initialization and top-level symbols export.
 - **`tests/`**: Automated test suites executed via `pytest`.
   - **`test_*.py`**: Unit and functional tests covering constructors, boolean
@@ -53,8 +52,8 @@ The core functionality of `bitvector-modern` is implemented in
   - **Memory Array (`self.vector`)**: Store bits in an `array.array('H')`
     (unsigned short integers, 16 bits per element) for memory compactness.
   - **Size (`self.size`)**: Tracks the exact integer number of valid bits.
-- **`BitVectorIterator` Class**: An iterator supporting sequentially stepping
-  through bits via `__iter__` and `next`.
+  - **Iteration (`__iter__`)**: Supports sequentially yielding individual bits
+    via a generator expression.
 
 ### Constructors & Data Input (`__init__`)
 
