@@ -92,7 +92,7 @@ The core functionality of `bitvector-modern` is implemented in
   `gf_MI`), greatest common divisor (`gcd`), multiplicative inverse
   (`multiplicative_inverse`), and primality testing (`test_for_primality`).
 - **Utilities**: Random bit vector generation (`gen_random_bits`) and deep
-  copying (`deep_copy` / `__deepcopy__`).
+  copying (`__deepcopy__`).
 
 ## 4. Development Environment & Tooling
 

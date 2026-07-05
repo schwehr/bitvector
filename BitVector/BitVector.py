@@ -1222,14 +1222,6 @@ class BitVector:
         new_bv.size = self.size
         return new_bv
 
-    def deep_copy(self) -> BitVector:
-        """Creates and returns an independent deep copy of the bit vector.
-
-        Returns:
-            A new BitVector instance with identical bits and attributes.
-        """
-        return copy.deepcopy(self)
-
     def _resize_pad_from_left(self, n: int) -> BitVector:
         """Resizes the bit vector by padding with n zeros from the left.
 

@@ -272,7 +272,7 @@ def test_bench_get_bitvector_in_ascii(benchmark, sample_bv1):
     benchmark(sample_bv1.get_bitvector_in_ascii)
 
 
-def test_bench_deep_copy(benchmark, sample_bv1):
+def test_bench_deepcopy(benchmark, sample_bv1):
     benchmark(copy.deepcopy, sample_bv1)
 
 
