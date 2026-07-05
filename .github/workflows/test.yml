@@ -9,10 +9,14 @@ on:
 
 jobs:
   test:
-    name: Run tests (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: Run tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
         python-version:
           - "3.13"
           - "3.14"
