@@ -57,13 +57,25 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           uv run coverage report --format=markdown --fail-under=95 >> $GITHUB_STEP_SUMMARY
 
-      - name: Run benchmark tests (Linux only)
-        if: >-
-          (success() || failure()) &&
-          matrix.os == 'ubuntu-latest' &&
-          matrix.python-version == '3.14'
-        run: uv run pytest --benchmark-only --no-cov
-
       - name: Run type checks with ty (Linux only)
         if: (success() || failure()) && matrix.os == 'ubuntu-latest'
         run: uv run ty check --output-format github
+
+  benchmark:
+    name: "Benchmarks (Linux Python 3.14)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run benchmark tests
+        run: uv run pytest --benchmark-only --no-cov
