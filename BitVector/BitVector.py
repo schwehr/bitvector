@@ -102,6 +102,28 @@ class BitVector:
         textstring: str | None = None,
         rawbytes: bytes | None = None,
     ) -> None:
+        """Initializes a BitVector instance from one of several possible input sources.
+
+        You must specify exactly one keyword argument to determine the data
+        source and size of the bit vector. Providing multiple data source
+        arguments will raise a ValueError.
+
+        Args:
+            filename: Path to a disk file to open for streaming input.
+            fp: An open file-like stream object to read bits from.
+            size: The desired number of bits for a zero-initialized vector (or
+                used in conjunction with intVal).
+            intVal: An integer value to convert into a bit vector.
+            bitlist: A sequence or list of integers (0s and 1s) representing bits.
+            bitstring: A string of binary characters ('0's and '1's).
+            hexstring: A string of hexadecimal characters to convert to bits.
+            textstring: An ASCII or text string to convert to character bits.
+            rawbytes: A bytes object to unpack into a bit vector.
+
+        Raises:
+            ValueError: If no argument is provided, if mutually exclusive
+                arguments are specified together, or if input values are invalid.
+        """
         self.filename = None
         self.size = 0
         self.FILEIN = None
@@ -449,11 +471,17 @@ class BitVector:
             return BitVector(bitlist=slicebits)
 
     def __xor__(self, other: BitVector) -> BitVector:
-        """
-        Take a bitwise 'XOR' of the bit vector on which the method is invoked with
-        the argument bit vector.  Return the result as a new bit vector.  If the two
-        bit vectors are not of the same size, pad the shorter one with zeros from the
-        left.
+        """Performs a bitwise exclusive OR (XOR) with another bit vector.
+
+        If the two bit vectors are not of equal length, the shorter vector is
+        automatically padded with zero bits from the left before performing
+        the XOR operation.
+
+        Args:
+            other: The second BitVector operand.
+
+        Returns:
+            A new BitVector instance containing the bitwise XOR result.
         """
         if self.size < other.size:
             bv1 = self._resize_pad_from_left(other.size - self.size)
@@ -470,11 +498,17 @@ class BitVector:
         return res
 
     def __and__(self, other: BitVector) -> BitVector:
-        """
-        Take a bitwise 'AND' of the bit vector on which the method is invoked with
-        the argument bit vector.  Return the result as a new bit vector.  If the two
-        bit vectors are not of the same size, pad the shorter one with zeros from the
-        left.
+        """Performs a bitwise AND with another bit vector.
+
+        If the two bit vectors are not of equal length, the shorter vector is
+        automatically padded with zero bits from the left before performing
+        the AND operation.
+
+        Args:
+            other: The second BitVector operand.
+
+        Returns:
+            A new BitVector instance containing the bitwise AND result.
         """
         if self.size < other.size:
             bv1 = self._resize_pad_from_left(other.size - self.size)
@@ -491,11 +525,17 @@ class BitVector:
         return res
 
     def __or__(self, other: BitVector) -> BitVector:
-        """
-        Take a bitwise 'OR' of the bit vector on which the method is invoked with the
-        argument bit vector.  Return the result as a new bit vector.  If the two bit
-        vectors are not of the same size, pad the shorter one with zero's from the
-        left.
+        """Performs a bitwise inclusive OR with another bit vector.
+
+        If the two bit vectors are not of equal length, the shorter vector is
+        automatically padded with zero bits from the left before performing
+        the OR operation.
+
+        Args:
+            other: The second BitVector operand.
+
+        Returns:
+            A new BitVector instance containing the bitwise OR result.
         """
         if self.size < other.size:
             bv1 = self._resize_pad_from_left(other.size - self.size)
@@ -512,9 +552,11 @@ class BitVector:
         return res
 
     def __invert__(self) -> BitVector:
-        """
-        Invert the bits in the bit vector on which the method is invoked
-        and return the result as a new bit vector.
+        """Inverts all bits in the bit vector (bitwise NOT).
+
+        Returns:
+            A new BitVector instance where each 0 bit is replaced by 1 and
+            each 1 bit is replaced by 0.
         """
         res = BitVector(size=self.size)
         lpb = list(map(operator.__inv__, self.vector))
@@ -524,13 +566,16 @@ class BitVector:
         return res
 
     def __add__(self, other: BitVector) -> BitVector:
-        """
-        Because __add__ is supplied, you can always join two bitvectors by
+        """Concatenates this bit vector with another bit vector.
 
-            bitvec3  =  bitvec1  +  bitvec2
+        Creates a new bit vector containing all bits from this vector followed
+        by all bits from the other vector.
 
-        bitvec3 is a new bitvector object that contains all the bits of bitvec1
-        followed by all the bits of bitvec2.
+        Args:
+            other: The BitVector instance to append to the end of this vector.
+
+        Returns:
+            A new BitVector instance representing the concatenated bit string.
         """
         new_bv = BitVector(size=0)
         if isinstance(self.vector, array.array) and isinstance(
@@ -547,13 +592,19 @@ class BitVector:
         return new_bv
 
     def __iadd__(self, other: BitVector) -> Self:
-        """
-        When extending an existing instance of a BitVector,  __iadd__ should be faster
-        than __add__ because we do not need to create a new BitVector. The call to
-        __iadd__ simply modifies the current bitvector.   __iadd__ is invoked when a
-        user calls:
+        """Appends another bit vector to this vector in-place.
 
-            bitvec1 += bitvec2
+        Extends the current bit vector's storage array by appending all bits
+        from the argument vector without allocating a new BitVector object.
+
+        Args:
+            other: The BitVector instance to append to this vector.
+
+        Returns:
+            This BitVector instance (self) after in-place modification.
+
+        Raises:
+            TypeError: If the operand is not a BitVector instance.
         """
         if not isinstance(other, type(self)):
             raise TypeError(f"Can only join two BitVector objects, not {type(other)}")
@@ -850,17 +901,20 @@ class BitVector:
         )
 
     def __lshift__(self, n: int) -> Self:
-        """
-        Left circular rotation of a BitVector through N positions can be
-        carried out by
+        """Performs an in-place circular left rotation by n bit positions.
 
-            bitvec  << N
+        Rotates the bit vector circularly to the left n times. Negative values
+        for n delegate to a circular right rotation. Modifies and returns the
+        current instance to support method chaining.
 
-        This operator overloading is made possible by implementing the
-        __lshift__ method defined here.  Note that this operator returns
-        the bitvector on which it is invoked.  This allows for a chained
-        invocation of the operator
+        Args:
+            n: The integer number of positions to circularly rotate left.
 
+        Returns:
+            This BitVector instance (self) after in-place rotation.
+
+        Raises:
+            ValueError: If attempting to rotate an empty bit vector.
         """
         if self.size == 0:
             raise ValueError("""Circular shift of an empty vector
@@ -872,16 +926,20 @@ class BitVector:
         return self
 
     def __rshift__(self, n: int) -> Self:
-        """
-        Right circular rotation of a BitVector through N positions can be
-        carried out by
+        """Performs an in-place circular right rotation by n bit positions.
 
-            bitvec  >> N
+        Rotates the bit vector circularly to the right n times. Negative values
+        for n delegate to a circular left rotation. Modifies and returns the
+        current instance to support method chaining.
 
-        This operator overloading is made possible by implementing the
-        __rshift__ method defined here.  Note that this operator returns
-        the bitvector on which it is invoked.  This allows for a chained
-        invocation of the operator.
+        Args:
+            n: The integer number of positions to circularly rotate right.
+
+        Returns:
+            This BitVector instance (self) after in-place rotation.
+
+        Raises:
+            ValueError: If attempting to rotate an empty bit vector.
         """
         if self.size == 0:
             raise ValueError("""Circular shift of an empty vector makes no sense""")
@@ -1030,11 +1088,19 @@ class BitVector:
     __getitem__ = _getbit
 
     def __setitem__(self, pos: int | slice | Any, item: int | BitVector | Any) -> Any:
-        """
-        This is needed for both slice assignments and for index assignments.  It
-        checks the types of pos and item to see if the call is for slice assignment.
-        For slice assignment, pos must be of type 'slice' and item of type BitVector.
-        For index assignment, the argument types are checked in the _setbit() method.
+        """Assigns a bit or slice of bits at the specified position.
+
+        Supports both index assignment (setting a single bit to 0 or 1) and
+        slice assignment (replacing a slice of bits with another BitVector).
+
+        Args:
+            pos: An integer index or slice object indicating where to assign.
+            item: An integer (0 or 1) for index assignment, or a BitVector for
+                slice assignment.
+
+        Raises:
+            TypeError: If the assigned item has an incompatible type.
+            ValueError: If slice lengths are incompatible or index is out of range.
         """
         # The following section is for slice assignment:
         if isinstance(pos, slice):
@@ -1095,21 +1161,32 @@ class BitVector:
     __int__ = int_val
 
     def __iter__(self) -> BitVectorIterator:
-        """
-        To allow iterations over a bit vector by supporting the 'for bit in
-        bit_vector' syntax:
+        """Returns an iterator over the individual bits in the vector.
+
+        Returns:
+            A BitVectorIterator instance stepping through bits sequentially.
         """
         return BitVectorIterator(self)
 
     def __str__(self) -> str:
-        "To create a print representation"
+        """Returns an ASCII string representation of the bit vector ('0's and '1's).
+
+        Returns:
+            A string of '0' and '1' characters matching the stored bits.
+        """
         if self.size == 0:
             return ""
         return "".join(map(str, self))
 
     def __eq__(self, other: Any) -> bool:
-        """
-        Compare two bit vectors
+        """Checks equality between this bit vector and another object.
+
+        Args:
+            other: The object to compare against.
+
+        Returns:
+            True if other is a BitVector of identical size and bit values,
+            otherwise False.
         """
         if self.size != other.size:
             return False
@@ -1121,21 +1198,78 @@ class BitVector:
         return True
 
     def __ne__(self, other: Any) -> bool:
+        """Checks inequality between this bit vector and another object.
+
+        Args:
+            other: The object to compare against.
+
+        Returns:
+            True if the objects are not equal, otherwise False.
+        """
         return not self == other
 
     def __lt__(self, other: Any) -> bool:
+        """Checks if this bit vector is strictly less than another vector.
+
+        Comparison is performed by evaluating integer values.
+
+        Args:
+            other: The BitVector instance to compare against.
+
+        Returns:
+            True if this vector's integer value is less than other's.
+        """
         return self.intValue() < other.intValue()
 
     def __le__(self, other: Any) -> bool:
+        """Checks if this bit vector is less than or equal to another vector.
+
+        Comparison is performed by evaluating integer values.
+
+        Args:
+            other: The BitVector instance to compare against.
+
+        Returns:
+            True if this vector's integer value is less than or equal to other's.
+        """
         return self.intValue() <= other.intValue()
 
     def __gt__(self, other: Any) -> bool:
+        """Checks if this bit vector is strictly greater than another vector.
+
+        Comparison is performed by evaluating integer values.
+
+        Args:
+            other: The BitVector instance to compare against.
+
+        Returns:
+            True if this vector's integer value is greater than other's.
+        """
         return self.intValue() > other.intValue()
 
     def __ge__(self, other: Any) -> bool:
+        """Checks if this bit vector is greater than or equal to another vector.
+
+        Comparison is performed by evaluating integer values.
+
+        Args:
+            other: The BitVector instance to compare against.
+
+        Returns:
+            True if this vector's integer value is greater than or equal to other's.
+        """
         return self.intValue() >= other.intValue()
 
     def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
+        """Creates a deep copy of the bit vector for the copy module.
+
+        Args:
+            memo: An optional dictionary tracking copied objects to prevent
+                infinite recursion.
+
+        Returns:
+            A new BitVector instance identical to this vector.
+        """
         if memo is None:
             memo = {}
         new_bv = self.__class__(size=0)
@@ -1205,8 +1339,18 @@ class BitVector:
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
-        """
-        This supports 'if x in y' and 'if x not in y' syntax for bit vectors.
+        """Checks if a sub-vector is contained within this bit vector.
+
+        Supports the 'in' and 'not in' operators for subsequence searching.
+
+        Args:
+            otherBitVec: The BitVector subsequence to search for.
+
+        Returns:
+            True if otherBitVec appears as a contiguous subsequence, else False.
+
+        Raises:
+            ValueError: If this vector is empty or shorter than otherBitVec.
         """
         if self.size == 0:
             raise ValueError("First arg bitvec has no bits")
@@ -1788,12 +1932,22 @@ class BitVectorIterator:
     index: int
 
     def __init__(self, bitvec: BitVector) -> None:
+        """Initializes the iterator with a copy of the target vector's bits.
+
+        Args:
+            bitvec: The BitVector instance to iterate over.
+        """
         self.items = []
         for i in range(bitvec.size):
             self.items.append(bitvec._getbit(i))
         self.index = -1
 
     def __iter__(self) -> Self:
+        """Returns the iterator object itself.
+
+        Returns:
+            This BitVectorIterator instance (self).
+        """
         return self
 
     def next(self) -> int:
