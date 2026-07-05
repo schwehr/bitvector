@@ -182,6 +182,12 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
 
 ## 7. Version Control & Commit Messages
 
+- **Feature Branches**:
+  - **CRITICAL RULE**: All code changes and refactoring work MUST be performed
+    on dedicated git feature branches (e.g., `git checkout -b <branch-name>`).
+  - Never make direct commits on the `main` branch.
+  - When work on a feature branch is complete, open a GitHub Pull Request (PR)
+    via `/usr/bin/gh` for code review and merging into `main`.
 - **Code Review**:
   - Always do a code review before committing. In addition to finding and
     suggesting fixes to issues, try to create 1-3 suggestions for improvement to
