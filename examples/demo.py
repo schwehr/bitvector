@@ -59,8 +59,8 @@ print(bv)
 print("The integer value of the above bit vector is:%d" % int(bv))
 
 # Construct a bit vector directly from a file-like object:
-x = "111100001111"
-fp_read = io.StringIO(x)
+bit_str = "111100001111"
+fp_read = io.StringIO(bit_str)
 bv = BitVector(fp=fp_read)
 print("\nBit vector constructed directly from a file like object:")
 print(bv)  # 111100001111
@@ -593,9 +593,9 @@ print(
 )
 bv = BitVector(intVal=17)
 print("bv: " + str(bv) + " of int value: " + str(int(bv)))
-result = bv.multiplicative_inverse(bv_modulus)
-if result is not None:
-    print("MI bitvec is: " + str(result) + " of int value: " + str(int(result)))
+mi_result = bv.multiplicative_inverse(bv_modulus)
+if mi_result is not None:
+    print("MI bitvec is: " + str(mi_result) + " of int value: " + str(int(mi_result)))
 else:
     print("No multiplicative inverse in this case")
     # 17

@@ -319,13 +319,17 @@ class BitVector:
                     """When bits are specified through rawbytes, you """
                     """cannot give values to any other constructor args"""
                 )
-            hexlist = binascii.hexlify(rawbytes)
+            # TODO(https://github.com/schwehr/bitvector-modern/issues/23): Resolve hexlist type collision.
+            hexlist = binascii.hexlify(rawbytes)  # type: ignore[assignment]
             bitlist = list(
                 map(
                     int,
                     list(
                         "".join(
-                            map(lambda x: _hexdict[x], list(map(chr, list(hexlist))))
+                            map(
+                                lambda x: _hexdict[x],
+                                list(map(chr, list(hexlist))),  # type: ignore[arg-type]
+                            )
                         )
                     ),
                 )
@@ -593,7 +597,7 @@ class BitVector:
         This function is meant to read a bit string from a file like
         object.
         """
-        bitlist = []
+        bitlist: list[str] = []
         while 1:
             bit = fp.read()
             if bit == "":
@@ -1214,7 +1218,7 @@ class BitVector:
         anything.  The allowable modes for changing the internally stored
         bit array for a bitvector are the same as for the constructor.
         """
-        self.__init__(*args, **kwargs)
+        BitVector.__init__(self, *args, **kwargs)
 
     def count_bits_sparse(self) -> int:
         """
@@ -1631,7 +1635,7 @@ class BitVector:
         The object returned by runs() is a list of strings, with each
         element of this list being a string of 1's and 0's.
         """
-        allruns = []
+        allruns: list[str] = []
         if self.size == 0:
             return allruns
         run = ""

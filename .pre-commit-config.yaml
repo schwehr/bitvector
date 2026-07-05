@@ -20,6 +20,14 @@ repos:
     hooks:
       - id: ty
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - pytest
+          - pytest-benchmark
+
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.21
     hooks:

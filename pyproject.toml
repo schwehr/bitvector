@@ -43,6 +43,7 @@ dev = [
     "conventional-pre-commit>=4.4.0",
     "mdformat>=0.7.21",
     "mdformat-gfm>=0.3.7",
+    "mypy>=1.15.0",
     "pre-commit>=4.6.0",
     "pytest-benchmark>=4.0.0",
     "pytest>=8.0.0",
