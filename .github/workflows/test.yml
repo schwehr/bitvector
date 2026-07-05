@@ -62,7 +62,7 @@ jobs:
           (success() || failure()) &&
           matrix.os == 'ubuntu-latest' &&
           matrix.python-version == '3.14'
-        run: uv run pytest --benchmark-only
+        run: uv run pytest --benchmark-only --no-cov
 
       - name: Run type checks with ty (Linux only)
         if: (success() || failure()) && matrix.os == 'ubuntu-latest'
