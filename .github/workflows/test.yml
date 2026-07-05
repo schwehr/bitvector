@@ -17,6 +17,7 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
         python-version:
           - "3.13"
           - "3.14"
@@ -42,9 +43,12 @@ jobs:
         run: uv run pytest --benchmark-skip
 
       - name: Run benchmark tests
-        if: (success() || failure()) && matrix.python-version == '3.14'
+        if: >-
+          (success() || failure()) &&
+          matrix.os == 'ubuntu-latest' &&
+          matrix.python-version == '3.14'
         run: uv run pytest --benchmark-only
 
       - name: Run type checks with ty
-        if: success() || failure()
+        if: (success() || failure()) && matrix.os == 'ubuntu-latest'
         run: uv run ty check --output-format github
