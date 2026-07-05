@@ -165,7 +165,7 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
 ## 7. Version Control & Commit Messages
 
 * **Code Review**:
-  * Always do a code review before commiting. In addition to finding and 
+  * Always do a code review before committing. In addition to finding and
     suggesting fixes to issues, try to create 1-3 suggestions for improvement
     to the code based on the current changes.
   * See if there needs to be any changes to `AGENTS.md` based on the current
