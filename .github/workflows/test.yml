@@ -47,6 +47,16 @@ jobs:
         if: success() || failure()
         run: uv run pytest --benchmark-skip
 
+      - name: Write coverage report to Job Summary (Linux only)
+        if: >-
+          (success() || failure()) &&
+          matrix.os == 'ubuntu-latest' &&
+          matrix.python-version == '3.14'
+        run: |
+          echo "### Test Coverage Report (Python 3.14)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+
       - name: Run benchmark tests (Linux only)
         if: >-
           (success() || failure()) &&
