@@ -1,9 +1,11 @@
+# SPDX-License-Identifier: PSF-2.0
+# Copyright (c) 2021 Avinash Kak
+
 """A memory-efficient packed representation of bit arrays."""
 
 from __future__ import annotations
 
 __version__ = "3.5.0"
-__copyright__ = "(C) 2021 Avinash Kak. Python Software Foundation."
 
 import array
 import binascii
