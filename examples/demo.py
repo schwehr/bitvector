@@ -46,8 +46,8 @@ print(bv)  # 11
 print("\nBit vector constructed from integer 123456:")
 bv = BitVector(intVal=123456)
 print(bv)  # 11110001001000000
-print("\nInt value of the previous bit vector as computed by intVal():")
-print(bv.intValue())  # 123456
+print("\nInt value of the previous bit vector as computed by int_val():")
+print(bv.int_val())  # 123456
 print("\nInt value of the previous bit vector as computed by int():")
 print(int(bv))  # 123456
 
@@ -74,7 +74,7 @@ bv = BitVector(bitstring="")
 print("\nBit Vector constructed directly from an empty bit string:")
 print(bv)  # nothing
 print("\nInteger value of the previous bit vector:")
-print(bv.intValue())  # 0
+print(bv.int_val())  # 0
 
 # Construct a bit vector from a text string:
 print("\nConstructing a bit vector from the textstring 'hello':")
@@ -148,7 +148,7 @@ print(bv1 != bv2)  # False
 print(bv1 < bv2)  # False
 print(bv1 <= bv2)  # True
 bv3 = BitVector(intVal=5678)
-print(bv3.intValue())  # 5678
+print(bv3.int_val())  # 5678
 print(bv3)  # 1011000101110
 print(bv1 == bv3)  # False
 print(bv3 > bv1)  # True
@@ -156,7 +156,6 @@ print(bv3 >= bv1)  # True
 
 # Write a bit vector to a file like object
 fp_write = io.StringIO()
-# bv.write_bits_to_fileobject( fp_write )
 bv.write_bits_to_stream_object(fp_write)
 print("\nGet bit vector written out to a file-like object:")
 print(fp_write.getvalue())  # 1011

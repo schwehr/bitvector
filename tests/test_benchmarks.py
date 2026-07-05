@@ -417,10 +417,6 @@ def test_bench_unpermute(benchmark, sample_bv1):
     benchmark(sample_bv1.unpermute, perm)
 
 
-def test_bench_int_value_legacy(benchmark, sample_bv1):
-    benchmark(sample_bv1.intValue)
-
-
 # --- Group 2: Galois Field (GF) & Advanced Cryptographic Math ---
 
 

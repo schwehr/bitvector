@@ -694,8 +694,6 @@ class BitVector:
             else:
                 fp.write("1")
 
-    write_bits_to_fileobject = write_bits_to_stream_object
-
     def divide_into_two(self) -> list[BitVector]:
         """Splits an even-length bit vector into two equal halves.
 
@@ -810,8 +808,6 @@ class BitVector:
         for i in range(self.size):
             intVal += self[i] * (2 ** (self.size - i - 1))
         return intVal
-
-    intValue = int_val
 
     def get_bitvector_in_ascii(self) -> str:
         """Converts the bit vector into an ASCII character string.
@@ -1158,7 +1154,7 @@ class BitVector:
         Returns:
             True if this vector's integer value is less than other's.
         """
-        return self.intValue() < other.intValue()
+        return self.int_val() < other.int_val()
 
     def __le__(self, other: Any) -> bool:
         """Checks if this bit vector is less than or equal to another vector.
@@ -1171,7 +1167,7 @@ class BitVector:
         Returns:
             True if this vector's integer value is less than or equal to other's.
         """
-        return self.intValue() <= other.intValue()
+        return self.int_val() <= other.int_val()
 
     def __gt__(self, other: Any) -> bool:
         """Checks if this bit vector is strictly greater than another vector.
@@ -1184,7 +1180,7 @@ class BitVector:
         Returns:
             True if this vector's integer value is greater than other's.
         """
-        return self.intValue() > other.intValue()
+        return self.int_val() > other.int_val()
 
     def __ge__(self, other: Any) -> bool:
         """Checks if this bit vector is greater than or equal to another vector.
@@ -1197,7 +1193,7 @@ class BitVector:
         Returns:
             True if this vector's integer value is greater than or equal to other's.
         """
-        return self.intValue() >= other.intValue()
+        return self.int_val() >= other.int_val()
 
     def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
         """Creates a deep copy of the bit vector for the copy module.
@@ -1354,7 +1350,7 @@ class BitVector:
         Raises:
             AssertionError: If vectors are of unequal length or both zero.
         """
-        assert self.intValue() > 0 or other.intValue() > 0, (
+        assert self.int_val() > 0 or other.int_val() > 0, (
             "Jaccard called on two zero vectors --- NOT ALLOWED"
         )
         assert self.size == other.size, (
@@ -1452,10 +1448,10 @@ class BitVector:
         Returns:
             True if the integer representation is a power of two, else False.
         """
-        if self.intValue() == 0:
+        if self.int_val() == 0:
             return False
-        bv = self & BitVector(intVal=self.intValue() - 1)
-        if bv.intValue() == 0:
+        bv = self & BitVector(intVal=self.int_val() - 1)
+        if bv.int_val() == 0:
             return True
         return False
 
@@ -1493,8 +1489,8 @@ class BitVector:
         Returns:
             A new BitVector instance containing the GCD of the two integer values.
         """
-        a = self.intValue()
-        b = other.intValue()
+        a = self.int_val()
+        b = other.int_val()
         if a < b:
             a, b = b, a
         while b != 0:
@@ -1514,8 +1510,8 @@ class BitVector:
             A new BitVector with the multiplicative inverse modulo modulus,
             or None if no inverse exists.
         """
-        MOD = mod = modulus.intValue()
-        num = self.intValue()
+        MOD = mod = modulus.int_val()
+        num = self.int_val()
         x, x_old = 0, 1
         y, y_old = 1, 0
         while mod:
