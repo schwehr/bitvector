@@ -353,7 +353,16 @@ class BitVector:
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
     def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
-        "Set the bit at the designated position to the value shown"
+        """Sets the bit at the designated position to the specified value.
+
+        Args:
+            posn: The target bit index (or a 1-element tuple containing the
+                index) to modify. Negative indices count from the end.
+            val: The binary integer value (0 or 1) to set at the position.
+
+        Raises:
+            ValueError: If val is not 0 or 1, or if posn is out of range.
+        """
         if val not in (0, 1):
             raise ValueError("incorrect value for a bit")
         if isinstance(posn, (tuple)):
@@ -369,7 +378,20 @@ class BitVector:
             self.vector[block_index] = cv ^ (1 << shift)
 
     def _getbit(self, pos: int | slice | Any) -> Any:
-        "Get the bit from the designated position"
+        """Retrieves the bit or slice of bits from the designated position.
+
+        Args:
+            pos: An integer index or slice object specifying the bit position(s)
+                to extract.
+
+        Returns:
+            An integer (0 or 1) if pos is an integer index, or a new BitVector
+            instance containing the sliced bits if pos is a slice object.
+
+        Raises:
+            ValueError: If pos is out of valid bounds or if slice indices are
+                illegal.
+        """
         if not isinstance(pos, slice):
             if pos >= self.size or pos < -self.size:
                 raise ValueError("index range error")
@@ -553,7 +575,11 @@ class BitVector:
         return self
 
     def _getsize(self) -> int:
-        "Return the number of bits in a bit vector."
+        """Returns the number of bits stored in the bit vector.
+
+        Returns:
+            The integer number of valid bits in the vector.
+        """
         return self.size
 
     def read_bits_from_file(self, blocksize: int) -> BitVector:
@@ -1135,9 +1161,13 @@ class BitVector:
         return copy.deepcopy(self)
 
     def _resize_pad_from_left(self, n: int) -> BitVector:
-        """
-        Resize a bit vector by padding with n 0's from the left. Return the result as
-        a new bit vector.
+        """Resizes the bit vector by padding with n zeros from the left.
+
+        Args:
+            n: The integer number of zero bits to prepend to the bit vector.
+
+        Returns:
+            A new BitVector instance containing the left-padded bits.
         """
         new_str = "0" * n + str(self)
         return BitVector(bitstring=new_str)
