@@ -278,6 +278,20 @@ def test_set_value() -> None:
     assert str(bv) == "1100"
 
 
+def test_set_value_positional_args_error() -> None:
+    """Verifies that passing positional arguments to set_value raises TypeError."""
+    bv = BitVector.BitVector(intVal=7, size=16)
+    with pytest.raises(TypeError, match="takes 1 positional argument"):
+        bv.set_value(123)  # type: ignore[misc,arg-type]  # ty: ignore[too-many-positional-arguments]
+
+
+def test_set_value_invalid_keyword_error() -> None:
+    """Verifies passing unexpected keyword arguments to set_value raises TypeError."""
+    bv = BitVector.BitVector(intVal=7, size=16)
+    with pytest.raises(TypeError, match="unexpected keyword argument"):
+        bv.set_value(invalid_param=123)  # type: ignore[call-arg]  # ty: ignore[unknown-argument]
+
+
 @pytest.mark.parametrize(
     ("method_name", "bv1_str", "bv2_str", "err_match"),
     [
