@@ -1311,17 +1311,52 @@ class BitVector:
         """
         return sum(self)
 
-    def set_value(self, *args: Any, **kwargs: Any) -> None:
+    def set_value(
+        self,
+        *,
+        filename: str | None = None,
+        fp: Any = None,
+        size: int | None = None,
+        intVal: int | None = None,
+        bitlist: Any = None,
+        bitstring: str | None = None,
+        hexstring: str | None = None,
+        textstring: str | None = None,
+        rawbytes: bytes | None = None,
+    ) -> None:
         """Reinitializes the bit vector in-place with new data.
 
         Accepts the same keyword arguments as the class constructor to overwrite
         the current vector's size and contents.
 
         Args:
-            *args: Positional arguments passed to constructor.
-            **kwargs: Keyword arguments specifying the new data source and size.
+            filename: Path to a disk file to open for streaming input.
+            fp: An open file-like stream object to read bits from.
+            size: The desired number of bits for a zero-initialized vector (or
+                used in conjunction with intVal).
+            intVal: An integer value to convert into a bit vector.
+            bitlist: A sequence or list of integers (0s and 1s) representing bits.
+            bitstring: A string of binary characters ('0's and '1's).
+            hexstring: A string of hexadecimal characters to convert to bits.
+            textstring: An ASCII or text string to convert to character bits.
+            rawbytes: A bytes object to unpack into a bit vector.
+
+        Raises:
+            ValueError: If no argument is provided, if mutually exclusive
+                arguments are specified together, or if input values are invalid.
         """
-        BitVector.__init__(self, *args, **kwargs)
+        BitVector.__init__(
+            self,
+            filename=filename,
+            fp=fp,
+            size=size,
+            intVal=intVal,
+            bitlist=bitlist,
+            bitstring=bitstring,
+            hexstring=hexstring,
+            textstring=textstring,
+            rawbytes=rawbytes,
+        )
 
     def count_bits_sparse(self) -> int:
         """Counts set bits using Brian Kernighan's algorithm for sparse vectors.

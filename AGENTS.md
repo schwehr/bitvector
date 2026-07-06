@@ -214,9 +214,6 @@ project goals tracked in our
   for automating package publishing and release management.
 - **Issue #13 (Documentation Migration)**: Create a dedicated `docs/` directory
   and import/format prior documentation and user manuals.
-- **Issue #12 (Explicit Keyword Args)**: Refactor `set_value` and constructor
-  interfaces to require explicit keyword arguments for clearer API contracts and
-  better IDE support.
 - **Issue #11 (f-strings)**: Convert remaining legacy string formatting across
   `BitVector.py` to modern f-strings.
 - **Issue #10 (Modern Random Number Generator)**: Replace default
