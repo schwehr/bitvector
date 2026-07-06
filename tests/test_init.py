@@ -1,6 +1,7 @@
 """Tests BitVector constructors and initialization error validation."""
 
 import io
+import re
 from pathlib import Path
 from typing import Any
 
@@ -172,3 +173,15 @@ def test_intVal_zero_hex_helper() -> None:
     )
     assert bv2.size == 5
     assert str(bv2) == "00000"
+
+
+def test_version() -> None:
+    """Tests that the package version string conforms to semantic versioning."""
+    semver_pattern = (
+        r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+        r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+        r"(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
+    )
+    assert isinstance(BitVector.__version__, str)
+    assert re.fullmatch(semver_pattern, BitVector.__version__) is not None

@@ -49,7 +49,7 @@ wheels = [
 
 [[package]]
 name = "bitvector-modern"
-version = "3.5.0"
+version = "0.0.1"
 source = { editable = "." }
 
 [package.dev-dependencies]
