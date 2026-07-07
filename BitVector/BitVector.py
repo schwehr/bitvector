@@ -387,8 +387,10 @@ class BitVector:
         """
         if val not in (0, 1):
             raise ValueError("incorrect value for a bit")
-        if isinstance(posn, (tuple)):
+        if isinstance(posn, tuple):
             posn = posn[0]
+        if not isinstance(posn, int):
+            raise TypeError("posn must be an integer")
         if posn >= self.size or posn < -self.size:
             raise ValueError("index range error")
         if posn < 0:
@@ -415,6 +417,8 @@ class BitVector:
                 illegal.
         """
         if not isinstance(pos, slice):
+            if not isinstance(pos, int):
+                raise TypeError("pos must be an integer or slice")
             if pos >= self.size or pos < -self.size:
                 raise ValueError("index range error")
             if pos < 0:
