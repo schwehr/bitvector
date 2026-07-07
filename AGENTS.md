@@ -109,11 +109,12 @@ static analysis:
   uv run ruff check --fix
   uv run ruff format
   ```
-- **Static Type Checking (`ty` & `mypy`)**: Enforces strict type annotations
-  across all modules.
+- **Static Type Checking (`ty`, `mypy`, & `pyrefly`)**: Enforces strict type
+  annotations across all modules.
   ```bash
   uv run ty check
   uv run mypy .
+  uv run pyrefly check
   ```
 - **Markdown Formatting (`mdformat`)**: Enforces 80-column line wrapping and
   standard GFM formatting across Markdown files.
