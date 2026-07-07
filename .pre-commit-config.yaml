@@ -37,6 +37,14 @@ repos:
           - pytest
           - pytest-benchmark
 
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.411
+    hooks:
+      - id: pyright
+        additional_dependencies:
+          - pytest
+          - pytest-benchmark
+
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.21
     hooks:
