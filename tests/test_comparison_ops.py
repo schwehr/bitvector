@@ -80,3 +80,60 @@ def test_comparison_operators(
     right: BitVector.BitVector = request.getfixturevalue(right_name)
     compare_func = OP_MAP[op]
     assert compare_func(left, right) is expected
+
+
+@pytest.mark.parametrize(
+    ("bv_val", "other", "op", "expected"),
+    [
+        (51, 51, "==", True),
+        (51, 52, "==", False),
+        (51, 51, "!=", False),
+        (51, 52, "!=", True),
+        (51, 52, "<", True),
+        (51, 51, "<=", True),
+        (51, 50, ">", True),
+        (51, 51, ">=", True),
+        # Float comparisons
+        (51, 51.0, "==", True),
+        (51, 51.5, "==", False),
+        (51, 51.0, "!=", False),
+        (51, 51.5, "!=", True),
+        (51, 52.0, "<", True),
+        (51, 51.0, "<=", True),
+        (51, 50.0, ">", True),
+        (51, 51.0, ">=", True),
+    ],
+)
+def test_comparison_with_numeric_types(
+    bv_val: int, other: int | float, op: ComparisonOp, expected: bool
+) -> None:
+    """Tests comparisons between BitVector and int/float."""
+    bv = BitVector.BitVector(intVal=bv_val)
+    compare_func = OP_MAP[op]
+    assert compare_func(bv, other) is expected
+
+
+def test_eq_ne_with_unsupported_types() -> None:
+    """Tests that == and != work with any type and don't raise TypeError."""
+    bv = BitVector.BitVector(intVal=51)
+    assert (bv == "hello") is False
+    assert (bv != "hello") is True
+    assert (bv == [51]) is False
+    assert (bv != [51]) is True
+    assert (bv == None) is False  # noqa: E711
+    assert (bv != None) is True  # noqa: E711
+
+
+@pytest.mark.parametrize("op", ["<", "<=", ">", ">="])
+def test_order_comparisons_with_unsupported_types_raise_type_error(
+    op: ComparisonOp,
+) -> None:
+    """Tests that <, <=, >, and >= raise TypeError for unsupported types."""
+    bv = BitVector.BitVector(intVal=51)
+    compare_func = OP_MAP[op]
+    with pytest.raises(TypeError):
+        compare_func(bv, "hello")
+    with pytest.raises(TypeError):
+        compare_func(bv, [51])
+    with pytest.raises(TypeError):
+        compare_func(bv, None)
