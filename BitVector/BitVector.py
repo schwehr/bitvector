@@ -1122,7 +1122,7 @@ class BitVector:
             return ""
         return "".join(map(str, self))
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Checks equality between this bit vector and another object.
 
         Args:
@@ -1130,18 +1130,23 @@ class BitVector:
 
         Returns:
             True if other is a BitVector of identical size and bit values,
-            otherwise False.
+            or if other is an int/float equal to the integer value of this
+            vector. Otherwise False.
         """
-        if self.size != other.size:
-            return False
-        i = 0
-        while i < self.size:
-            if self[i] != other[i]:
+        if isinstance(other, BitVector):
+            if self.size != other.size:
                 return False
-            i += 1
-        return True
+            for i in range(self.size):
+                if self[i] != other[i]:
+                    return False
+            return True
 
-    def __ne__(self, other: Any) -> bool:
+        if isinstance(other, (int, float)):
+            return self.int_val() == other
+
+        return False
+
+    def __ne__(self, other: object) -> bool:
         """Checks inequality between this bit vector and another object.
 
         Args:
@@ -1152,57 +1157,101 @@ class BitVector:
         """
         return not self == other
 
-    def __lt__(self, other: Any) -> bool:
-        """Checks if this bit vector is strictly less than another vector.
+    def __lt__(self, other: object) -> bool:
+        """Checks if this bit vector is strictly less than another object.
 
         Comparison is performed by evaluating integer values.
 
         Args:
-            other: The BitVector instance to compare against.
+            other: The BitVector, int, or float instance to compare against.
 
         Returns:
             True if this vector's integer value is less than other's.
-        """
-        return self.int_val() < other.int_val()
 
-    def __le__(self, other: Any) -> bool:
-        """Checks if this bit vector is less than or equal to another vector.
+        Raises:
+            TypeError: If other is not a BitVector, int, or float.
+        """
+        if isinstance(other, BitVector):
+            return self.int_val() < other.int_val()
+
+        if isinstance(other, (int, float)):
+            return self.int_val() < other
+
+        raise TypeError(
+            f"'<' not supported between instances of 'BitVector' and '{type(other).__name__}'"
+        )
+
+    def __le__(self, other: object) -> bool:
+        """Checks if this bit vector is less than or equal to another object.
 
         Comparison is performed by evaluating integer values.
 
         Args:
-            other: The BitVector instance to compare against.
+            other: The BitVector, int, or float instance to compare against.
 
         Returns:
             True if this vector's integer value is less than or equal to other's.
-        """
-        return self.int_val() <= other.int_val()
 
-    def __gt__(self, other: Any) -> bool:
-        """Checks if this bit vector is strictly greater than another vector.
+        Raises:
+            TypeError: If other is not a BitVector, int, or float.
+        """
+        if isinstance(other, BitVector):
+            return self.int_val() <= other.int_val()
+
+        if isinstance(other, (int, float)):
+            return self.int_val() <= other
+
+        raise TypeError(
+            f"'<=' not supported between instances of 'BitVector' and '{type(other).__name__}'"
+        )
+
+    def __gt__(self, other: object) -> bool:
+        """Checks if this bit vector is strictly greater than another object.
 
         Comparison is performed by evaluating integer values.
 
         Args:
-            other: The BitVector instance to compare against.
+            other: The BitVector, int, or float instance to compare against.
 
         Returns:
             True if this vector's integer value is greater than other's.
-        """
-        return self.int_val() > other.int_val()
 
-    def __ge__(self, other: Any) -> bool:
-        """Checks if this bit vector is greater than or equal to another vector.
+        Raises:
+            TypeError: If other is not a BitVector, int, or float.
+        """
+        if isinstance(other, BitVector):
+            return self.int_val() > other.int_val()
+
+        if isinstance(other, (int, float)):
+            return self.int_val() > other
+
+        raise TypeError(
+            f"'>' not supported between instances of 'BitVector' and '{type(other).__name__}'"
+        )
+
+    def __ge__(self, other: object) -> bool:
+        """Checks if this bit vector is greater than or equal to another object.
 
         Comparison is performed by evaluating integer values.
 
         Args:
-            other: The BitVector instance to compare against.
+            other: The BitVector, int, or float instance to compare against.
 
         Returns:
             True if this vector's integer value is greater than or equal to other's.
+
+        Raises:
+            TypeError: If other is not a BitVector, int, or float.
         """
-        return self.int_val() >= other.int_val()
+        if isinstance(other, BitVector):
+            return self.int_val() >= other.int_val()
+
+        if isinstance(other, (int, float)):
+            return self.int_val() >= other
+
+        raise TypeError(
+            f"'>=' not supported between instances of 'BitVector' and '{type(other).__name__}'"
+        )
 
     def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
         """Creates a deep copy of the bit vector for the copy module.

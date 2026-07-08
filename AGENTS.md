@@ -78,7 +78,9 @@ The core functionality of `bitvector-modern` is implemented in
 - **Permutations**: Reordering bits via `permute()`, `unpermute()`, and
   `reverse()`.
 - **Comparisons & Equality**: Full rich comparison support (`==`, `!=`, `<`,
-  `<=`, `>`, `>=`) and canonical ordering (`min_canonical`).
+  `<=`, `>`, `>=`) supporting `BitVector`, `int`, and `float` operands, and
+  canonical ordering (`min_canonical`). `==` and `!=` also allow comparison with
+  other types (evaluating to `False` and `True` respectively).
 - **Conversions & Output**: Integer conversion (`int_val()`), string output
   (`get_bitvector_in_ascii()`, `get_bitvector_in_hex()`, `__str__`), and stream
   writing (`write_to_file`, `write_bits_to_stream_object`).
