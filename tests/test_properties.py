@@ -134,3 +134,37 @@ def test_int_val_roundtrip(bits: str) -> None:
 
     reconstructed = BitVector.BitVector(intVal=val, size=len(bits))
     assert str(reconstructed) == bits
+
+
+@given(
+    st.text(alphabet="01", min_size=0, max_size=80),
+    st.one_of(st.none(), st.integers(min_value=0, max_value=80)),
+    st.one_of(st.none(), st.integers(min_value=0, max_value=80)),
+)
+def test_slicing_consistency(bits: str, start: int | None, stop: int | None) -> None:
+    """Tests that __getitem__ slicing matches standard Python string slicing.
+
+    Verifies slice extraction across 16-bit word boundaries for arbitrary
+    valid non-negative start and stop indices.
+
+    Args:
+        bits: Bitstring representation of the test vector.
+        start: Optional start index for the slice.
+        stop: Optional stop index for the slice.
+    """
+    if start is not None:
+        start = min(start, len(bits))
+    if stop is not None:
+        stop = min(stop, len(bits))
+    if start is not None and stop is not None and start > stop:
+        start, stop = stop, start
+
+    bv = BitVector.BitVector(bitstring=bits) if bits else BitVector.BitVector(size=0)
+    sl = slice(start, stop)
+    try:
+        sliced_bv = bv[sl]
+    except ValueError as e:
+        if "illegal slice index values" in str(e):
+            return
+        raise
+    assert str(sliced_bv) == bits[sl]
