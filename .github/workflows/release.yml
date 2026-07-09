@@ -5,18 +5,23 @@ on:
     tags:
       - 'v[0-9]*.[0-9]*.[0-9]*'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v8.3.2
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
         with:
-          enable-cache: true
+          enable-cache: false
           python-version: "3.14"
 
       - name: Install dependencies
@@ -31,19 +36,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v8.3.2
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
         with:
-          enable-cache: true
+          enable-cache: false
           python-version: "3.14"
 
       - name: Build package
         run: uv build
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: dist
           path: dist/
@@ -58,15 +65,16 @@ jobs:
       url: https://pypi.org/p/bitvector-modern
     permissions:
       id-token: write
+      contents: read
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: dist
           path: dist/
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1
 
   github-release:
     name: Create GitHub Release
@@ -76,10 +84,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: dist
           path: dist/
@@ -89,10 +99,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PRERELEASE_FLAG=""
-          if [[ "${{ github.ref_name }}" =~ -(rc|beta|alpha|pre) ]]; then
+          if [[ "${GITHUB_REF_NAME}" =~ -(rc|beta|alpha|pre) ]]; then
             PRERELEASE_FLAG="--prerelease"
           fi
-          gh release create "${{ github.ref_name }}" dist/* \
-            --title "${{ github.ref_name }}" \
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --title "${GITHUB_REF_NAME}" \
             --generate-notes \
             $PRERELEASE_FLAG
