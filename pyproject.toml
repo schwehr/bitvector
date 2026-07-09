@@ -42,6 +42,7 @@ dev = [
     "codespell>=2.4.0",
     "conventional-pre-commit>=4.4.0",
     "hypothesis>=6.0.0",
+    "hypofuzz>=24.0.0",
     "mdformat>=0.7.21",
     "mdformat-gfm>=0.3.7",
     "mypy>=1.15.0",
