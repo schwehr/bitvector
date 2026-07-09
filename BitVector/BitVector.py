@@ -619,7 +619,8 @@ class BitVector:
         curr_bit = self.size % 16
         curr_two_byte_int = self.size // 16
         for bit in other:
-            self.vector[curr_two_byte_int] = self.vector[curr_two_byte_int] | (
+            mask = ~(1 << curr_bit) & 0xFFFF
+            self.vector[curr_two_byte_int] = (self.vector[curr_two_byte_int] & mask) | (
                 bit << curr_bit
             )
             curr_bit += 1
