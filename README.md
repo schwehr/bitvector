@@ -30,6 +30,19 @@ uv sync
 uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
 ```
 
+To execute the automated test suite and check code coverage:
+
+```bash
+uv run pytest
+```
+
+To continuously run adaptive, coverage-guided property-based fuzzing on the
+hypothesis test suite (`tests/test_properties.py`):
+
+```bash
+uv run hypothesis fuzz tests/test_properties.py
+```
+
 ## Releasing
 
 Releases are automated via GitHub Actions. We strictly adhere to

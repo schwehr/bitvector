@@ -143,6 +143,12 @@ All testing is orchestrated via `pytest`, `pytest-cov`, and `pytest-benchmark`.
   ```bash
   uv run pytest
   ```
+- **Continuous Fuzz Testing (`hypofuzz`)**: To continuously run adaptive,
+  coverage-guided property-based fuzzing on our hypothesis test suite
+  (`tests/test_properties.py`):
+  ```bash
+  uv run hypothesis fuzz tests/test_properties.py
+  ```
 - **Cross-Platform CI**: Automated matrix testing in GitHub Actions executes
   across Linux (`ubuntu-latest`), macOS (`macos-latest`), and Windows
   (`windows-latest`) for Python 3.14, while Python 3.13 testing is scoped to
