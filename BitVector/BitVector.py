@@ -12,7 +12,7 @@ import binascii
 import copy
 import itertools
 import operator
-import random
+import secrets
 import sys
 from typing import Any, BinaryIO, Iterator, Self, Sequence
 
@@ -61,19 +61,21 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
     if bitvector.FILEIN is None:
         raise ValueError("FILEIN must not be None")
 
-    bitstring = ""
+    bit_list: list[str] = []
     i = 0
     while i < blocksize / 8:
         i += 1
         byte = bitvector.FILEIN.read(1)
         if byte == b"":
+            bitstring = "".join(bit_list)
             if len(bitstring) < blocksize:
                 bitvector.more_to_read = False
             return bitstring
         hexvalue = "%02x" % byte[0]
-        bitstring += _hexdict[hexvalue[0]]
-        bitstring += _hexdict[hexvalue[1]]
+        bit_list.append(_hexdict[hexvalue[0]])
+        bit_list.append(_hexdict[hexvalue[1]])
 
+    bitstring = "".join(bit_list)
     file_pos = bitvector.FILEIN.tell()
     # Peek at the next byte; moves file position only if a byte is read.
     next_byte = bitvector.FILEIN.read(1)
@@ -1817,7 +1819,7 @@ class BitVector:
         Returns:
             A new BitVector instance containing the generated random bits.
         """
-        candidate = random.getrandbits(width)
+        candidate = secrets.randbits(width)
         candidate |= 1
         candidate |= 1 << width - 1
         candidate |= 2 << width - 3
