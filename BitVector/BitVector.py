@@ -13,7 +13,10 @@ import copy
 import itertools
 import operator
 import random
+import sys
 from typing import Any, BinaryIO, Iterator, Self, Sequence
+
+_BYTE_REVERSE_TABLE = bytes(int(f"{i:08b}"[::-1], 2) for i in range(256))
 
 _hexdict = {
     "0": "0000",
@@ -765,11 +768,20 @@ class BitVector:
             self.FILEOUT = file_out
         if self.size % 8:
             raise ValueError(err_str)
-        for byte in range(int(self.size / 8)):
-            value = 0
-            for bit in range(8):
-                value += self._getbit(byte * 8 + (7 - bit)) << bit
-            file_out.write(bytes([value]))
+
+        num_bytes = self.size // 8
+        if isinstance(self.vector, list):
+            self.vector = array.array("H", self.vector)
+
+        if sys.byteorder == "little":
+            raw_bytes = self.vector.tobytes()[:num_bytes]
+        else:
+            v_copy = array.array("H", self.vector)
+            v_copy.byteswap()
+            raw_bytes = v_copy.tobytes()[:num_bytes]
+
+        out = raw_bytes.translate(_BYTE_REVERSE_TABLE)
+        file_out.write(out)
 
     def close_file_object(self) -> None:
         """Closes the input file stream associated with this BitVector.
