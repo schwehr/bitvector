@@ -1072,7 +1072,6 @@ class BitVector:
                 if pos.start >= 0:
                     if (len(self) - pos.start) != len(item):
                         raise ValueError("incompatible lengths for slice assignment 3")
-                    #                    for i in range(len(item)-1):
                     for i in range(len(item)):
                         self[pos.start + i] = item[i]
                 else:
