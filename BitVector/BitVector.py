@@ -57,7 +57,7 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
     if bitvector.FILEIN is None:
         raise ValueError("FILEIN must not be None")
 
-    bit_list = []
+    bit_list: list[str] = []
     i = 0
     while i < blocksize / 8:
         i += 1
