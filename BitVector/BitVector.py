@@ -206,8 +206,7 @@ class BitVector:
                 hexVal = hexVal[2:]
                 if len(hexVal) == 1:
                     hexVal = "0" + hexVal
-                bitlist = "".join(map(lambda x: _hexdict[x], hexVal))
-                bitlist = list(map(int, bitlist))
+                bitlist = [int(b) for h in hexVal for b in _hexdict[h]]
                 i = 0
                 while i < len(bitlist):
                     if bitlist[i] == 1:
@@ -313,9 +312,7 @@ class BitVector:
                     ),
                 )
             )
-            bitlist = list(
-                map(int, list("".join(map(lambda x: _hexdict[x], list(hexlist)))))
-            )
+            bitlist = [int(b) for h in hexlist for b in _hexdict[h]]
             self.size = len(bitlist)
         elif hexstring is not None:
             if (
@@ -332,12 +329,7 @@ class BitVector:
                     "When bits are specified through hexstring, you "
                     "cannot give values to any other constructor args"
                 )
-            bitlist = list(
-                map(
-                    int,
-                    list("".join(map(lambda x: _hexdict[x], list(hexstring.lower())))),
-                )
-            )
+            bitlist = [int(b) for h in hexstring.lower() for b in _hexdict[h]]
             self.size = len(bitlist)
         elif rawbytes is not None:
             if (
@@ -354,21 +346,8 @@ class BitVector:
                     "When bits are specified through rawbytes, you "
                     "cannot give values to any other constructor args"
                 )
-            # TODO(https://github.com/schwehr/bitvector-modern/issues/23): Resolve hexlist type collision.
-            hexlist = binascii.hexlify(rawbytes)  # type: ignore[assignment]
-            bitlist = list(
-                map(
-                    int,
-                    list(
-                        "".join(
-                            map(
-                                lambda x: _hexdict[x],
-                                list(map(chr, list(hexlist))),  # type: ignore[arg-type]
-                            )
-                        )
-                    ),
-                )
-            )
+            hexlist = binascii.hexlify(rawbytes).decode("ascii")
+            bitlist = [int(b) for h in hexlist for b in _hexdict[h]]
             self.size = len(bitlist)
         else:
             raise ValueError("wrong arg(s) for constructor")
