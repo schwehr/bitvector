@@ -814,9 +814,11 @@ class BitVector:
         Returns:
             The integer represented by the binary bits in big-endian order.
         """
+        if self.size == 0:
+            return 0
         intVal = 0
         for i in range(self.size):
-            intVal += self[i] * (2 ** (self.size - i - 1))
+            intVal = (intVal << 1) | self[i]
         return intVal
 
     def get_bitvector_in_ascii(self) -> str:
