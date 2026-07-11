@@ -562,11 +562,25 @@ def test_test_for_primality() -> None:
     assert BitVector.BitVector(intVal=361, size=16).test_for_primality() == 0
 
 
-def test_gen_random_bits() -> None:
+def test_gen_random_bits(mocker) -> None:
     """Tests random bit vector generation with forced odd integer result."""
     bv = BitVector.BitVector(size=0).gen_random_bits(32)
     assert bv.size == 32
+    # Check least significant bit is 1
     assert int(bv) & 1 == 1
+    # Check the two most significant bits are 1
+    assert bv[0] == 1
+    assert bv[1] == 1
+
+    # Check that it returns different values on consecutive calls
+    bv2 = BitVector.BitVector(size=0).gen_random_bits(32)
+    assert bv != bv2
+
+    # Check that secrets.randbits is called
+    mock_randbits = mocker.patch("BitVector.BitVector.secrets.randbits", return_value=0)
+    bv_mock = BitVector.BitVector(size=0).gen_random_bits(32)
+    mock_randbits.assert_called_once_with(32)
+    assert int(bv_mock) == (1 | (1 << 31) | (2 << 29))
 
 
 def test_min_canonical() -> None:
