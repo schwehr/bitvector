@@ -693,16 +693,9 @@ class BitVector:
         """
         if self.size % 2 != 0:
             raise ValueError("must have even num bits")
-        i = 0
-        outlist1 = []
-        while i < self.size / 2:
-            outlist1.append(self[i])
-            i += 1
-        outlist2 = []
-        while i < self.size:
-            outlist2.append(self[i])
-            i += 1
-        return [self.__class__(bitlist=outlist1), self.__class__(bitlist=outlist2)]
+
+        half = self.size // 2
+        return [self[:half], self[half:]]
 
     def permute(self, permute_list: Sequence[int] | Any) -> Self:
         """Permutes the bits of the vector according to a permutation list.
