@@ -10,6 +10,7 @@ __version__ = "0.0.1"
 import array
 import binascii
 import copy
+import itertools
 import operator
 import random
 from typing import Any, BinaryIO, Iterator, Self, Sequence
@@ -1768,7 +1769,7 @@ class BitVector:
             run = "0"
         else:
             run = "1"
-        for bit in list(self)[1:]:
+        for bit in itertools.islice(self, 1, None):
             if bit == 0 and previous_bit == 0:
                 run += "0"
             elif bit == 1 and previous_bit == 0:
