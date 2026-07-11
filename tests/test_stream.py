@@ -131,3 +131,18 @@ def test_close_file_object(tmp_path: Path) -> None:
     assert bv.FILEIN.closed is False
     bv.close_file_object()
     assert bv.FILEIN.closed is True
+
+
+def test_read_bits_from_file_none_filein(tmp_path: Path) -> None:
+    """Verifies that reading from a file when FILEIN is None raises ValueError.
+
+    Args:
+        tmp_path: Pytest temporary directory path fixture.
+    """
+    file_path = tmp_path / "test_none_filein.bin"
+    file_path.write_bytes(b"test")
+    bv = BitVector.BitVector(filename=str(file_path))
+    bv.close_file_object()
+    bv.FILEIN = None
+    with pytest.raises(ValueError, match="FILEIN must not be None"):
+        bv.read_bits_from_file(8)

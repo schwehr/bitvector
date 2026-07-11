@@ -54,7 +54,8 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
         A string of binary characters ('0's and '1's) representing the read
         bits, up to blocksize in length.
     """
-    assert bitvector.FILEIN is not None
+    if bitvector.FILEIN is None:
+        raise ValueError("FILEIN must not be None")
 
     bitstring = ""
     i = 0
@@ -1442,14 +1443,14 @@ class BitVector:
             A floating-point coefficient between 0.0 and 1.0.
 
         Raises:
-            AssertionError: If vectors are of unequal length or both zero.
+            ValueError: If vectors are of unequal length or both zero.
         """
-        assert self.int_val() > 0 or other.int_val() > 0, (
-            "Jaccard called on two zero vectors --- NOT ALLOWED"
-        )
-        assert self.size == other.size, (
-            "bitvectors for comparing with Jaccard must be of equal length"
-        )
+        if self.int_val() == 0 and other.int_val() == 0:
+            raise ValueError("Jaccard called on two zero vectors --- NOT ALLOWED")
+        if self.size != other.size:
+            raise ValueError(
+                "bitvectors for comparing with Jaccard must be of equal length"
+            )
         intersect = self & other
         union = self | other
         return intersect.count_bits_sparse() / float(union.count_bits_sparse())
@@ -1464,9 +1465,10 @@ class BitVector:
             A floating-point distance between 0.0 and 1.0 (1 - similarity).
 
         Raises:
-            AssertionError: If vectors are of unequal length.
+            ValueError: If vectors are of unequal length.
         """
-        assert self.size == other.size, "vectors of unequal length"
+        if self.size != other.size:
+            raise ValueError("vectors of unequal length")
         return 1 - self.jaccard_similarity(other)
 
     def hamming_distance(self, other: BitVector) -> int:
@@ -1479,9 +1481,10 @@ class BitVector:
             The integer number of bit positions where the two vectors disagree.
 
         Raises:
-            AssertionError: If vectors are of unequal length.
+            ValueError: If vectors are of unequal length.
         """
-        assert self.size == other.size, "vectors of unequal length"
+        if self.size != other.size:
+            raise ValueError("vectors of unequal length")
         diff = self ^ other
         return diff.count_bits_sparse()
 
@@ -1495,9 +1498,10 @@ class BitVector:
             The integer index of the next set bit (1), or -1 if none is found.
 
         Raises:
-            AssertionError: If from_index is negative.
+            ValueError: If from_index is negative.
         """
-        assert from_index >= 0, "from_index must be nonnegative"
+        if from_index < 0:
+            raise ValueError("from_index must be nonnegative")
         i = from_index
         v = self.vector
         vec_len = len(v)
@@ -1530,9 +1534,10 @@ class BitVector:
             The total number of set bits from index 0 up to position (inclusive).
 
         Raises:
-            AssertionError: If the bit at position is not set to 1.
+            ValueError: If the bit at position is not set to 1.
         """
-        assert self[position] == 1, "the arg bit not set"
+        if self[position] != 1:
+            raise ValueError("the arg bit not set")
         bv = self[0 : position + 1]
         return bv.count_bits()
 
