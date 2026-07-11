@@ -12,7 +12,7 @@ import binascii
 import copy
 import itertools
 import operator
-import random
+import secrets
 from typing import Any, BinaryIO, Iterator, Self, Sequence
 
 _hexdict = {
@@ -1807,7 +1807,7 @@ class BitVector:
         Returns:
             A new BitVector instance containing the generated random bits.
         """
-        candidate = random.getrandbits(width)
+        candidate = secrets.randbits(width)
         candidate |= 1
         candidate |= 1 << width - 1
         candidate |= 2 << width - 3
