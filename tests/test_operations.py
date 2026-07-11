@@ -304,7 +304,7 @@ def test_set_value_invalid_keyword_error() -> None:
 def test_distance_metrics_raise_error(
     method_name: str, bv1_str: str, bv2_str: str, err_match: str
 ) -> None:
-    """Verifies distance metrics raise AssertionError on invalid inputs.
+    """Verifies distance metrics raise ValueError on invalid inputs.
 
     Args:
         method_name: Metric method name ('jaccard_similarity', etc.).
@@ -315,7 +315,7 @@ def test_distance_metrics_raise_error(
     bv1 = BitVector.BitVector(bitstring=bv1_str)
     bv2 = BitVector.BitVector(bitstring=bv2_str)
     method = getattr(bv1, method_name)
-    with pytest.raises(AssertionError, match=err_match):
+    with pytest.raises(ValueError, match=err_match):
         method(bv2)
 
 
@@ -349,9 +349,9 @@ def test_distance_metrics(
 
 
 def test_next_set_bit_raises_error() -> None:
-    """Verifies calling next_set_bit with a negative index raises AssertionError."""
+    """Verifies calling next_set_bit with a negative index raises ValueError."""
     bv = BitVector.BitVector(bitstring="00000000000001")
-    with pytest.raises(AssertionError, match="from_index must be nonnegative"):
+    with pytest.raises(ValueError, match="from_index must be nonnegative"):
         bv.next_set_bit(-1)
 
 
@@ -376,9 +376,9 @@ def test_next_set_bit(bitstring: str, start_idx: int, expected_idx: int) -> None
 
 
 def test_rank_of_bit_set_at_index_raises_error() -> None:
-    """Verifies rank query on an unset bit raises AssertionError."""
+    """Verifies rank query on an unset bit raises ValueError."""
     bv = BitVector.BitVector(bitstring="01010101011100")
-    with pytest.raises(AssertionError, match="the arg bit not set"):
+    with pytest.raises(ValueError, match="the arg bit not set"):
         bv.rank_of_bit_set_at_index(0)
 
 
