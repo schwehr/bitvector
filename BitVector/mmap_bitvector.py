@@ -1,7 +1,7 @@
 import math
 import mmap
 import tempfile
-from typing import Any, Iterator, Self
+from typing import Any, Iterator, Self, cast
 
 
 class MmapBitVector:
@@ -41,7 +41,7 @@ class MmapBitVector:
             self._file.close()
 
     def _clone_empty(self, size: int) -> "MmapBitVector":
-        return type(self)(size=size)
+        return MmapBitVector(size=size)
 
     def int_val(self) -> int:
         return int.from_bytes(self._mmap[: self.byte_size], byteorder="big")
@@ -57,7 +57,7 @@ class MmapBitVector:
             return ""
         return bin(self.int_val())[2:].zfill(self.size)
 
-    def __xor__(self, other: Self) -> Self:
+    def __xor__(self, other: Self) -> "MmapBitVector":
         max_size = max(self.size, other.size)
         res = self._clone_empty(max_size)
         max_bytes = res.byte_size
@@ -70,9 +70,9 @@ class MmapBitVector:
             s_byte = self._mmap[i - s_offset] if i >= s_offset else 0
             o_byte = other._mmap[i - o_offset] if i >= o_offset else 0
             res._mmap[i] = s_byte ^ o_byte
-        return res
+        return cast(Self, res)
 
-    def __and__(self, other: Self) -> Self:
+    def __and__(self, other: Self) -> "MmapBitVector":
         max_size = max(self.size, other.size)
         res = self._clone_empty(max_size)
         max_bytes = res.byte_size
@@ -84,9 +84,9 @@ class MmapBitVector:
             s_byte = self._mmap[i - s_offset] if i >= s_offset else 0
             o_byte = other._mmap[i - o_offset] if i >= o_offset else 0
             res._mmap[i] = s_byte & o_byte
-        return res
+        return cast(Self, res)
 
-    def __or__(self, other: Self) -> Self:
+    def __or__(self, other: Self) -> "MmapBitVector":
         max_size = max(self.size, other.size)
         res = self._clone_empty(max_size)
         max_bytes = res.byte_size
@@ -98,9 +98,9 @@ class MmapBitVector:
             s_byte = self._mmap[i - s_offset] if i >= s_offset else 0
             o_byte = other._mmap[i - o_offset] if i >= o_offset else 0
             res._mmap[i] = s_byte | o_byte
-        return res
+        return cast(Self, res)
 
-    def __invert__(self) -> Self:
+    def __invert__(self) -> "MmapBitVector":
         res = self._clone_empty(self.size)
         for i in range(self.byte_size):
             res._mmap[i] = ~self._mmap[i] & 0xFF
@@ -111,13 +111,13 @@ class MmapBitVector:
             mask = (1 << (8 - excess)) - 1
             res._mmap[0] &= mask
 
-        return res
+        return cast(Self, res)
 
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: Self) -> "MmapBitVector":
         res_int = (self.int_val() << other.size) | other.int_val()
-        return type(self)(size=self.size + other.size, intVal=res_int)
+        return MmapBitVector(size=self.size + other.size, intVal=res_int)
 
-    def __iadd__(self, other: Self) -> Self:
+    def __iadd__(self, other: Self) -> "MmapBitVector":
         res_int = (self.int_val() << other.size) | other.int_val()
         self.size += other.size
         self.byte_size = math.ceil(self.size / 8)
@@ -134,13 +134,13 @@ class MmapBitVector:
         self._mmap[: len(val_bytes)] = val_bytes
         return self
 
-    def __lshift__(self, n: int) -> Self:
+    def __lshift__(self, n: int) -> "MmapBitVector":
         res_int = (self.int_val() << n) & ((1 << self.size) - 1)
-        return type(self)(size=self.size, intVal=res_int)
+        return MmapBitVector(size=self.size, intVal=res_int)
 
-    def __rshift__(self, n: int) -> Self:
+    def __rshift__(self, n: int) -> "MmapBitVector":
         res_int = self.int_val() >> n
-        return type(self)(size=self.size, intVal=res_int)
+        return MmapBitVector(size=self.size, intVal=res_int)
 
     def __getitem__(self, pos: int | slice | Any) -> Any:
         if isinstance(pos, slice):
@@ -148,14 +148,16 @@ class MmapBitVector:
             if step != 1:
                 raise ValueError("Slice steps other than 1 are not supported")
             if start >= stop:
-                return type(self)(size=0, intVal=0)
+                return MmapBitVector(size=0, intVal=0)
             length = stop - start
             val = self.int_val()
             shift = self.size - stop
             mask = (1 << length) - 1
             res_int = (val >> shift) & mask
-            return type(self)(size=length, intVal=res_int)
+            return MmapBitVector(size=length, intVal=res_int)
         else:
+            if not isinstance(pos, int):
+                raise TypeError("Index must be an integer")
             if pos < 0:
                 pos += self.size
             if pos < 0 or pos >= self.size:
@@ -187,6 +189,8 @@ class MmapBitVector:
             val_bytes = val.to_bytes(self.byte_size, byteorder="big")
             self._mmap[: len(val_bytes)] = val_bytes
         else:
+            if not isinstance(pos, int):
+                raise TypeError("Index must be an integer")
             if pos < 0:
                 pos += self.size
             if pos < 0 or pos >= self.size:
@@ -214,40 +218,46 @@ class MmapBitVector:
     def __eq__(self, other: object) -> bool:
         if not hasattr(other, "size"):
             return NotImplemented
-        if self.size != other.size:
+        if self.size != getattr(other, "size", -1):
             return False
 
         if hasattr(other, "_mmap"):
+            other_mmap: Any = getattr(other, "_mmap")
             for i in range(self.byte_size):
-                if self._mmap[i] != other._mmap[i]:
+                if self._mmap[i] != other_mmap[i]:
                     return False
             return True
-        elif hasattr(other, "int_val"):
-            return self.int_val() == other.int_val()
+        elif hasattr(other, "int_val") and callable(getattr(other, "int_val")):
+            other_int_val: Any = getattr(other, "int_val")
+            return self.int_val() == other_int_val()
         return False
 
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __lt__(self, other: object) -> bool:
-        if not hasattr(other, "int_val"):
+        if not hasattr(other, "int_val") or not callable(getattr(other, "int_val")):
             return NotImplemented
-        return self.int_val() < other.int_val()
+        other_int_val: Any = getattr(other, "int_val")
+        return self.int_val() < other_int_val()
 
     def __le__(self, other: object) -> bool:
-        if not hasattr(other, "int_val"):
+        if not hasattr(other, "int_val") or not callable(getattr(other, "int_val")):
             return NotImplemented
-        return self.int_val() <= other.int_val()
+        other_int_val: Any = getattr(other, "int_val")
+        return self.int_val() <= other_int_val()
 
     def __gt__(self, other: object) -> bool:
-        if not hasattr(other, "int_val"):
+        if not hasattr(other, "int_val") or not callable(getattr(other, "int_val")):
             return NotImplemented
-        return self.int_val() > other.int_val()
+        other_int_val: Any = getattr(other, "int_val")
+        return self.int_val() > other_int_val()
 
     def __ge__(self, other: object) -> bool:
-        if not hasattr(other, "int_val"):
+        if not hasattr(other, "int_val") or not callable(getattr(other, "int_val")):
             return NotImplemented
-        return self.int_val() >= other.int_val()
+        other_int_val: Any = getattr(other, "int_val")
+        return self.int_val() >= other_int_val()
 
     def __contains__(self, otherBitVec: Self) -> bool:
         if otherBitVec.size == 0:
