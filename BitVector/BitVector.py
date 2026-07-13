@@ -251,8 +251,8 @@ class BitVector:
                     "give values to any other constructor args"
                 )
             self.size = size
-            two_byte_ints_needed = (size + 15) // 16
-            self.vector = array.array("H", [0] * two_byte_ints_needed)
+            eight_byte_ints_needed = (size + 63) // 64
+            self.vector = array.array("Q", [0] * eight_byte_ints_needed)
             return
         elif bitstring is not None:
             if (
@@ -354,8 +354,8 @@ class BitVector:
             self.size = len(bitlist)
         else:
             raise ValueError("wrong arg(s) for constructor")
-        two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        eight_byte_ints_needed = (len(bitlist) + 63) // 64
+        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
     def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
@@ -379,8 +379,8 @@ class BitVector:
             raise ValueError("index range error")
         if posn < 0:
             posn = self.size + posn
-        block_index = posn // 16
-        shift = posn & 15
+        block_index = posn // 64
+        shift = posn & 63
         cv = self.vector[block_index]
         if (cv >> shift) & 1 != val:
             self.vector[block_index] = cv ^ (1 << shift)
@@ -407,7 +407,7 @@ class BitVector:
                 raise ValueError("index range error")
             if pos < 0:
                 pos = self.size + pos
-            return (self.vector[pos // 16] >> (pos & 15)) & 1
+            return (self.vector[pos // 64] >> (pos & 63)) & 1
         else:
             slicebits = []
             i, j = pos.start, pos.stop
@@ -482,7 +482,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__xor__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        res.vector = array.array("Q", lpb)
         return res
 
     def __and__(self, other: BitVector) -> Self:
@@ -509,7 +509,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__and__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        res.vector = array.array("Q", lpb)
         return res
 
     def __or__(self, other: BitVector) -> Self:
@@ -536,7 +536,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__or__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        res.vector = array.array("Q", lpb)
         return res
 
     def __invert__(self) -> Self:
@@ -548,9 +548,9 @@ class BitVector:
         """
         res = self.__class__(size=self.size)
         lpb = list(map(operator.__inv__, self.vector))
-        res.vector = array.array("H")
+        res.vector = array.array("Q")
         for i in range(len(lpb)):
-            res.vector.append(lpb[i] & 0x0000FFFF)
+            res.vector.append(lpb[i] & 0xFFFFFFFFFFFFFFFF)
         return res
 
     def __add__(self, other: BitVector) -> Self:
@@ -597,19 +597,19 @@ class BitVector:
         if not isinstance(other, type(self)):
             raise TypeError(f"Can only join two BitVector objects, not {type(other)}")
         # Calculate number of two-byte ints we will need to add and extend the vector.
-        two_byte_ints_to_add = (self.size + other.size + 15) // 16 - len(self.vector)
-        self.vector.extend([0] * two_byte_ints_to_add)
+        eight_byte_ints_to_add = (self.size + other.size + 63) // 64 - len(self.vector)
+        self.vector.extend([0] * eight_byte_ints_to_add)
         # Add the bits
-        curr_bit = self.size % 16
-        curr_two_byte_int = self.size // 16
+        curr_bit = self.size % 64
+        curr_eight_byte_int = self.size // 64
         for bit in other:
-            mask = ~(1 << curr_bit) & 0xFFFF
-            self.vector[curr_two_byte_int] = (self.vector[curr_two_byte_int] & mask) | (
+            mask = ~(1 << curr_bit) & 0xFFFFFFFFFFFFFFFF
+            self.vector[curr_eight_byte_int] = (self.vector[curr_eight_byte_int] & mask) | (
                 bit << curr_bit
             )
             curr_bit += 1
-            curr_two_byte_int += curr_bit // 16
-            curr_bit %= 16
+            curr_eight_byte_int += curr_bit // 64
+            curr_bit %= 64
 
         self.size += other.size
         return self
@@ -902,7 +902,7 @@ class BitVector:
             map(
                 operator.__or__,
                 self.vector,
-                list(map(operator.__lshift__, left_most_bits, [15] * size)),
+                list(map(operator.__lshift__, left_most_bits, [63] * size)),
             )
         )
         self._setbit(self.size - 1, bitstring_leftmost_bit)
@@ -911,8 +911,8 @@ class BitVector:
         """Performs a one-bit in-place circular right rotation of the vector."""
         size = len(self.vector)
         bitstring_rightmost_bit = self[self.size - 1]
-        right_most_bits = list(map(operator.__and__, self.vector, [0x8000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000] * size))
+        right_most_bits = list(map(operator.__and__, self.vector, [0x8000000000000000] * size))
+        self.vector = list(map(operator.__and__, self.vector, [~0x8000000000000000] * size))
         right_most_bits.insert(0, bitstring_rightmost_bit)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
@@ -920,33 +920,33 @@ class BitVector:
             map(
                 operator.__or__,
                 self.vector,
-                list(map(operator.__rshift__, right_most_bits, [15] * size)),
+                list(map(operator.__rshift__, right_most_bits, [63] * size)),
             )
         )
         self._setbit(0, bitstring_rightmost_bit)
 
     def circular_rot_left(self) -> None:
         """Performs a one-bit in-place circular left rotation without map()."""
-        max_index = (self.size - 1) // 16
+        max_index = (self.size - 1) // 64
         left_most_bit = self.vector[0] & 1
         self.vector[0] = self.vector[0] >> 1
         for i in range(1, max_index + 1):
             left_bit = self.vector[i] & 1
             self.vector[i] = self.vector[i] >> 1
-            self.vector[i - 1] |= left_bit << 15
+            self.vector[i - 1] |= left_bit << 63
         self._setbit(self.size - 1, left_most_bit)
 
     def circular_rot_right(self) -> None:
         """Performs a one-bit in-place circular right rotation without map()."""
-        max_index = (self.size - 1) // 16
+        max_index = (self.size - 1) // 64
         right_most_bit = self[self.size - 1]
-        self.vector[max_index] &= ~0x8000
+        self.vector[max_index] &= ~0x8000000000000000
         self.vector[max_index] = self.vector[max_index] << 1
         for i in range(max_index - 1, -1, -1):
-            right_bit = self.vector[i] & 0x8000
-            self.vector[i] &= ~0x8000
+            right_bit = self.vector[i] & 0x8000000000000000
+            self.vector[i] &= ~0x8000000000000000
             self.vector[i] = self.vector[i] << 1
-            self.vector[i + 1] |= right_bit >> 15
+            self.vector[i + 1] |= right_bit >> 63
         self._setbit(0, right_most_bit)
 
     def shift_left_by_one(self) -> None:
@@ -960,7 +960,7 @@ class BitVector:
             map(
                 operator.__or__,
                 self.vector,
-                list(map(operator.__lshift__, left_most_bits, [15] * size)),
+                list(map(operator.__lshift__, left_most_bits, [63] * size)),
             )
         )
         self._setbit(self.size - 1, 0)
@@ -968,8 +968,8 @@ class BitVector:
     def shift_right_by_one(self) -> None:
         """Performs a one-bit in-place logical right shift (zero-filling left)."""
         size = len(self.vector)
-        right_most_bits = list(map(operator.__and__, self.vector, [0x8000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000] * size))
+        right_most_bits = list(map(operator.__and__, self.vector, [0x8000000000000000] * size))
+        self.vector = list(map(operator.__and__, self.vector, [~0x8000000000000000] * size))
         right_most_bits.insert(0, 0)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
@@ -977,7 +977,7 @@ class BitVector:
             map(
                 operator.__or__,
                 self.vector,
-                list(map(operator.__rshift__, right_most_bits, [15] * size)),
+                list(map(operator.__rshift__, right_most_bits, [63] * size)),
             )
         )
         self._setbit(0, 0)
@@ -1247,7 +1247,7 @@ class BitVector:
         new_bv = self.__class__(size=0)
         memo[id(self)] = new_bv
         if isinstance(self.vector, array.array):
-            new_bv.vector = array.array("H", self.vector)
+            new_bv.vector = array.array("Q", self.vector)
         elif isinstance(self.vector, list):
             new_bv.vector = self.vector.copy()
         else:
@@ -1276,8 +1276,8 @@ class BitVector:
         new_str = "0" * n + str(self)
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
-        two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        eight_byte_ints_needed = (len(bitlist) + 63) // 64
+        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def pad_from_right(self, n: int) -> None:
@@ -1289,8 +1289,8 @@ class BitVector:
         new_str = str(self) + "0" * n
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
-        two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        eight_byte_ints_needed = (len(bitlist) + 63) // 64
+        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
@@ -1482,21 +1482,21 @@ class BitVector:
         i = from_index
         v = self.vector
         vec_len = len(v)
-        o = i >> 4
-        s = i & 0x0F
-        i = o << 4
+        o = i >> 6
+        s = i & 0x3F
+        i = o << 6
         while o < vec_len:
             h = v[o]
             if h:
                 i += s
                 m = 1 << s
-                while m != (1 << 0x10):
+                while m != (1 << 0x40):
                     if h & m:
                         return i
                     m <<= 1
                     i += 1
             else:
-                i += 0x10
+                i += 0x40
             s = 0
             o += 1
         return -1
