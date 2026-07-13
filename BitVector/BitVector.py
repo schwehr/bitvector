@@ -86,6 +86,7 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
 
 
 class BitVector:
+    __slots__ = ("filename", "size", "FILEIN", "FILEOUT", "more_to_read", "vector")
     filename: str | None
     size: int
     FILEIN: BinaryIO | None
