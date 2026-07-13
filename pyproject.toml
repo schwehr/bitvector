@@ -1,102 +1,75 @@
+dependencies = [ "numpy>=2.0.0",]
+
 [project]
 name = "bitvector-modern"
 version = "0.0.1"
 description = "A memory-efficient packed representation for bit arrays in pure Python"
-readme = { file = "README.md", content-type = "text/markdown" }
-authors = [
-    { name = "Avinash Kak", email = "kak@purdue.edu" },
-]
-maintainers = [
-    { name = "Avinash Kak", email = "kak@purdue.edu" },
-]
 requires-python = ">=3.13"
-keywords = ["bit array", "bit vector", "bit string", "logical operations on bit fields"]
-license = { file = "LICENSE" }
-classifiers = [
-    "Topic :: Utilities",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-]
-dependencies = []
+keywords = [ "bit array", "bit vector", "bit string", "logical operations on bit fields",]
+classifiers = [ "Topic :: Utilities", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.13", "Programming Language :: Python :: 3.14",]
+dependencies = [ "numpy>=2.5.1",]
+[[project.authors]]
+name = "Avinash Kak"
+email = "kak@purdue.edu"
+
+[[project.maintainers]]
+name = "Avinash Kak"
+email = "kak@purdue.edu"
+
+[build-system]
+requires = [ "hatchling",]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [ "codespell>=2.4.0", "conventional-pre-commit>=4.4.0", "hypothesis>=6.0.0", "hypofuzz>=24.0.0", "mdformat>=0.7.21", "mdformat-gfm>=0.3.7", "mypy>=1.15.0", "pre-commit>=4.6.0", "pyrefly>=1.1.1", "pyright>=1.1.411", "pytest-benchmark>=4.0.0", "pytest>=8.0.0", "pytest-cov>=7.1.0", "ruff>=0.15.20", "ty>=0.0.56", "zizmor>=1.26.1", "pytest-mock>=3.15.1", "mkdocs>=1.6.1", "mkdocs-material>=9.7.6", "mkdocstrings[python]>=1.0.6",]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+file = "LICENSE"
 
 [project.urls]
 Homepage = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html"
 Download = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.tar.gz"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["BitVector"]
-
-
+[tool.uv]
 [[tool.uv.index]]
 name = "pypi"
 url = "https://pypi.org/simple"
 default = true
 
-[dependency-groups]
-dev = [
-    "codespell>=2.4.0",
-    "conventional-pre-commit>=4.4.0",
-    "hypothesis>=6.0.0",
-    "hypofuzz>=24.0.0",
-    "mdformat>=0.7.21",
-    "mdformat-gfm>=0.3.7",
-    "mypy>=1.15.0",
-    "pre-commit>=4.6.0",
-    "pyrefly>=1.1.1",
-    "pyright>=1.1.411",
-    "pytest-benchmark>=4.0.0",
-    "pytest>=8.0.0",
-    "pytest-cov>=7.1.0",
-    "ruff>=0.15.20",
-    "ty>=0.0.56",
-    "zizmor>=1.26.1",
-    "pytest-mock>=3.15.1",
-    "mkdocs>=1.6.1",
-    "mkdocs-material>=9.7.6",
-    "mkdocstrings[python]>=1.0.6",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-p no:doctest --cov=BitVector --cov-report=term-missing --cov-report=xml"
-pythonpath = ["."]
-
 [tool.ruff]
 line-length = 88
 target-version = "py313"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "W"]
-ignore = ["E501"]
-
-[tool.coverage.run]
-source = ["BitVector"]
-branch = true
-
-[tool.coverage.report]
-show_missing = true
-fail_under = 95
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if __name__ == .__main__.:",
-    "raise NotImplementedError",
-    "\\.\\.\\.",
-]
 
 [tool.codespell]
 ignore-words-list = "bu,mis,whet,wit"
 
 [tool.pyrefly]
-project-includes = [
-    "**/*.py*",
-    "**/*.ipynb",
-]
+project-includes = [ "**/*.py*", "**/*.ipynb",]
 
 [tool.pyright]
-include = ["BitVector"]
+include = [ "BitVector",]
+
+[tool.pytest.ini_options]
+testpaths = [ "tests",]
+addopts = "-p no:doctest --cov=BitVector --cov-report=term-missing --cov-report=xml"
+pythonpath = [ ".",]
+
+[tool.ruff.lint]
+select = [ "E", "F", "I", "W",]
+ignore = [ "E501",]
+
+[tool.coverage.run]
+source = [ "BitVector",]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 95
+exclude_lines = [ "pragma: no cover", "def __repr__", "if __name__ == .__main__.:", "raise NotImplementedError", "\\.\\.\\.",]
+
+[tool.hatch.build.targets.wheel]
+packages = [ "BitVector",]
