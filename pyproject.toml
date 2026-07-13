@@ -86,6 +86,7 @@ exclude_lines = [
     "def __repr__",
     "if __name__ == .__main__.:",
     "raise NotImplementedError",
+    "\\.\\.\\.",
 ]
 
 [tool.codespell]
