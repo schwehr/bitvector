@@ -56,6 +56,9 @@ dev = [
     "ty>=0.0.56",
     "zizmor>=1.26.1",
     "pytest-mock>=3.15.1",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
+    "mkdocstrings[python]>=1.0.6",
 ]
 
 [tool.pytest.ini_options]
