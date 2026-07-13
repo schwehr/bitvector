@@ -604,9 +604,9 @@ class BitVector:
         curr_eight_byte_int = self.size // 64
         for bit in other:
             mask = ~(1 << curr_bit) & 0xFFFFFFFFFFFFFFFF
-            self.vector[curr_eight_byte_int] = (self.vector[curr_eight_byte_int] & mask) | (
-                bit << curr_bit
-            )
+            self.vector[curr_eight_byte_int] = (
+                self.vector[curr_eight_byte_int] & mask
+            ) | (bit << curr_bit)
             curr_bit += 1
             curr_eight_byte_int += curr_bit // 64
             curr_bit %= 64
@@ -911,8 +911,12 @@ class BitVector:
         """Performs a one-bit in-place circular right rotation of the vector."""
         size = len(self.vector)
         bitstring_rightmost_bit = self[self.size - 1]
-        right_most_bits = list(map(operator.__and__, self.vector, [0x8000000000000000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000000000000000] * size))
+        right_most_bits = list(
+            map(operator.__and__, self.vector, [0x8000000000000000] * size)
+        )
+        self.vector = list(
+            map(operator.__and__, self.vector, [~0x8000000000000000] * size)
+        )
         right_most_bits.insert(0, bitstring_rightmost_bit)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
@@ -968,8 +972,12 @@ class BitVector:
     def shift_right_by_one(self) -> None:
         """Performs a one-bit in-place logical right shift (zero-filling left)."""
         size = len(self.vector)
-        right_most_bits = list(map(operator.__and__, self.vector, [0x8000000000000000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000000000000000] * size))
+        right_most_bits = list(
+            map(operator.__and__, self.vector, [0x8000000000000000] * size)
+        )
+        self.vector = list(
+            map(operator.__and__, self.vector, [~0x8000000000000000] * size)
+        )
         right_most_bits.insert(0, 0)
         right_most_bits.pop()
         self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
