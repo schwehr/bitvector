@@ -119,8 +119,6 @@ class MmapBitVector:
                 raise ValueError("Slice steps other than 1 are not supported")
             if start >= stop:  # pragma: no cover
                 return MmapBitVector(size=0, intVal=0)  # pragma: no cover
-                return MmapBitVector(size=0, intVal=0)  # pragma: no cover
-                return MmapBitVector(size=0, intVal=0)  # pragma: no cover
             length = stop - start
             val = self.int_val()
             shift = self.size - stop
@@ -153,10 +151,10 @@ class MmapBitVector:
             item_val_int: int = 0
             if hasattr(item, "int_val") and callable(getattr(item, "int_val")):
                 item_val_int = int(getattr(item, "int_val")())
-            elif isinstance(item, int): # pragma: no cover
-                item_val_int = item # pragma: no cover
-            else: # pragma: no cover
-                item_val_int = int(item) # pragma: no cover
+            elif isinstance(item, int):  # pragma: no cover
+                item_val_int = item  # pragma: no cover
+            else:  # pragma: no cover
+                item_val_int = int(item)  # pragma: no cover
 
             val = self.int_val()
             shift = self.size - stop
@@ -197,7 +195,7 @@ class MmapBitVector:
     def __eq__(self, other: object) -> bool:
         if not hasattr(other, "size"):
             return False
-        if self.size != getattr(other, "size", -1):  # pragma: no cover
+        if self.size != getattr(other, "size", -1):
             return False
 
         if hasattr(other, "_mmap"):

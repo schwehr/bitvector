@@ -229,28 +229,36 @@ def test_mmap_exceptions2():
     with pytest.raises(TypeError):
         bv.__ge__("str")
 
+
 def test_mmap_eq_unsupported():
     bv = MmapBitVector(size=4, intVal=4)
+
     # This invokes the part of __eq__ where other doesn't have size and returns NotImplemented.
     # Python falls back to id() check, which returns False
     class Dummy:
         pass
+
     assert bv != Dummy()
+
 
 def test_mmap_eq_different_size():
     bv1 = MmapBitVector(size=4, intVal=4)
     bv2 = MmapBitVector(size=5, intVal=4)
     assert bv1 != bv2
 
+
 def test_mmap_eq_mmap():
     bv1 = MmapBitVector(size=4, intVal=4)
     bv2 = MmapBitVector(size=4, intVal=5)
     assert bv1 != bv2
 
+
 def test_mmap_eq_int_val_only():
     bv1 = MmapBitVector(size=4, intVal=4)
+
     class DummyWithIntVal:
         size = 4
+
         def int_val(self):
             return 4
 
@@ -258,6 +266,7 @@ def test_mmap_eq_int_val_only():
 
     class DummyWithIntValBad:
         size = 4
+
         def int_val(self):
             return 5
 
@@ -275,6 +284,7 @@ def test_mmap_slice_steps():
         bv[0:4:2]
     with pytest.raises(ValueError):
         bv[0:4:2] = 1
+
 
 def test_mmap_contains_miss():
     bv = MmapBitVector(size=4, intVal=0b1010)
