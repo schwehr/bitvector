@@ -53,22 +53,23 @@ project-includes = [ "**/*.py*", "**/*.ipynb",]
 [tool.pyright]
 include = [ "BitVector",]
 
+[tool.ruff.lint]
+select = [ "E", "F", "I", "W",]
+ignore = [ "E501",]
+
 [tool.pytest.ini_options]
 testpaths = [ "tests",]
 addopts = "-p no:doctest --cov=BitVector --cov-report=term-missing --cov-report=xml"
 pythonpath = [ ".",]
 
-[tool.ruff.lint]
-select = [ "E", "F", "I", "W",]
-ignore = [ "E501",]
-
 [tool.coverage.run]
 source = [ "BitVector",]
 branch = true
+omit = [ "BitVector/numpy_impl.py",]
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 0
+fail_under = 95
 exclude_lines = [ "pragma: no cover", "def __repr__", "if __name__ == .__main__.:", "raise NotImplementedError", "\\.\\.\\.",]
 
 [tool.hatch.build.targets.wheel]
