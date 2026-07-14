@@ -85,7 +85,7 @@ def test_add_vector_type_fallback() -> None:
     assert str(bv_list + bv2) == "1100010"
 
     bv_tuple = BitVector.BitVector(bitstring="1001")
-    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
+    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]
     assert str(bv_tuple + bv2) == "1001010"
 
 
@@ -141,7 +141,7 @@ def test_deepcopy() -> None:
     assert str(bv_list_copy) == "1100"
 
     bv_tuple = BitVector.BitVector(bitstring="1001")
-    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
+    bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]
     bv_tuple_copy = copy.deepcopy(bv_tuple)
     assert str(bv_tuple_copy) == "1001"
 

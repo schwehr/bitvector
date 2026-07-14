@@ -87,12 +87,50 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
 
 class BitVector:
     __slots__ = ("filename", "size", "FILEIN", "FILEOUT", "more_to_read", "vector")
+
+    def _allocate_vector(self, two_byte_ints_needed: int) -> None:
+        import array
+
+        self.vector = array.array("H", [0] * two_byte_ints_needed)
+
+    def _set_vector(self, new_vec) -> None:
+        import array
+
+        if isinstance(self.vector, array.array):
+            if isinstance(new_vec, array.array):
+                self.vector = array.array("H", new_vec)
+            else:
+                self.vector = array.array("H", new_vec)
+        else:
+            self.vector = list(new_vec)
+
+    def _extend_vector(self, ints_to_add: int) -> None:
+        if ints_to_add > 0:
+            if hasattr(self.vector, "extend"):
+                self.vector.extend([0] * ints_to_add)
+
+    def _copy_vector(self, source_vector) -> None:
+        import array
+
+        if isinstance(self.vector, array.array) and isinstance(
+            source_vector, array.array
+        ):
+            self.vector.frombytes(source_vector.tobytes())
+        else:
+            if isinstance(source_vector, array.array):
+                self.vector = list(source_vector)
+            else:
+                if hasattr(source_vector, "copy"):
+                    self.vector = source_vector.copy()
+                else:
+                    self.vector = list(int(x) for x in source_vector)
+
     filename: str | None
     size: int
     FILEIN: BinaryIO | None
     FILEOUT: BinaryIO | None
     more_to_read: bool
-    vector: array.array[int] | list[int]
+    vector: array.array[int] | list[int] | memoryview | Any
 
     def __init__(
         self,
@@ -252,7 +290,7 @@ class BitVector:
                 )
             self.size = size
             two_byte_ints_needed = (size + 15) // 16
-            self.vector = array.array("H", [0] * two_byte_ints_needed)
+            self._allocate_vector(two_byte_ints_needed)
             return
         elif bitstring is not None:
             if (
@@ -355,7 +393,7 @@ class BitVector:
         else:
             raise ValueError("wrong arg(s) for constructor")
         two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        self._allocate_vector(two_byte_ints_needed)
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
     def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
@@ -419,26 +457,26 @@ class BitVector:
                         raise ValueError("illegal slice index values")
                     for x in range(j):
                         slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+                    return self.__class__(bitlist=slicebits)
                 else:
                     if abs(j) > len(self):
                         raise ValueError("illegal slice index values")
                     for x in range(len(self) - abs(j)):
                         slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+                    return self.__class__(bitlist=slicebits)
             if j is None:
                 if i >= 0:
                     if i > len(self):
                         raise ValueError("illegal slice index values")
                     for x in range(i, len(self)):
                         slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+                    return self.__class__(bitlist=slicebits)
                 else:
                     if abs(i) > len(self):
                         raise ValueError("illegal slice index values")
                     for x in range(len(self) - abs(i), len(self)):
                         slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+                    return self.__class__(bitlist=slicebits)
             if (i >= 0 and j >= 0) and i > j:
                 raise ValueError("illegal slice index values")
             if (i < 0 and j >= 0) and (len(self) - abs(i)) > j:
@@ -449,14 +487,14 @@ class BitVector:
                 else:
                     for x in range(i, len(self) - abs(j)):
                         slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+                    return self.__class__(bitlist=slicebits)
             if self.size == 0:
-                return BitVector(bitstring="")
+                return self.__class__(bitstring="")
             if i == j:
-                return BitVector(bitstring="")
+                return self.__class__(bitstring="")
             for x in range(i, j):
                 slicebits.append(self[x])
-            return BitVector(bitlist=slicebits)
+            return self.__class__(bitlist=slicebits)
 
     def __xor__(self, other: BitVector) -> Self:
         """Performs a bitwise exclusive OR (XOR) with another bit vector.
@@ -481,8 +519,8 @@ class BitVector:
             bv1 = self
             bv2 = other
         res = self.__class__(size=bv1.size)
-        lpb = map(operator.__xor__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        lpb = list(map(operator.__xor__, bv1.vector, bv2.vector))
+        res._set_vector(lpb)
         return res
 
     def __and__(self, other: BitVector) -> Self:
@@ -508,8 +546,8 @@ class BitVector:
             bv1 = self
             bv2 = other
         res = self.__class__(size=bv1.size)
-        lpb = map(operator.__and__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        lpb = list(map(operator.__and__, bv1.vector, bv2.vector))
+        res._set_vector(lpb)
         return res
 
     def __or__(self, other: BitVector) -> Self:
@@ -535,8 +573,8 @@ class BitVector:
             bv1 = self
             bv2 = other
         res = self.__class__(size=bv1.size)
-        lpb = map(operator.__or__, bv1.vector, bv2.vector)
-        res.vector = array.array("H", lpb)
+        lpb = list(map(operator.__or__, bv1.vector, bv2.vector))
+        res._set_vector(lpb)
         return res
 
     def __invert__(self) -> Self:
@@ -548,9 +586,9 @@ class BitVector:
         """
         res = self.__class__(size=self.size)
         lpb = list(map(operator.__inv__, self.vector))
-        res.vector = array.array("H")
+        res._allocate_vector(0)
         for i in range(len(lpb)):
-            res.vector.append(lpb[i] & 0x0000FFFF)
+            res.vector.append(lpb[i] & 0x0000FFFF)  # type: ignore[union-attr]  # ty: ignore
         return res
 
     def __add__(self, other: BitVector) -> Self:
@@ -598,7 +636,7 @@ class BitVector:
             raise TypeError(f"Can only join two BitVector objects, not {type(other)}")
         # Calculate number of two-byte ints we will need to add and extend the vector.
         two_byte_ints_to_add = (self.size + other.size + 15) // 16 - len(self.vector)
-        self.vector.extend([0] * two_byte_ints_to_add)
+        self._extend_vector(two_byte_ints_to_add)
         # Add the bits
         curr_bit = self.size % 16
         curr_two_byte_int = self.size // 16
@@ -897,12 +935,14 @@ class BitVector:
         left_most_bits = list(map(operator.__and__, self.vector, [1] * size))
         left_most_bits.append(left_most_bits[0])
         del left_most_bits[0]
-        self.vector = list(map(operator.__rshift__, self.vector, [1] * size))
-        self.vector = list(
-            map(
-                operator.__or__,
-                self.vector,
-                list(map(operator.__lshift__, left_most_bits, [15] * size)),
+        self._set_vector(list(map(operator.__rshift__, self.vector, [1] * size)))
+        self._set_vector(
+            list(
+                map(
+                    operator.__or__,
+                    self.vector,
+                    list(map(operator.__lshift__, left_most_bits, [15] * size)),
+                )
             )
         )
         self._setbit(self.size - 1, bitstring_leftmost_bit)
@@ -912,15 +952,17 @@ class BitVector:
         size = len(self.vector)
         bitstring_rightmost_bit = self[self.size - 1]
         right_most_bits = list(map(operator.__and__, self.vector, [0x8000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000] * size))
+        self._set_vector(list(map(operator.__and__, self.vector, [~0x8000] * size)))
         right_most_bits.insert(0, bitstring_rightmost_bit)
         right_most_bits.pop()
-        self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
-        self.vector = list(
-            map(
-                operator.__or__,
-                self.vector,
-                list(map(operator.__rshift__, right_most_bits, [15] * size)),
+        self._set_vector(list(map(operator.__lshift__, self.vector, [1] * size)))
+        self._set_vector(
+            list(
+                map(
+                    operator.__or__,
+                    self.vector,
+                    list(map(operator.__rshift__, right_most_bits, [15] * size)),
+                )
             )
         )
         self._setbit(0, bitstring_rightmost_bit)
@@ -955,12 +997,14 @@ class BitVector:
         left_most_bits = list(map(operator.__and__, self.vector, [1] * size))
         left_most_bits.append(left_most_bits[0])
         del left_most_bits[0]
-        self.vector = list(map(operator.__rshift__, self.vector, [1] * size))
-        self.vector = list(
-            map(
-                operator.__or__,
-                self.vector,
-                list(map(operator.__lshift__, left_most_bits, [15] * size)),
+        self._set_vector(list(map(operator.__rshift__, self.vector, [1] * size)))
+        self._set_vector(
+            list(
+                map(
+                    operator.__or__,
+                    self.vector,
+                    list(map(operator.__lshift__, left_most_bits, [15] * size)),
+                )
             )
         )
         self._setbit(self.size - 1, 0)
@@ -969,15 +1013,17 @@ class BitVector:
         """Performs a one-bit in-place logical right shift (zero-filling left)."""
         size = len(self.vector)
         right_most_bits = list(map(operator.__and__, self.vector, [0x8000] * size))
-        self.vector = list(map(operator.__and__, self.vector, [~0x8000] * size))
+        self._set_vector(list(map(operator.__and__, self.vector, [~0x8000] * size)))
         right_most_bits.insert(0, 0)
         right_most_bits.pop()
-        self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
-        self.vector = list(
-            map(
-                operator.__or__,
-                self.vector,
-                list(map(operator.__rshift__, right_most_bits, [15] * size)),
+        self._set_vector(list(map(operator.__lshift__, self.vector, [1] * size)))
+        self._set_vector(
+            list(
+                map(
+                    operator.__or__,
+                    self.vector,
+                    list(map(operator.__rshift__, right_most_bits, [15] * size)),
+                )
             )
         )
         self._setbit(0, 0)
@@ -1251,7 +1297,7 @@ class BitVector:
         elif isinstance(self.vector, list):
             new_bv.vector = self.vector.copy()
         else:
-            new_bv.vector = copy.deepcopy(self.vector, memo)
+            new_bv._copy_vector(self.vector)
         new_bv.size = self.size
         return new_bv
 
@@ -1277,7 +1323,7 @@ class BitVector:
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
         two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        self._allocate_vector(two_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def pad_from_right(self, n: int) -> None:
@@ -1290,7 +1336,7 @@ class BitVector:
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
         two_byte_ints_needed = (len(bitlist) + 15) // 16
-        self.vector = array.array("H", [0] * two_byte_ints_needed)
+        self._allocate_vector(two_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
@@ -1526,7 +1572,7 @@ class BitVector:
         """
         if self.int_val() == 0:
             return False
-        bv = self & BitVector(intVal=self.int_val() - 1)
+        bv = self & self.__class__(intVal=self.int_val() - 1)
         if bv.int_val() == 0:
             return True
         return False
