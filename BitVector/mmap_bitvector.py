@@ -117,10 +117,10 @@ class MmapBitVector:
             start, stop, step = pos.indices(self.size)
             if step != 1:
                 raise ValueError("Slice steps other than 1 are not supported")
-            if start >= stop: # pragma: no cover
-                return MmapBitVector(size=0, intVal=0) # pragma: no cover
-                return MmapBitVector(size=0, intVal=0) # pragma: no cover
-                return MmapBitVector(size=0, intVal=0) # pragma: no cover
+            if start >= stop:  # pragma: no cover
+                return MmapBitVector(size=0, intVal=0)  # pragma: no cover
+                return MmapBitVector(size=0, intVal=0)  # pragma: no cover
+                return MmapBitVector(size=0, intVal=0)  # pragma: no cover
             length = stop - start
             val = self.int_val()
             shift = self.size - stop
@@ -132,9 +132,9 @@ class MmapBitVector:
                 raise TypeError(
                     "Index must be an integer"
                 )  # pragma: no cover # pragma: no cover
-            if pos < 0: # pragma: no cover
+            if pos < 0:  # pragma: no cover
                 pos += self.size
-            if pos < 0 or pos >= self.size: # pragma: no cover
+            if pos < 0 or pos >= self.size:  # pragma: no cover
                 raise IndexError("Index out of range")
 
             # Direct byte indexing
@@ -150,18 +150,19 @@ class MmapBitVector:
             if step != 1:
                 raise ValueError("Slice steps other than 1 are not supported")
             length = stop - start
-            if isinstance(item, int): # pragma: no cover
-                item_val = item # pragma: no cover
-            else:
-                item_val = item # pragma: no cover.int_val()
+            item_val_int: int = 0
+            if hasattr(item, "int_val") and callable(getattr(item, "int_val")):
+                item_val_int = int(getattr(item, "int_val")())
+            elif isinstance(item, int): # pragma: no cover
+                item_val_int = item # pragma: no cover
+            else: # pragma: no cover
+                item_val_int = int(item) # pragma: no cover
 
             val = self.int_val()
             shift = self.size - stop
             mask = ((1 << length) - 1) << shift
 
-            if isinstance(item_val, MmapBitVector):
-                item_val = item_val.int_val() # pragma: no cover
-            val = (val & ~mask) | ((item_val << shift) & mask)
+            val = (val & ~mask) | ((item_val_int << shift) & mask)
             val_bytes = val.to_bytes(self.byte_size, byteorder="big")
             self._mmap[: len(val_bytes)] = val_bytes
         else:
@@ -169,9 +170,9 @@ class MmapBitVector:
                 raise TypeError(
                     "Index must be an integer"
                 )  # pragma: no cover # pragma: no cover
-            if pos < 0: # pragma: no cover
+            if pos < 0:  # pragma: no cover
                 pos += self.size
-            if pos < 0 or pos >= self.size: # pragma: no cover
+            if pos < 0 or pos >= self.size:  # pragma: no cover
                 raise IndexError("Index out of range")
 
             bit_index = self.size - pos - 1
@@ -182,7 +183,7 @@ class MmapBitVector:
             if item:
                 byte_val |= 1 << bit_in_byte
             else:
-                byte_val &= ~(1 << bit_in_byte) # pragma: no cover
+                byte_val &= ~(1 << bit_in_byte)  # pragma: no cover
             self._mmap[byte_idx] = byte_val
 
     def __iter__(self) -> Iterator[int]:
@@ -203,7 +204,7 @@ class MmapBitVector:
             other_mmap: Any = getattr(other, "_mmap")
             for i in range(self.byte_size):
                 if self._mmap[i] != other_mmap[i]:
-                    return False # pragma: no cover
+                    return False  # pragma: no cover
             return True
         elif hasattr(other, "int_val") and callable(getattr(other, "int_val")):
             other_int_val: Any = getattr(other, "int_val")
