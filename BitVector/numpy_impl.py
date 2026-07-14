@@ -21,6 +21,8 @@ class NumpyBitVectorBase:
         self.dtype = self._dtype
         self.bits_per_word = self._bits_per_word
 
+        if bitstring is not None and intVal is not None:
+            raise ValueError("Cannot provide both bitstring and intVal")
         if bitstring is not None:
             self.size = len(bitstring)
             words = (self.size + self.bits_per_word - 1) // self.bits_per_word
@@ -329,9 +331,8 @@ class NumpyBitVectorBase:
             start, stop, step = pos.indices(self.size)
             if step != 1:
                 raise ValueError("Slice step must be 1")
-            if stop < start:
-                stop = start
-            slice_size = stop - start
+
+            slice_size = max(0, stop - start)
             if hasattr(item, "size") and hasattr(item, "_getbit"):
                 if getattr(item, "size") != slice_size:
                     raise ValueError("Size mismatch")

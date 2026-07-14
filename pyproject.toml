@@ -65,7 +65,7 @@ pythonpath = [ ".",]
 [tool.coverage.run]
 source = [ "BitVector",]
 branch = true
-omit = [ "BitVector/numpy_impl.py",]
+omit = [ "tests/*",]
 
 [tool.coverage.report]
 show_missing = true
