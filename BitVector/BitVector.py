@@ -302,7 +302,7 @@ class BitVector:
                     "When bits are specified through textstring, you "
                     "cannot give values to any other constructor args"
                 )
-            hexlist = "".join(
+            hex_str = "".join(
                 map(
                     lambda x: x[2:],
                     map(
@@ -315,7 +315,7 @@ class BitVector:
                     ),
                 )
             )
-            bitlist = [int(b) for h in hexlist for b in _hexdict[h]]
+            bitlist = [int(b) for h in hex_str for b in _hexdict[h]]
             self.size = len(bitlist)
         elif hexstring is not None:
             if (
@@ -349,8 +349,8 @@ class BitVector:
                     "When bits are specified through rawbytes, you "
                     "cannot give values to any other constructor args"
                 )
-            hexlist = binascii.hexlify(rawbytes).decode("ascii")
-            bitlist = [int(b) for h in hexlist for b in _hexdict[h]]
+            hex_str = binascii.hexlify(rawbytes).decode("ascii")
+            bitlist = [int(b) for h in hex_str for b in _hexdict[h]]
             self.size = len(bitlist)
         else:
             raise ValueError("wrong arg(s) for constructor")
