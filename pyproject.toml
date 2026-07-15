@@ -18,7 +18,9 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.5.1",
+]
 
 [project.urls]
 Homepage = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html"
