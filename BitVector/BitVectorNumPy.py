@@ -92,7 +92,7 @@ class BitVectorNumPy:
     FILEIN: BinaryIO | None
     FILEOUT: BinaryIO | None
     more_to_read: bool
-    vector: np.ndarray | list[int]
+    vector: np.ndarray
 
     def __init__(
         self,
@@ -581,11 +581,15 @@ class BitVectorNumPy:
             TypeError: If the operand is not a BitVectorNumPy instance.
         """
         if not isinstance(other, type(self)):
-            raise TypeError(f"Can only join two BitVectorNumPy objects, not {type(other)}")
+            raise TypeError(
+                f"Can only join two BitVectorNumPy objects, not {type(other)}"
+            )
         # Calculate number of two-byte ints we will need to add and extend the vector.
         eight_byte_ints_to_add = (self.size + other.size + 63) // 64 - len(self.vector)
         if eight_byte_ints_to_add > 0:
-            self.vector = np.concatenate([self.vector, np.zeros(eight_byte_ints_to_add, dtype=np.uint64)])
+            self.vector = np.concatenate(
+                [self.vector, np.zeros(eight_byte_ints_to_add, dtype=np.uint64)]
+            )
         # Add the bits
         curr_bit = self.size % 64
         curr_eight_byte_int = self.size // 64
@@ -968,7 +972,9 @@ class BitVectorNumPy:
     # Allow array like subscripting for getting and setting:
     __getitem__ = _getbit
 
-    def __setitem__(self, pos: int | slice | Any, item: int | BitVectorNumPy | Any) -> Any:
+    def __setitem__(
+        self, pos: int | slice | Any, item: int | BitVectorNumPy | Any
+    ) -> Any:
         """Assigns a bit or slice of bits at the specified position.
 
         Supports both index assignment (setting a single bit to 0 or 1) and
@@ -1638,7 +1644,9 @@ class BitVectorNumPy:
             remainder = remainder[remainder.length() - n :]
         return quotient, remainder
 
-    def gf_multiply_modular(self, b: BitVectorNumPy | Any, mod: BitVectorNumPy, n: int) -> Self:
+    def gf_multiply_modular(
+        self, b: BitVectorNumPy | Any, mod: BitVectorNumPy, n: int
+    ) -> Self:
         """Performs modular polynomial multiplication in Galois Field GF(2^n).
 
         Args:

@@ -101,4 +101,4 @@ project-includes = [
 ]
 
 [tool.pyright]
-include = ["BitVector"]
+include = ["BitVector", "tests"]
