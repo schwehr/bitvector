@@ -7,7 +7,7 @@ def test_numpy_init():
     bv = BitVectorNumPy(size=128)
     assert bv.size == 128
     assert len(bv.vector) == 2
-    assert bv.vector.dtype == np.uint64
+    assert getattr(bv.vector, "dtype", None) == np.uint64
     bv[0] = 1
     assert bv[0] == 1
     assert bv[1] == 0
