@@ -43,3 +43,24 @@ def test_numpy_shift():
     bv2 = BitVectorNumPy(bitstring="1011")
     bv2.shift_right_by_one()
     assert str(bv2) == "0101"
+
+
+def test_more_coverage():
+    bv = BitVectorNumPy(size=256)
+    bv[0] = 1
+    bv[255] = 1
+    bv.shift_left(1)
+    assert bv[0] == 0
+    assert bv[1] == 0
+
+    bv.shift_right(1)
+    assert bv[0] == 0
+
+    bv2 = BitVectorNumPy(size=0)
+    bv3 = bv + bv2
+    assert bv3.size == 256
+
+    bv.circular_rot_left()
+    bv.circular_rot_right()
+    bv.circular_rotate_left_by_one()
+    bv.circular_rotate_right_by_one()
