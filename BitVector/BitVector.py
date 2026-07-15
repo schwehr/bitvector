@@ -34,6 +34,8 @@ _hexdict = {
     "f": "1111",
 }
 
+ARRAY_TYPE = "Q"
+
 
 def _readblock(blocksize: int, bitvector: BitVector) -> str:
     """Reads a block of bits from a file stream into a binary bitstring.
@@ -252,7 +254,7 @@ class BitVector:
                 )
             self.size = size
             eight_byte_ints_needed = (size + 63) // 64
-            self.vector = array.array("Q", [0] * eight_byte_ints_needed)
+            self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
             return
         elif bitstring is not None:
             if (
@@ -355,7 +357,7 @@ class BitVector:
         else:
             raise ValueError("wrong arg(s) for constructor")
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
-        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
+        self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
         list(map(self._setbit, range(len(bitlist)), bitlist))
 
     def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
@@ -482,7 +484,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__xor__, bv1.vector, bv2.vector)
-        res.vector = array.array("Q", lpb)
+        res.vector = array.array(ARRAY_TYPE, lpb)
         return res
 
     def __and__(self, other: BitVector) -> Self:
@@ -509,7 +511,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__and__, bv1.vector, bv2.vector)
-        res.vector = array.array("Q", lpb)
+        res.vector = array.array(ARRAY_TYPE, lpb)
         return res
 
     def __or__(self, other: BitVector) -> Self:
@@ -536,7 +538,7 @@ class BitVector:
             bv2 = other
         res = self.__class__(size=bv1.size)
         lpb = map(operator.__or__, bv1.vector, bv2.vector)
-        res.vector = array.array("Q", lpb)
+        res.vector = array.array(ARRAY_TYPE, lpb)
         return res
 
     def __invert__(self) -> Self:
@@ -548,7 +550,7 @@ class BitVector:
         """
         res = self.__class__(size=self.size)
         lpb = list(map(operator.__inv__, self.vector))
-        res.vector = array.array("Q")
+        res.vector = array.array(ARRAY_TYPE)
         for i in range(len(lpb)):
             res.vector.append(lpb[i] & 0xFFFFFFFFFFFFFFFF)
         return res
@@ -1255,7 +1257,7 @@ class BitVector:
         new_bv = self.__class__(size=0)
         memo[id(self)] = new_bv
         if isinstance(self.vector, array.array):
-            new_bv.vector = array.array("Q", self.vector)
+            new_bv.vector = array.array(ARRAY_TYPE, self.vector)
         elif isinstance(self.vector, list):
             new_bv.vector = self.vector.copy()
         else:
@@ -1285,7 +1287,7 @@ class BitVector:
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
-        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
+        self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def pad_from_right(self, n: int) -> None:
@@ -1298,7 +1300,7 @@ class BitVector:
         bitlist = list(map(int, list(new_str)))
         self.size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
-        self.vector = array.array("Q", [0] * eight_byte_ints_needed)
+        self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
         list(map(self._setbit, enumerate(bitlist), bitlist))
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
