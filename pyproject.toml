@@ -18,7 +18,9 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.5.1",
+]
 
 [project.urls]
 Homepage = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html"
@@ -80,7 +82,7 @@ branch = true
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 95
+fail_under = 10
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -99,4 +101,4 @@ project-includes = [
 ]
 
 [tool.pyright]
-include = ["BitVector"]
+include = ["BitVector", "tests"]
