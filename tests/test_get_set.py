@@ -1,4 +1,4 @@
-"""Tests bit retrieval and assignment (_getbit, _setbit, slicing, iteration)."""
+"""Tests bit retrieval and assignment (__getitem__, _setbit, slicing, iteration)."""
 
 from collections.abc import Iterator
 
@@ -54,15 +54,15 @@ def test_setbit_valid(
 
 
 @pytest.mark.parametrize("index", [5, -6])
-def test_getbit_int_raises_error(index: int) -> None:
-    """Verifies that out-of-bounds _getbit calls raise ValueError.
+def test_getitem_int_raises_error(index: int) -> None:
+    """Verifies that out-of-bounds __getitem__ calls raise ValueError.
 
     Args:
         index: The out-of-bounds index to query.
     """
     bv = BitVector.BitVector(bitstring="10110")
     with pytest.raises(ValueError, match="index range error"):
-        bv._getbit(index)
+        bv[index]
 
 
 @pytest.mark.parametrize(
@@ -74,15 +74,15 @@ def test_getbit_int_raises_error(index: int) -> None:
         (-2, 1),
     ],
 )
-def test_getbit_int(index: int, expected: int) -> None:
-    """Tests _getbit with positive and negative integer indices.
+def test_getitem_int(index: int, expected: int) -> None:
+    """Tests __getitem__ with positive and negative integer indices.
 
     Args:
         index: The bit index to query.
         expected: The expected integer bit value (0 or 1).
     """
     bv = BitVector.BitVector(bitstring="10110")
-    assert bv._getbit(index) == expected
+    assert bv[index] == expected
 
 
 @pytest.mark.parametrize(
