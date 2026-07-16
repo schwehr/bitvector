@@ -792,10 +792,10 @@ class BitVector:
         """
         if self.size == 0:
             return 0
-        intVal = 0
+        int_val = 0
         for i in range(self.size):
-            intVal = (intVal << 1) | self[i]
-        return intVal
+            int_val = (int_val << 1) | self[i]
+        return int_val
 
     def get_bitvector_in_ascii(self) -> str:
         """Converts the bit vector into an ASCII character string.
