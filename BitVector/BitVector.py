@@ -685,11 +685,11 @@ class BitVector:
             else:
                 fp.write("1")
 
-    def divide_into_two(self) -> list[Self]:
+    def divide_into_two(self) -> tuple[Self, Self]:
         """Splits an even-length bit vector into two equal halves.
 
         Returns:
-            A list of two new BitVector instances: [left_half, right_half].
+            A tuple of two new BitVector instances: (left_half, right_half).
 
         Raises:
             ValueError: If the vector length is not even.
@@ -698,7 +698,7 @@ class BitVector:
             raise ValueError("must have even num bits")
 
         half = self.size // 2
-        return [self[:half], self[half:]]
+        return (self[:half], self[half:])
 
     def permute(self, permute_list: Sequence[int] | Any) -> Self:
         """Permutes the bits of the vector according to a permutation list.
