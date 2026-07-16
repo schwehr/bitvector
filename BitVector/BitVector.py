@@ -387,7 +387,7 @@ class BitVector:
         if (cv >> shift) & 1 != val:
             self.vector[block_index] = cv ^ (1 << shift)
 
-    def _getbit(self, pos: int | slice | Any) -> Any:
+    def __getitem__(self, pos: int | slice | Any) -> Any:
         """Retrieves the bit or slice of bits from the designated position.
 
         Args:
@@ -771,7 +771,7 @@ class BitVector:
         for byte in range(int(self.size / 8)):
             value = 0
             for bit in range(8):
-                value += self._getbit(byte * 8 + (7 - bit)) << bit
+                value += self[byte * 8 + (7 - bit)] << bit
             file_out.write(bytes([value]))
 
     def close_file_object(self) -> None:
@@ -1029,8 +1029,6 @@ class BitVector:
         return self
 
     # Allow array like subscripting for getting and setting:
-    __getitem__ = _getbit
-
     def __setitem__(self, pos: int | slice | Any, item: int | BitVector | Any) -> Any:
         """Assigns a bit or slice of bits at the specified position.
 
@@ -1107,7 +1105,7 @@ class BitVector:
         Yields:
             The integer bit value (0 or 1) at each position from left to right.
         """
-        yield from (self._getbit(i) for i in range(self.size))
+        yield from (self[i] for i in range(self.size))
 
     def __str__(self) -> str:
         """Returns an ASCII string representation of the bit vector ('0's and '1's).
