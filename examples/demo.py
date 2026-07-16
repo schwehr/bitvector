@@ -211,7 +211,7 @@ print(bv3)
 # 0110000101000010000110100001101000011001000010010101001000011111
 
 print("\nExperiment with dividing an even-sized vector into two:")
-[bv4, bv5] = bv3.divide_into_two()
+bv4, bv5 = bv3.divide_into_two()
 print(bv4)  # 01100001010000100001101000011010
 print(bv5)  # 00011001000010010101001000011111
 
