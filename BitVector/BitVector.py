@@ -94,7 +94,7 @@ class BitVector:
     FILEIN: BinaryIO | None
     FILEOUT: BinaryIO | None
     more_to_read: bool
-    vector: array.array[int] | list[int]
+    vector: array.array[int]
 
     def __init__(
         self,
@@ -572,8 +572,6 @@ class BitVector:
             new_bv.vector, array.array
         ):
             new_bv.vector.frombytes(self.vector.tobytes())
-        elif isinstance(self.vector, list):
-            new_bv.vector = self.vector.copy()
         else:
             out_str = str(self) + str(other)
             return self.__class__(bitstring=out_str)
@@ -899,13 +897,16 @@ class BitVector:
         left_most_bits = list(map(operator.__and__, self.vector, [1] * size))
         left_most_bits.append(left_most_bits[0])
         del left_most_bits[0]
-        self.vector = list(map(operator.__rshift__, self.vector, [1] * size))
-        self.vector = list(
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__rshift__, self.vector, [1] * size)
+        )
+        self.vector = array.array(
+            ARRAY_TYPE,
             map(
                 operator.__or__,
                 self.vector,
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
-            )
+            ),
         )
         self._setbit(self.size - 1, bitstring_leftmost_bit)
 
@@ -916,18 +917,21 @@ class BitVector:
         right_most_bits = list(
             map(operator.__and__, self.vector, [0x8000000000000000] * size)
         )
-        self.vector = list(
-            map(operator.__and__, self.vector, [~0x8000000000000000] * size)
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__and__, self.vector, [~0x8000000000000000] * size)
         )
         right_most_bits.insert(0, bitstring_rightmost_bit)
         right_most_bits.pop()
-        self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
-        self.vector = list(
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__lshift__, self.vector, [1] * size)
+        )
+        self.vector = array.array(
+            ARRAY_TYPE,
             map(
                 operator.__or__,
                 self.vector,
                 list(map(operator.__rshift__, right_most_bits, [63] * size)),
-            )
+            ),
         )
         self._setbit(0, bitstring_rightmost_bit)
 
@@ -961,13 +965,16 @@ class BitVector:
         left_most_bits = list(map(operator.__and__, self.vector, [1] * size))
         left_most_bits.append(left_most_bits[0])
         del left_most_bits[0]
-        self.vector = list(map(operator.__rshift__, self.vector, [1] * size))
-        self.vector = list(
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__rshift__, self.vector, [1] * size)
+        )
+        self.vector = array.array(
+            ARRAY_TYPE,
             map(
                 operator.__or__,
                 self.vector,
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
-            )
+            ),
         )
         self._setbit(self.size - 1, 0)
 
@@ -977,18 +984,21 @@ class BitVector:
         right_most_bits = list(
             map(operator.__and__, self.vector, [0x8000000000000000] * size)
         )
-        self.vector = list(
-            map(operator.__and__, self.vector, [~0x8000000000000000] * size)
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__and__, self.vector, [~0x8000000000000000] * size)
         )
         right_most_bits.insert(0, 0)
         right_most_bits.pop()
-        self.vector = list(map(operator.__lshift__, self.vector, [1] * size))
-        self.vector = list(
+        self.vector = array.array(
+            ARRAY_TYPE, map(operator.__lshift__, self.vector, [1] * size)
+        )
+        self.vector = array.array(
+            ARRAY_TYPE,
             map(
                 operator.__or__,
                 self.vector,
                 list(map(operator.__rshift__, right_most_bits, [63] * size)),
-            )
+            ),
         )
         self._setbit(0, 0)
 
@@ -1258,8 +1268,6 @@ class BitVector:
         memo[id(self)] = new_bv
         if isinstance(self.vector, array.array):
             new_bv.vector = array.array(ARRAY_TYPE, self.vector)
-        elif isinstance(self.vector, list):
-            new_bv.vector = self.vector.copy()
         else:
             new_bv.vector = copy.deepcopy(self.vector, memo)
         new_bv.size = self.size

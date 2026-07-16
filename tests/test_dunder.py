@@ -80,10 +80,6 @@ def test_add_vector_type_fallback() -> None:
     """Tests __add__ fallback branches when self.vector is a list or tuple."""
     bv2 = BitVector.BitVector(bitstring="010")
 
-    bv_list = BitVector.BitVector(bitstring="1100")
-    bv_list.vector = list(bv_list.vector)
-    assert str(bv_list + bv2) == "1100010"
-
     bv_tuple = BitVector.BitVector(bitstring="1001")
     bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
     assert str(bv_tuple + bv2) == "1001010"
@@ -134,11 +130,6 @@ def test_deepcopy() -> None:
     bv_memo = copy.deepcopy(bv, memo)
     assert str(bv_memo) == "10110"
     assert str(bv.__deepcopy__()) == "10110"
-
-    bv_list = BitVector.BitVector(bitstring="1100")
-    bv_list.vector = list(bv_list.vector)
-    bv_list_copy = copy.deepcopy(bv_list)
-    assert str(bv_list_copy) == "1100"
 
     bv_tuple = BitVector.BitVector(bitstring="1001")
     bv_tuple.vector = tuple(bv_tuple.vector)  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
