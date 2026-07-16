@@ -1135,8 +1135,11 @@ class BitVector:
         if isinstance(other, BitVector):
             if self.size != other.size:
                 return False
-            for i in range(self.size):
-                if self[i] != other[i]:
+
+            # TODO: Consider a block-based implementation comparing `self.vector`
+            # elements directly with a mask for the last element for better performance.
+            for val1, val2 in zip(self, other):
+                if val1 != val2:
                     return False
             return True
 
