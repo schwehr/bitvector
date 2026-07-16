@@ -614,7 +614,7 @@ class BitVector:
         self.size += other.size
         return self
 
-    def _getsize(self) -> int:
+    def __len__(self) -> int:
         """Returns the number of bits stored in the bit vector.
 
         Returns:
@@ -1098,8 +1098,6 @@ class BitVector:
         # For index assignment use _setbit()
         self._setbit(pos, item)
 
-    # Allow len() to work:
-    __len__ = _getsize
     # Allow int() to work:
     __int__ = int_val
 
