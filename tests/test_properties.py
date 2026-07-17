@@ -121,14 +121,14 @@ def test_reverse_involution(bits: str) -> None:
 
 
 @given(st.text(alphabet="01", min_size=1, max_size=64))
-def test_int_val_roundtrip(bits: str) -> None:
-    """Tests converting to int_val and back to BitVector preserves bit string.
+def test_int_roundtrip(bits: str) -> None:
+    """Tests converting to int and back to BitVector preserves bit string.
 
     Args:
         bits: Bitstring representation of the test vector.
     """
     bv = BitVector.BitVector(bitstring=bits)
-    val = bv.int_val()
+    val = int(bv)
     expected_val = int(bits, 2)
     assert val == expected_val
 
