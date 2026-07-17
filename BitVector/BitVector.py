@@ -1566,12 +1566,12 @@ class BitVector:
         Returns:
             A new BitVector instance with bits in reversed order.
         """
-        reverseList = []
+        reverse_list = []
         i = 1
         while i < self.size + 1:
-            reverseList.append(self[-i])
+            reverse_list.append(self[-i])
             i += 1
-        return self.__class__(bitlist=reverseList)
+        return self.__class__(bitlist=reverse_list)
 
     def gcd(self, other: BitVector) -> Self:
         """Calculates the greatest common divisor (GCD) using Euclid's algorithm.
