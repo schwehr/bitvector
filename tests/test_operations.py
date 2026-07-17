@@ -194,7 +194,7 @@ def test_padding(
     else:
         bv.pad_from_right(pad_count)
     assert str(bv) == expected_str
-    assert bv.size == expected_size
+    assert bv._size == expected_size
 
 
 def test_reset_raises_error() -> None:
@@ -565,7 +565,7 @@ def test_test_for_primality() -> None:
 def test_gen_random_bits(mocker) -> None:
     """Tests random bit vector generation with forced odd integer result."""
     bv = BitVector.BitVector(size=0).gen_random_bits(32)
-    assert bv.size == 32
+    assert bv._size == 32
     # Check least significant bit is 1
     assert int(bv) & 1 == 1
     # Check the two most significant bits are 1

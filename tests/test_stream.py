@@ -52,7 +52,7 @@ def test_read_bits_from_file_sequential(tmp_path: Path) -> None:
         assert bv.more_to_read is False
 
         bv3 = bv.read_bits_from_file(8)
-        assert bv3.size == 0
+        assert bv3._size == 0
         assert str(bv3) == ""
     finally:
         bv.close_file_object()
