@@ -1709,7 +1709,7 @@ class BitVector:
         quotient, remainder = product.gf_divide_by_modulus(mod, n)
         return remainder
 
-    def gf_MI(self, mod: BitVector, n: int) -> Self | tuple[str, ...]:
+    def gf_MI(self, mod: BitVector, n: int) -> Self | str:
         """Calculates the multiplicative inverse in Galois Field GF(2^n).
 
         Args:
@@ -1718,7 +1718,7 @@ class BitVector:
 
         Returns:
             A new BitVector with the multiplicative inverse in GF(2^n), or a
-            tuple of descriptive strings if no inverse exists.
+            string indicating that no inverse exists.
         """
         num: BitVector = self
         NUM = copy.deepcopy(num)
@@ -1733,14 +1733,7 @@ class BitVector:
             x, x_old = x_old ^ quotient.gf_multiply(x), x
             y, y_old = y_old ^ quotient.gf_multiply(y), y
         if int(num) != 1:
-            return (
-                "NO MI. However, the GCD of ",
-                str(NUM),
-                " and ",
-                str(MOD),
-                " is ",
-                str(num),
-            )
+            return f"NO MI. However, the GCD of {NUM} and {MOD} is {num}"
         else:
             z = x_old ^ MOD
             quotient, remainder = z.gf_divide_by_modulus(MOD, n)
