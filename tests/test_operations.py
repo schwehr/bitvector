@@ -511,8 +511,8 @@ def test_gf_mi() -> None:
     mod_no_mi = BitVector.BitVector(bitstring="1010")
     a_no_mi = BitVector.BitVector(bitstring="0010")
     res_no_mi = a_no_mi.gf_MI(mod_no_mi, 3)
-    assert isinstance(res_no_mi, tuple)
-    assert res_no_mi[0] == "NO MI. However, the GCD of "
+    assert isinstance(res_no_mi, str)
+    assert res_no_mi == "NO MI. However, the GCD of 0010 and 1010 is 010"
 
 
 @pytest.mark.parametrize(
