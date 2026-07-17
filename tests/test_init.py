@@ -155,7 +155,7 @@ def test_constructor_valid_kwargs(
     """
     bv = BitVector.BitVector(**kwargs)
     assert str(bv) == expected_str
-    assert bv.size == expected_size
+    assert bv._size == expected_size
 
 
 def test_intVal_zero_hex_helper() -> None:
@@ -164,14 +164,14 @@ def test_intVal_zero_hex_helper() -> None:
         intVal=ZeroHex(),  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
         size=0,
     )
-    assert bv.size == 0
+    assert bv._size == 0
     assert str(bv) == ""
 
     bv2 = BitVector.BitVector(
         intVal=ZeroHex(),  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
         size=5,
     )
-    assert bv2.size == 5
+    assert bv2._size == 5
     assert str(bv2) == "00000"
 
 

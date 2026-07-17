@@ -88,9 +88,9 @@ def _readblock(blocksize: int, bitvector: BitVector) -> str:
 
 
 class BitVector:
-    __slots__ = ("filename", "size", "FILEIN", "FILEOUT", "more_to_read", "vector")
+    __slots__ = ("filename", "_size", "FILEIN", "FILEOUT", "more_to_read", "vector")
     filename: str | None
-    size: int
+    _size: int
     FILEIN: BinaryIO | None
     FILEOUT: BinaryIO | None
     more_to_read: bool
@@ -132,7 +132,7 @@ class BitVector:
                 arguments are specified together, or if input values are invalid.
         """
         self.filename = None
-        self.size = 0
+        self._size = 0
         self.FILEIN = None
         self.FILEOUT = None
         if filename is not None:
@@ -171,7 +171,7 @@ class BitVector:
                 )
             bits = self.read_bits_from_fileobject(fp)
             bitlist = list(map(int, bits))
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         elif intVal is not None:
             if (
                 filename is not None
@@ -189,7 +189,7 @@ class BitVector:
             if intVal == 0:
                 bitlist = [0]
                 if size is None:
-                    self.size = 1
+                    self._size = 1
                 elif size == 0:
                     raise ValueError(
                         "The value specified for size must be at least "
@@ -205,7 +205,7 @@ class BitVector:
                         )
                     n = size - len(bitlist)
                     bitlist = [0] * n + bitlist
-                    self.size = len(bitlist)
+                    self._size = len(bitlist)
             else:
                 hexVal = hex(intVal).lower().rstrip("l")
                 hexVal = hexVal[2:]
@@ -219,7 +219,7 @@ class BitVector:
                     i += 1
                 del bitlist[0:i]
                 if size is None:
-                    self.size = len(bitlist)
+                    self._size = len(bitlist)
                 elif size == 0:
                     if size < len(bitlist):
                         raise ValueError(
@@ -236,7 +236,7 @@ class BitVector:
                         )
                     n = size - len(bitlist)
                     bitlist = [0] * n + bitlist
-                    self.size = len(bitlist)
+                    self._size = len(bitlist)
         elif size is not None and size >= 0:
             if (
                 filename is not None
@@ -252,7 +252,7 @@ class BitVector:
                     "When size is specified (without an intVal), you cannot "
                     "give values to any other constructor args"
                 )
-            self.size = size
+            self._size = size
             eight_byte_ints_needed = (size + 63) // 64
             self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
             return
@@ -272,7 +272,7 @@ class BitVector:
                     "values to any other constructor args"
                 )
             bitlist = list(map(int, list(bitstring)))
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         elif bitlist is not None:
             if (
                 filename is not None
@@ -288,7 +288,7 @@ class BitVector:
                     "When bits are specified, you cannot give values "
                     "to any other constructor args"
                 )
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         elif textstring is not None:
             if (
                 filename is not None
@@ -318,7 +318,7 @@ class BitVector:
                 )
             )
             bitlist = [int(b) for h in hex_str for b in _hexdict[h]]
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         elif hexstring is not None:
             if (
                 filename is not None
@@ -335,7 +335,7 @@ class BitVector:
                     "cannot give values to any other constructor args"
                 )
             bitlist = [int(b) for h in hexstring.lower() for b in _hexdict[h]]
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         elif rawbytes is not None:
             if (
                 filename is not None
@@ -353,7 +353,7 @@ class BitVector:
                 )
             hex_str = binascii.hexlify(rawbytes).decode("ascii")
             bitlist = [int(b) for h in hex_str for b in _hexdict[h]]
-            self.size = len(bitlist)
+            self._size = len(bitlist)
         else:
             raise ValueError("wrong arg(s) for constructor")
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
@@ -378,10 +378,10 @@ class BitVector:
         if not isinstance(pos, slice):
             if not isinstance(pos, int):
                 raise TypeError("pos must be an integer or slice")
-            if pos >= self.size or pos < -self.size:
+            if pos >= self._size or pos < -self._size:
                 raise ValueError("index range error")
             if pos < 0:
-                pos = self.size + pos
+                pos = self._size + pos
             return (self.vector[pos // 64] >> (pos & 63)) & 1
         else:
             slicebits = []
@@ -425,7 +425,7 @@ class BitVector:
                     for x in range(i, len(self) - abs(j)):
                         slicebits.append(self[x])
                     return BitVector(bitlist=slicebits)
-            if self.size == 0:
+            if self._size == 0:
                 return BitVector(bitstring="")
             if i == j:
                 return BitVector(bitstring="")
@@ -446,16 +446,16 @@ class BitVector:
         Returns:
             A new BitVector instance containing the bitwise XOR result.
         """
-        if self.size < other.size:
-            bv1 = self._resize_pad_from_left(other.size - self.size)
+        if self._size < other._size:
+            bv1 = self._resize_pad_from_left(other._size - self._size)
             bv2 = other
-        elif self.size > other.size:
+        elif self._size > other._size:
             bv1 = self
-            bv2 = other._resize_pad_from_left(self.size - other.size)
+            bv2 = other._resize_pad_from_left(self._size - other._size)
         else:
             bv1 = self
             bv2 = other
-        res = self.__class__(size=bv1.size)
+        res = self.__class__(size=bv1._size)
         lpb = map(operator.__xor__, bv1.vector, bv2.vector)
         res.vector = array.array(ARRAY_TYPE, lpb)
         return res
@@ -473,16 +473,16 @@ class BitVector:
         Returns:
             A new BitVector instance containing the bitwise AND result.
         """
-        if self.size < other.size:
-            bv1 = self._resize_pad_from_left(other.size - self.size)
+        if self._size < other._size:
+            bv1 = self._resize_pad_from_left(other._size - self._size)
             bv2 = other
-        elif self.size > other.size:
+        elif self._size > other._size:
             bv1 = self
-            bv2 = other._resize_pad_from_left(self.size - other.size)
+            bv2 = other._resize_pad_from_left(self._size - other._size)
         else:
             bv1 = self
             bv2 = other
-        res = self.__class__(size=bv1.size)
+        res = self.__class__(size=bv1._size)
         lpb = map(operator.__and__, bv1.vector, bv2.vector)
         res.vector = array.array(ARRAY_TYPE, lpb)
         return res
@@ -500,16 +500,16 @@ class BitVector:
         Returns:
             A new BitVector instance containing the bitwise OR result.
         """
-        if self.size < other.size:
-            bv1 = self._resize_pad_from_left(other.size - self.size)
+        if self._size < other._size:
+            bv1 = self._resize_pad_from_left(other._size - self._size)
             bv2 = other
-        elif self.size > other.size:
+        elif self._size > other._size:
             bv1 = self
-            bv2 = other._resize_pad_from_left(self.size - other.size)
+            bv2 = other._resize_pad_from_left(self._size - other._size)
         else:
             bv1 = self
             bv2 = other
-        res = self.__class__(size=bv1.size)
+        res = self.__class__(size=bv1._size)
         lpb = map(operator.__or__, bv1.vector, bv2.vector)
         res.vector = array.array(ARRAY_TYPE, lpb)
         return res
@@ -521,7 +521,7 @@ class BitVector:
             A new BitVector instance where each 0 bit is replaced by 1 and
             each 1 bit is replaced by 0.
         """
-        res = self.__class__(size=self.size)
+        res = self.__class__(size=self._size)
         lpb = list(map(operator.__inv__, self.vector))
         res.vector = array.array(ARRAY_TYPE)
         for i in range(len(lpb)):
@@ -548,7 +548,7 @@ class BitVector:
         else:
             out_str = str(self) + str(other)
             return self.__class__(bitstring=out_str)
-        new_bv.size = self.size
+        new_bv._size = self._size
         new_bv += other
         return new_bv
 
@@ -570,11 +570,13 @@ class BitVector:
         if not isinstance(other, type(self)):
             raise TypeError(f"Can only join two BitVector objects, not {type(other)}")
         # Calculate number of two-byte ints we will need to add and extend the vector.
-        eight_byte_ints_to_add = (self.size + other.size + 63) // 64 - len(self.vector)
+        eight_byte_ints_to_add = (self._size + other._size + 63) // 64 - len(
+            self.vector
+        )
         self.vector.extend([0] * eight_byte_ints_to_add)
         # Add the bits
-        curr_bit = self.size % 64
-        curr_eight_byte_int = self.size // 64
+        curr_bit = self._size % 64
+        curr_eight_byte_int = self._size // 64
         for bit in other:
             mask = ~(1 << curr_bit) & 0xFFFFFFFFFFFFFFFF
             self.vector[curr_eight_byte_int] = (
@@ -584,7 +586,7 @@ class BitVector:
             curr_eight_byte_int += curr_bit // 64
             curr_bit %= 64
 
-        self.size += other.size
+        self._size += other._size
         return self
 
     def __len__(self) -> int:
@@ -593,7 +595,7 @@ class BitVector:
         Returns:
             The integer number of valid bits in the vector.
         """
-        return self.size
+        return self._size
 
     def read_bits_from_file(self, blocksize: int) -> Self:
         """Reads a block of bits from the associated disk file.
@@ -652,7 +654,7 @@ class BitVector:
         Args:
             fp: An open text stream or file-like object supporting write().
         """
-        for bit_index in range(self.size):
+        for bit_index in range(self._size):
             if self[bit_index] == 0:
                 fp.write("0")
             else:
@@ -667,10 +669,10 @@ class BitVector:
         Raises:
             ValueError: If the vector length is not even.
         """
-        if self.size % 2 != 0:
+        if self._size % 2 != 0:
             raise ValueError("must have even num bits")
 
-        half = self.size // 2
+        half = self._size // 2
         return self[:half], self[half:]
 
     def permute(self, permute_list: Sequence[int] | Any) -> Self:
@@ -686,7 +688,7 @@ class BitVector:
         Raises:
             ValueError: If any index in permute_list exceeds vector bounds.
         """
-        if max(permute_list) > self.size - 1:
+        if max(permute_list) > self._size - 1:
             raise ValueError("Bad permutation index")
         out_vector = self.__class__(size=len(permute_list))
         for i, idx in enumerate(permute_list):
@@ -707,11 +709,11 @@ class BitVector:
         Raises:
             ValueError: If indices are out of bounds or list size does not match.
         """
-        if max(permute_list) > self.size - 1:
+        if max(permute_list) > self._size - 1:
             raise ValueError("Bad permutation index")
-        if self.size != len(permute_list):
+        if self._size != len(permute_list):
             raise ValueError("Bad size for permute list")
-        out_bv = self.__class__(size=self.size)
+        out_bv = self.__class__(size=self._size)
         for i, idx in enumerate(permute_list):
             if self[i]:
                 out_bv[idx] = 1
@@ -737,9 +739,9 @@ class BitVector:
         )
         if not self.FILEOUT:
             self.FILEOUT = file_out
-        if self.size % 8:
+        if self._size % 8:
             raise ValueError(err_str)
-        for byte in range(int(self.size / 8)):
+        for byte in range(int(self._size / 8)):
             value = 0
             for bit in range(8):
                 value += self[byte * 8 + (7 - bit)] << bit
@@ -761,10 +763,10 @@ class BitVector:
         Returns:
             The integer represented by the binary bits in big-endian order.
         """
-        if self.size == 0:
+        if self._size == 0:
             return 0
         int_val = 0
-        for i in range(self.size):
+        for i in range(self._size):
             int_val = (int_val << 1) | self[i]
         return int_val
 
@@ -780,12 +782,12 @@ class BitVector:
         Raises:
             ValueError: If the vector size is not an integral multiple of 8.
         """
-        if self.size % 8:
+        if self._size % 8:
             raise ValueError(
                 "The bitvector for get_bitvector_in_ascii() "
                 "must be an integral multiple of 8 bits"
             )
-        return "".join(chr(int(self[i : i + 8])) for i in range(0, self.size, 8))
+        return "".join(chr(int(self[i : i + 8])) for i in range(0, self._size, 8))
 
     def get_bitvector_in_hex(self) -> str:
         """Converts the bit vector into a hexadecimal representation string.
@@ -799,7 +801,7 @@ class BitVector:
         Raises:
             ValueError: If the vector size is not an integral multiple of 4.
         """
-        if self.size % 4:
+        if self._size % 4:
             raise ValueError(
                 "The bitvector for get_bitvector_in_hex() "
                 "must be an integral multiple of 4 bits"
@@ -807,7 +809,7 @@ class BitVector:
         return "".join(
             map(
                 lambda x: x.replace("0x", ""),
-                map(hex, map(int, [self[i : i + 4] for i in range(0, self.size, 4)])),
+                map(hex, map(int, [self[i : i + 4] for i in range(0, self._size, 4)])),
             )
         )
 
@@ -827,7 +829,7 @@ class BitVector:
         Raises:
             ValueError: If attempting to rotate an empty bit vector.
         """
-        if self.size == 0:
+        if self._size == 0:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
             return self >> abs(n)
@@ -851,7 +853,7 @@ class BitVector:
         Raises:
             ValueError: If attempting to rotate an empty bit vector.
         """
-        if self.size == 0:
+        if self._size == 0:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
             return self << abs(n)
@@ -877,12 +879,12 @@ class BitVector:
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
             ),
         )
-        self[self.size - 1] = bitstring_leftmost_bit
+        self[self._size - 1] = bitstring_leftmost_bit
 
     def circular_rotate_right_by_one(self) -> None:
         """Performs a one-bit in-place circular right rotation of the vector."""
         size = len(self.vector)
-        bitstring_rightmost_bit = self[self.size - 1]
+        bitstring_rightmost_bit = self[self._size - 1]
         right_most_bits = list(
             map(operator.__and__, self.vector, [0x8000000000000000] * size)
         )
@@ -906,19 +908,19 @@ class BitVector:
 
     def circular_rot_left(self) -> None:
         """Performs a one-bit in-place circular left rotation without map()."""
-        max_index = (self.size - 1) // 64
+        max_index = (self._size - 1) // 64
         left_most_bit = self.vector[0] & 1
         self.vector[0] = self.vector[0] >> 1
         for i in range(1, max_index + 1):
             left_bit = self.vector[i] & 1
             self.vector[i] = self.vector[i] >> 1
             self.vector[i - 1] |= left_bit << 63
-        self[self.size - 1] = left_most_bit
+        self[self._size - 1] = left_most_bit
 
     def circular_rot_right(self) -> None:
         """Performs a one-bit in-place circular right rotation without map()."""
-        max_index = (self.size - 1) // 64
-        right_most_bit = self[self.size - 1]
+        max_index = (self._size - 1) // 64
+        right_most_bit = self[self._size - 1]
         self.vector[max_index] &= ~0x8000000000000000
         self.vector[max_index] = self.vector[max_index] << 1
         for i in range(max_index - 1, -1, -1):
@@ -945,7 +947,7 @@ class BitVector:
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
             ),
         )
-        self[self.size - 1] = 0
+        self[self._size - 1] = 0
 
     def shift_right_by_one(self) -> None:
         """Performs a one-bit in-place logical right shift (zero-filling left)."""
@@ -1069,10 +1071,10 @@ class BitVector:
             pos = pos[0]
         if not isinstance(pos, int):
             raise TypeError("pos must be an integer")
-        if pos >= self.size or pos < -self.size:
+        if pos >= self._size or pos < -self._size:
             raise ValueError("index range error")
         if pos < 0:
-            pos = self.size + pos
+            pos = self._size + pos
         block_index = pos // 64
         shift = pos & 63
         cv = self.vector[block_index]
@@ -1087,7 +1089,7 @@ class BitVector:
         Yields:
             The integer bit value (0 or 1) at each position from left to right.
         """
-        yield from (self[i] for i in range(self.size))
+        yield from (self[i] for i in range(self._size))
 
     def __str__(self) -> str:
         """Returns an ASCII string representation of the bit vector ('0's and '1's).
@@ -1095,7 +1097,7 @@ class BitVector:
         Returns:
             A string of '0' and '1' characters matching the stored bits.
         """
-        if self.size == 0:
+        if self._size == 0:
             return ""
         return "".join(map(str, self))
 
@@ -1111,7 +1113,7 @@ class BitVector:
             vector. Otherwise False.
         """
         if isinstance(other, BitVector):
-            if self.size != other.size:
+            if self._size != other._size:
                 return False
 
             # TODO: Consider a block-based implementation comparing `self.vector`
@@ -1251,7 +1253,7 @@ class BitVector:
             new_bv.vector = array.array(ARRAY_TYPE, self.vector)
         else:
             new_bv.vector = copy.deepcopy(self.vector, memo)
-        new_bv.size = self.size
+        new_bv._size = self._size
         return new_bv
 
     def _resize_pad_from_left(self, n: int) -> Self:
@@ -1274,7 +1276,7 @@ class BitVector:
         """
         new_str = "0" * n + str(self)
         bitlist = list(map(int, list(new_str)))
-        self.size = len(bitlist)
+        self._size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
         list(map(self.__setitem__, range(len(bitlist)), bitlist))
@@ -1287,7 +1289,7 @@ class BitVector:
         """
         new_str = str(self) + "0" * n
         bitlist = list(map(int, list(new_str)))
-        self.size = len(bitlist)
+        self._size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
         list(map(self.__setitem__, range(len(bitlist)), bitlist))
@@ -1306,13 +1308,13 @@ class BitVector:
         Raises:
             ValueError: If this vector is empty or shorter than otherBitVec.
         """
-        if self.size == 0:
+        if self._size == 0:
             raise ValueError("First arg bitvec has no bits")
-        elif self.size < otherBitVec.size:
+        elif self._size < otherBitVec._size:
             raise ValueError("First arg bitvec too short")
-        max_index = self.size - otherBitVec.size + 1
+        max_index = self._size - otherBitVec._size + 1
         for i in range(max_index):
-            if self[i : i + otherBitVec.size] == otherBitVec:
+            if self[i : i + otherBitVec._size] == otherBitVec:
                 return True
         return False
 
@@ -1330,7 +1332,7 @@ class BitVector:
         """
         if val not in (0, 1):
             raise ValueError("Incorrect reset argument")
-        bitlist = [val for i in range(self.size)]
+        bitlist = [val for i in range(self._size)]
         list(map(self.__setitem__, range(len(bitlist)), bitlist))
         return self
 
@@ -1423,7 +1425,7 @@ class BitVector:
         """
         if int(self) == 0 and int(other) == 0:
             raise ValueError("Jaccard called on two zero vectors --- NOT ALLOWED")
-        if self.size != other.size:
+        if self._size != other._size:
             raise ValueError(
                 "bitvectors for comparing with Jaccard must be of equal length"
             )
@@ -1443,7 +1445,7 @@ class BitVector:
         Raises:
             ValueError: If vectors are of unequal length.
         """
-        if self.size != other.size:
+        if self._size != other._size:
             raise ValueError("vectors of unequal length")
         return 1 - self.jaccard_similarity(other)
 
@@ -1459,7 +1461,7 @@ class BitVector:
         Raises:
             ValueError: If vectors are of unequal length.
         """
-        if self.size != other.size:
+        if self._size != other._size:
             raise ValueError("vectors of unequal length")
         diff = self ^ other
         return diff.count_bits_sparse()
@@ -1548,7 +1550,7 @@ class BitVector:
         """
         reverse_list = []
         i = 1
-        while i < self.size + 1:
+        while i < self._size + 1:
             reverse_list.append(self[-i])
             i += 1
         return self.__class__(bitlist=reverse_list)
@@ -1604,7 +1606,7 @@ class BitVector:
         Returns:
             The integer count of valid bits.
         """
-        return self.size
+        return self._size
 
     def gf_multiply(self, b: BitVector) -> Self:
         """Multiplies two polynomials in Galois Field GF(2).
@@ -1727,7 +1729,7 @@ class BitVector:
             or 1s.
         """
         allruns: list[str] = []
-        if self.size == 0:
+        if self._size == 0:
             return allruns
         run = ""
         previous_bit = self[0]
