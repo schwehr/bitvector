@@ -66,7 +66,7 @@ The core functionality of `bitvector-modern` is implemented in
 ### Core Operations & Methods
 
 - **Bit Access & Mutators**: Indexing and slicing via `__getitem__` and
-  `__setitem__`, bit assignment via `set_value` / `_setbit`, and `reset()`.
+  `__setitem__`, bit assignment via `set_value`, and `reset()`.
 - **Boolean Logic (Dunders)**: Bitwise AND (`&` / `__and__`), OR (`|` /
   `__or__`), XOR (`^` / `__xor__`), and NOT (`~` / `__invert__`).
 - **Concatenation & Splitting**: Vector addition (`+` / `__add__`, `+=` /

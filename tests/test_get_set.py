@@ -1,4 +1,4 @@
-"""Tests bit retrieval and assignment (__getitem__, _setbit, slicing, iteration)."""
+"""Tests bit retrieval and assignment (__getitem__, __setitem__, slicing, iteration)."""
 
 from collections.abc import Iterator
 
@@ -15,7 +15,7 @@ import BitVector
         (-6, 1, "index range error"),
     ],
 )
-def test_setbit_raises_error(index: int, val: int, err_match: str) -> None:
+def test_setitem_raises_error(index: int, val: int, err_match: str) -> None:
     """Verifies that invalid bit assignments raise ValueError.
 
     Args:
@@ -25,7 +25,7 @@ def test_setbit_raises_error(index: int, val: int, err_match: str) -> None:
     """
     bv = BitVector.BitVector(bitstring="00000")
     with pytest.raises(ValueError, match=err_match):
-        bv._setbit(index, val)
+        bv[index] = val
 
 
 @pytest.mark.parametrize(
@@ -37,10 +37,10 @@ def test_setbit_raises_error(index: int, val: int, err_match: str) -> None:
         ("11111", 2, 0, "11011"),
     ],
 )
-def test_setbit_valid(
+def test_setitem_valid(
     initial: str, index: int | tuple[int], val: int, expected: str
 ) -> None:
-    """Tests _setbit with integer indices, tuple indices, and redundant values.
+    """Tests __setitem__ with integer indices, tuple indices, and redundant values.
 
     Args:
         initial: The starting bitstring representation.
@@ -49,7 +49,7 @@ def test_setbit_valid(
         expected: The expected vector bitstring after modification.
     """
     bv = BitVector.BitVector(bitstring=initial)
-    bv._setbit(index, val)
+    bv[index] = val
     assert str(bv) == expected
 
 
