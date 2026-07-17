@@ -135,8 +135,8 @@ def test_bench_count_bits(benchmark, sample_bv1):
     benchmark(sample_bv1.count_bits)
 
 
-def test_bench_int_val(benchmark, sample_bv1):
-    benchmark(sample_bv1.int_val)
+def test_bench_int(benchmark, sample_bv1):
+    benchmark(int, sample_bv1)
 
 
 def test_bench_get_hex_string(benchmark, sample_bv1):

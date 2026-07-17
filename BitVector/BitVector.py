@@ -784,7 +784,7 @@ class BitVector:
             raise SyntaxError("No associated open file")
         self.FILEIN.close()
 
-    def int_val(self) -> int:
+    def __int__(self) -> int:
         """Calculates and returns the unsigned integer value of the bit vector.
 
         Returns:
@@ -1097,7 +1097,6 @@ class BitVector:
         self._setbit(pos, item)
 
     # Allow int() to work:
-    __int__ = int_val
 
     def __iter__(self) -> Iterator[int]:
         """Yields individual bits sequentially from the vector.
@@ -1140,7 +1139,7 @@ class BitVector:
             return True
 
         if isinstance(other, (int, float)):
-            return self.int_val() == other
+            return int(self) == other
 
         return False
 
@@ -1170,10 +1169,10 @@ class BitVector:
             TypeError: If other is not a BitVector, int, or float.
         """
         if isinstance(other, BitVector):
-            return self.int_val() < other.int_val()
+            return int(self) < int(other)
 
         if isinstance(other, (int, float)):
-            return self.int_val() < other
+            return int(self) < other
 
         raise TypeError(
             f"'<' not supported between instances of 'BitVector' and '{type(other).__name__}'"
@@ -1194,10 +1193,10 @@ class BitVector:
             TypeError: If other is not a BitVector, int, or float.
         """
         if isinstance(other, BitVector):
-            return self.int_val() <= other.int_val()
+            return int(self) <= int(other)
 
         if isinstance(other, (int, float)):
-            return self.int_val() <= other
+            return int(self) <= other
 
         raise TypeError(
             f"'<=' not supported between instances of 'BitVector' and '{type(other).__name__}'"
@@ -1218,10 +1217,10 @@ class BitVector:
             TypeError: If other is not a BitVector, int, or float.
         """
         if isinstance(other, BitVector):
-            return self.int_val() > other.int_val()
+            return int(self) > int(other)
 
         if isinstance(other, (int, float)):
-            return self.int_val() > other
+            return int(self) > other
 
         raise TypeError(
             f"'>' not supported between instances of 'BitVector' and '{type(other).__name__}'"
@@ -1242,10 +1241,10 @@ class BitVector:
             TypeError: If other is not a BitVector, int, or float.
         """
         if isinstance(other, BitVector):
-            return self.int_val() >= other.int_val()
+            return int(self) >= int(other)
 
         if isinstance(other, (int, float)):
-            return self.int_val() >= other
+            return int(self) >= other
 
         raise TypeError(
             f"'>=' not supported between instances of 'BitVector' and '{type(other).__name__}'"
@@ -1439,7 +1438,7 @@ class BitVector:
         Raises:
             ValueError: If vectors are of unequal length or both zero.
         """
-        if self.int_val() == 0 and other.int_val() == 0:
+        if int(self) == 0 and int(other) == 0:
             raise ValueError("Jaccard called on two zero vectors --- NOT ALLOWED")
         if self.size != other.size:
             raise ValueError(
@@ -1541,10 +1540,10 @@ class BitVector:
         Returns:
             True if the integer representation is a power of two, else False.
         """
-        if self.int_val() == 0:
+        if int(self) == 0:
             return False
-        bv = self & BitVector(intVal=self.int_val() - 1)
-        if bv.int_val() == 0:
+        bv = self & BitVector(intVal=int(self) - 1)
+        if int(bv) == 0:
             return True
         return False
 
@@ -1582,8 +1581,8 @@ class BitVector:
         Returns:
             A new BitVector instance containing the GCD of the two integer values.
         """
-        a = self.int_val()
-        b = other.int_val()
+        a = int(self)
+        b = int(other)
         if a < b:
             a, b = b, a
         while b != 0:
@@ -1603,8 +1602,8 @@ class BitVector:
             A new BitVector with the multiplicative inverse modulo modulus,
             or None if no inverse exists.
         """
-        MOD = mod = modulus.int_val()
-        num = self.int_val()
+        MOD = mod = int(modulus)
+        num = int(self)
         x, x_old = 0, 1
         y, y_old = 1, 0
         while mod:
