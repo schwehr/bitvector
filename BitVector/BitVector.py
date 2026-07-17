@@ -1556,9 +1556,7 @@ class BitVector:
         Returns:
             True if exactly one bit is set to 1, else False.
         """
-        if self.count_bits_sparse() == 1:
-            return True
-        return False
+        return self.count_bits_sparse() == 1
 
     def reverse(self) -> Self:
         """Reverses the order of bits in the vector (left-to-right becomes right-to-left).
