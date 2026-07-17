@@ -715,12 +715,11 @@ class BitVector:
         """
         if max(permute_list) > self.size - 1:
             raise ValueError("Bad permutation index")
-        outlist = []
-        i = 0
-        while i < len(permute_list):
-            outlist.append(self[permute_list[i]])
-            i += 1
-        return self.__class__(bitlist=outlist)
+        out_vector = self.__class__(size=len(permute_list))
+        for i, idx in enumerate(permute_list):
+            if self[idx]:
+                out_vector[i] = 1
+        return out_vector
 
     def unpermute(self, permute_list: Sequence[int] | Any) -> Self:
         """Restores the original bit ordering of a previously permuted vector.
@@ -740,10 +739,9 @@ class BitVector:
         if self.size != len(permute_list):
             raise ValueError("Bad size for permute list")
         out_bv = self.__class__(size=self.size)
-        i = 0
-        while i < len(permute_list):
-            out_bv[permute_list[i]] = self[i]
-            i += 1
+        for i, idx in enumerate(permute_list):
+            if self[i]:
+                out_bv[idx] = 1
         return out_bv
 
     def write_to_file(self, file_out: BinaryIO | Any) -> None:
