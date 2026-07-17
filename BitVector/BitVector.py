@@ -358,34 +358,7 @@ class BitVector:
             raise ValueError("wrong arg(s) for constructor")
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self._setbit, range(len(bitlist)), bitlist))
-
-    def _setbit(self, posn: int | tuple[Any, ...] | Any, val: int | Any) -> None:
-        """Sets the bit at the designated position to the specified value.
-
-        Args:
-            posn: The target bit index (or a 1-element tuple containing the
-                index) to modify. Negative indices count from the end.
-            val: The binary integer value (0 or 1) to set at the position.
-
-        Raises:
-            ValueError: If val is not 0 or 1, or if posn is out of range.
-        """
-        if val not in (0, 1):
-            raise ValueError("incorrect value for a bit")
-        if isinstance(posn, tuple):
-            posn = posn[0]
-        if not isinstance(posn, int):
-            raise TypeError("posn must be an integer")
-        if posn >= self.size or posn < -self.size:
-            raise ValueError("index range error")
-        if posn < 0:
-            posn = self.size + posn
-        block_index = posn // 64
-        shift = posn & 63
-        cv = self.vector[block_index]
-        if (cv >> shift) & 1 != val:
-            self.vector[block_index] = cv ^ (1 << shift)
+        list(map(self.__setitem__, range(len(bitlist)), bitlist))
 
     def __getitem__(self, pos: int | slice | Any) -> Any:
         """Retrieves the bit or slice of bits from the designated position.
@@ -904,7 +877,7 @@ class BitVector:
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
             ),
         )
-        self._setbit(self.size - 1, bitstring_leftmost_bit)
+        self[self.size - 1] = bitstring_leftmost_bit
 
     def circular_rotate_right_by_one(self) -> None:
         """Performs a one-bit in-place circular right rotation of the vector."""
@@ -929,7 +902,7 @@ class BitVector:
                 list(map(operator.__rshift__, right_most_bits, [63] * size)),
             ),
         )
-        self._setbit(0, bitstring_rightmost_bit)
+        self[0] = bitstring_rightmost_bit
 
     def circular_rot_left(self) -> None:
         """Performs a one-bit in-place circular left rotation without map()."""
@@ -940,7 +913,7 @@ class BitVector:
             left_bit = self.vector[i] & 1
             self.vector[i] = self.vector[i] >> 1
             self.vector[i - 1] |= left_bit << 63
-        self._setbit(self.size - 1, left_most_bit)
+        self[self.size - 1] = left_most_bit
 
     def circular_rot_right(self) -> None:
         """Performs a one-bit in-place circular right rotation without map()."""
@@ -953,7 +926,7 @@ class BitVector:
             self.vector[i] &= ~0x8000000000000000
             self.vector[i] = self.vector[i] << 1
             self.vector[i + 1] |= right_bit >> 63
-        self._setbit(0, right_most_bit)
+        self[0] = right_most_bit
 
     def shift_left_by_one(self) -> None:
         """Performs a one-bit in-place logical left shift (zero-filling right)."""
@@ -972,7 +945,7 @@ class BitVector:
                 list(map(operator.__lshift__, left_most_bits, [63] * size)),
             ),
         )
-        self._setbit(self.size - 1, 0)
+        self[self.size - 1] = 0
 
     def shift_right_by_one(self) -> None:
         """Performs a one-bit in-place logical right shift (zero-filling left)."""
@@ -996,7 +969,7 @@ class BitVector:
                 list(map(operator.__rshift__, right_most_bits, [63] * size)),
             ),
         )
-        self._setbit(0, 0)
+        self[0] = 0
 
     def shift_left(self, n: int) -> Self:
         """Shifts the vector left by n bits in-place, filling right with zeros.
@@ -1089,8 +1062,22 @@ class BitVector:
             for i in range(pos.start, pos.stop):
                 self[i] = item[i - pos.start]
             return
-        # For index assignment use _setbit()
-        self._setbit(pos, item)
+        # Index assignment:
+        if item not in (0, 1):
+            raise ValueError("incorrect value for a bit")
+        if isinstance(pos, tuple):
+            pos = pos[0]
+        if not isinstance(pos, int):
+            raise TypeError("pos must be an integer")
+        if pos >= self.size or pos < -self.size:
+            raise ValueError("index range error")
+        if pos < 0:
+            pos = self.size + pos
+        block_index = pos // 64
+        shift = pos & 63
+        cv = self.vector[block_index]
+        if (cv >> shift) & 1 != item:
+            self.vector[block_index] = cv ^ (1 << shift)
 
     # Allow int() to work:
 
@@ -1290,7 +1277,7 @@ class BitVector:
         self.size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self._setbit, enumerate(bitlist), bitlist))
+        list(map(self.__setitem__, range(len(bitlist)), bitlist))
 
     def pad_from_right(self, n: int) -> None:
         """Pads the bit vector with n zeros from the right in-place.
@@ -1303,7 +1290,7 @@ class BitVector:
         self.size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self._setbit, enumerate(bitlist), bitlist))
+        list(map(self.__setitem__, range(len(bitlist)), bitlist))
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
         """Checks if a sub-vector is contained within this bit vector.
@@ -1344,7 +1331,7 @@ class BitVector:
         if val not in (0, 1):
             raise ValueError("Incorrect reset argument")
         bitlist = [val for i in range(self.size)]
-        list(map(self._setbit, enumerate(bitlist), bitlist))
+        list(map(self.__setitem__, range(len(bitlist)), bitlist))
         return self
 
     def count_bits(self) -> int:
