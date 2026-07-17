@@ -814,9 +814,7 @@ class BitVector:
                 "The bitvector for get_bitvector_in_ascii() "
                 "must be an integral multiple of 8 bits"
             )
-        return "".join(
-            map(chr, map(int, [self[i : i + 8] for i in range(0, self.size, 8)]))
-        )
+        return "".join(chr(int(self[i : i + 8])) for i in range(0, self.size, 8))
 
     def get_bitvector_in_hex(self) -> str:
         """Converts the bit vector into a hexadecimal representation string.
