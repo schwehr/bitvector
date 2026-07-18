@@ -807,10 +807,7 @@ class BitVector:
                 "must be an integral multiple of 4 bits"
             )
         return "".join(
-            map(
-                lambda x: x.replace("0x", ""),
-                map(hex, map(int, [self[i : i + 4] for i in range(0, self._size, 4)])),
-            )
+            hex(int(self[i : i + 4])).replace("0x", "") for i in range(0, self._size, 4)
         )
 
     def __lshift__(self, n: int) -> Self:
