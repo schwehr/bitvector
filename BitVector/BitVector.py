@@ -1318,7 +1318,7 @@ class BitVector:
                 return True
         return False
 
-    def reset(self, val: int | Any) -> Self:
+    def reset(self, val: int) -> Self:
         """Resets all bits in the vector to either 0 or 1 in-place.
 
         Args:
