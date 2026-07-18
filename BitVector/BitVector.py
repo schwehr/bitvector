@@ -1391,8 +1391,15 @@ class BitVector:
         """
         if val not in (0, 1):
             raise ValueError("Incorrect reset argument")
-        bitlist = [val for i in range(self._size)]
-        list(map(self.__setitem__, range(len(bitlist)), bitlist))
+        if val == 0:
+            self.vector = array.array(ARRAY_TYPE, [0] * len(self.vector))
+        else:
+            word_size = self.vector.itemsize * 8
+            full_word = (1 << word_size) - 1
+            self.vector = array.array(ARRAY_TYPE, [full_word] * len(self.vector))
+            rem = self._size % word_size
+            if rem > 0 and len(self.vector) > 0:
+                self.vector[-1] = (1 << rem) - 1
         return self
 
     def count_bits(self) -> int:
