@@ -77,13 +77,13 @@ print(int(bv))  # 0
 
 # Construct a bit vector from a text string:
 print("\nConstructing a bit vector from the textstring 'hello':")
-bv3 = BitVector(textstring="hello")
+bv3 = BitVector.from_string("hello")
 print(bv3)  # 0110100001100101011011000110110001101111
 mytext = bv3.get_bitvector_in_ascii()
 print("Text recovered from the previous bitvector: ")
 print(mytext)  # hello
 print("\nConstructing a bit vector from the textstring 'hello\\njello':")
-bv3 = BitVector(textstring="hello\njello")
+bv3 = BitVector.from_string("hello\njello")
 print(
     bv3
 )  # 0110100001100101011011000110110001101111000010100110101001100101011011000110110001101111
