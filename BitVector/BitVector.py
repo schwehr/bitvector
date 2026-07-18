@@ -34,6 +34,9 @@ _hexdict = {
     "f": "1111",
 }
 
+# The internal storage type for the `array` standard library module.
+# "Q" represents an unsigned long long integer (typically 64 bits),
+# which is used for compact bitwise storage.
 ARRAY_TYPE = "Q"
 
 
