@@ -261,7 +261,7 @@ def test_bench_len(benchmark, sample_bv1):
 
 
 def test_bench_length(benchmark, sample_bv1):
-    benchmark(sample_bv1.length)
+    benchmark(len, sample_bv1)
 
 
 def test_bench_str(benchmark, sample_bv1):
