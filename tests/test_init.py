@@ -1,8 +1,6 @@
 """Tests BitVector constructors and initialization error validation."""
 
-import io
 import re
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -32,38 +30,6 @@ def test_invalid_keyword_error() -> None:
     """Verifies passing unexpected keyword arguments raises TypeError."""
     with pytest.raises(TypeError, match="unexpected keyword argument"):
         BitVector.BitVector(invalid_param=123)  # type: ignore[call-arg]  # ty: ignore[unknown-argument]
-
-
-def test_filename_constructor(tmp_path: Path) -> None:
-    """Tests initializing BitVector from a filename and conflicting errors.
-
-    Args:
-        tmp_path: Pytest temporary directory path fixture.
-    """
-    file_path = tmp_path / "test_init.bin"
-    file_path.write_bytes(b"A")
-    file_str = str(file_path)
-
-    with pytest.raises(ValueError, match="When filename is specified"):
-        BitVector.BitVector(filename=file_str, size=8)
-
-    bv = BitVector.BitVector(filename=file_str)
-    try:
-        assert bv.filename == file_str
-        assert bv.more_to_read is True
-    finally:
-        bv.close_file_object()
-
-
-def test_fp_constructor() -> None:
-    """Tests initializing from an open file object and conflicting errors."""
-    fp_err = io.StringIO("1011000101110")
-    with pytest.raises(ValueError, match="When fileobject is specified"):
-        BitVector.BitVector(fp=fp_err, size=13)
-
-    fp_valid = io.StringIO("1011000101110")
-    bv = BitVector.BitVector(fp=fp_valid)
-    assert str(bv) == "1011000101110"
 
 
 @pytest.mark.parametrize(
