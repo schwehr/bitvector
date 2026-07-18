@@ -1666,14 +1666,6 @@ class BitVector:
             MI = (x_old + MOD) % MOD
             return self.__class__(intVal=MI)
 
-    def length(self) -> int:
-        """Returns the number of bits stored in the vector.
-
-        Returns:
-            The integer count of valid bits.
-        """
-        return self._size
-
     def gf_multiply(self, b: BitVector) -> Self:
         """Multiplies two polynomials in Galois Field GF(2).
 
@@ -1685,12 +1677,12 @@ class BitVector:
         """
         a = copy.deepcopy(self)
         b_copy = copy.deepcopy(b)
-        result = self.__class__(size=a.length() + b_copy.length())
-        a.pad_from_left(result.length() - a.length())
-        b_copy.pad_from_left(result.length() - b_copy.length())
+        result = self.__class__(size=len(a) + len(b_copy))
+        a.pad_from_left(len(result) - len(a))
+        b_copy.pad_from_left(len(result) - len(b_copy))
         for i, bit in enumerate(b_copy):
             if bit == 1:
-                power = b_copy.length() - i - 1
+                power = len(b_copy) - i - 1
                 a_copy = copy.deepcopy(a)
                 a_copy.shift_left(power)
                 result ^= a_copy
@@ -1710,33 +1702,31 @@ class BitVector:
             ValueError: If the modulus polynomial is too long for GF(2^n).
         """
         num = self
-        if mod.length() > n + 1:
+        if len(mod) > n + 1:
             raise ValueError("Modulus bit pattern too long")
-        quotient = self.__class__(intVal=0, size=num.length())
+        quotient = self.__class__(intVal=0, size=len(num))
         remainder = copy.deepcopy(num)
         i = 0
         while 1:
             i = i + 1
-            if i == num.length():
+            if i == len(num):
                 break
-            mod_highest_power = mod.length() - mod.next_set_bit(0) - 1
+            mod_highest_power = len(mod) - mod.next_set_bit(0) - 1
             if remainder.next_set_bit(0) == -1:
                 remainder_highest_power = 0
             else:
-                remainder_highest_power = (
-                    remainder.length() - remainder.next_set_bit(0) - 1
-                )
+                remainder_highest_power = len(remainder) - remainder.next_set_bit(0) - 1
             if (remainder_highest_power < mod_highest_power) or int(remainder) == 0:
                 break
             else:
                 exponent_shift = remainder_highest_power - mod_highest_power
-                quotient[quotient.length() - exponent_shift - 1] = 1
+                quotient[len(quotient) - exponent_shift - 1] = 1
                 quotient_mod_product = copy.deepcopy(mod)
-                quotient_mod_product.pad_from_left(remainder.length() - mod.length())
+                quotient_mod_product.pad_from_left(len(remainder) - len(mod))
                 quotient_mod_product.shift_left(exponent_shift)
                 remainder = remainder ^ quotient_mod_product
-        if remainder.length() > n:
-            remainder = remainder[remainder.length() - n :]
+        if len(remainder) > n:
+            remainder = remainder[len(remainder) - n :]
         return quotient, remainder
 
     def gf_multiply_modular(self, b: BitVector | Any, mod: BitVector, n: int) -> Self:
@@ -1771,10 +1761,10 @@ class BitVector:
         num: BitVector = self
         NUM = copy.deepcopy(num)
         MOD = copy.deepcopy(mod)
-        x = self.__class__(size=mod.length())
-        x_old = self.__class__(intVal=1, size=mod.length())
-        y = self.__class__(intVal=1, size=mod.length())
-        y_old = self.__class__(size=mod.length())
+        x = self.__class__(size=len(mod))
+        x_old = self.__class__(intVal=1, size=len(mod))
+        y = self.__class__(intVal=1, size=len(mod))
+        y_old = self.__class__(size=len(mod))
         while int(mod):
             quotient, remainder = num.gf_divide_by_modulus(mod, n)
             num, mod = mod, remainder
