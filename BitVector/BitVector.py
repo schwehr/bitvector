@@ -40,70 +40,15 @@ _hexdict = {
 ARRAY_TYPE = "Q"
 
 
-def _readblock(blocksize: int, bitvector: BitVector) -> str:
-    """Reads a block of bits from a file stream into a binary bitstring.
-
-    If this function succeeds in reading all blocksize bits, it uses a
-    tell-read-seek mechanism to peek ahead and check if any data remains in
-    the file. If there is nothing further to read, it sets the more_to_read
-    attribute of the bitvector instance to False. This peek mechanism is
-    supported on seekable streams such as disk files. A similar feature could
-    be implemented for socket streams using recv() with MSG_PEEK.
-
-    Args:
-        blocksize: The requested number of bits to read from the stream. Must
-            be a multiple of 8.
-        bitvector: The target BitVector instance whose FILEIN file stream is
-            read and whose more_to_read state is updated.
-
-    Returns:
-        A string of binary characters ('0's and '1's) representing the read
-        bits, up to blocksize in length.
-    """
-    if bitvector.FILEIN is None:
-        raise ValueError("FILEIN must not be None")
-
-    bit_list: list[str] = []
-    i = 0
-    while i < blocksize / 8:
-        i += 1
-        byte = bitvector.FILEIN.read(1)
-        if byte == b"":
-            bitstring = "".join(bit_list)
-            if len(bitstring) < blocksize:
-                bitvector.more_to_read = False
-            return bitstring
-        hexvalue = "%02x" % byte[0]
-        bit_list.append(_hexdict[hexvalue[0]])
-        bit_list.append(_hexdict[hexvalue[1]])
-
-    bitstring = "".join(bit_list)
-    file_pos = bitvector.FILEIN.tell()
-    # Peek at the next byte; moves file position only if a byte is read.
-    next_byte = bitvector.FILEIN.read(1)
-    if next_byte:
-        # pretend we never read the byte
-        bitvector.FILEIN.seek(file_pos)
-    else:
-        bitvector.more_to_read = False
-
-    return bitstring
-
-
 class BitVector:
-    __slots__ = ("filename", "_size", "FILEIN", "FILEOUT", "more_to_read", "vector")
-    filename: str | None
+    __slots__ = ("_size", "FILEOUT", "vector")
     _size: int
-    FILEIN: BinaryIO | None
     FILEOUT: BinaryIO | None
-    more_to_read: bool
     vector: array.array[int]
 
     def __init__(
         self,
         *,
-        filename: str | None = None,
-        fp: Any = None,
         size: int | None = None,
         intVal: int | None = None,
         bitlist: Any = None,
@@ -119,8 +64,6 @@ class BitVector:
         arguments will raise a ValueError.
 
         Args:
-            filename: Path to a disk file to open for streaming input.
-            fp: An open file-like stream object to read bits from.
             size: The desired number of bits for a zero-initialized vector (or
                 used in conjunction with intVal).
             intVal: An integer value to convert into a bit vector.
@@ -134,52 +77,11 @@ class BitVector:
             ValueError: If no argument is provided, if mutually exclusive
                 arguments are specified together, or if input values are invalid.
         """
-        self.filename = None
         self._size = 0
-        self.FILEIN = None
         self.FILEOUT = None
-        if filename is not None:
+        if intVal is not None:
             if (
-                fp is not None
-                or size is not None
-                or intVal is not None
-                or bitlist is not None
-                or bitstring is not None
-                or hexstring is not None
-                or textstring is not None
-                or rawbytes is not None
-            ):
-                raise ValueError(
-                    "When filename is specified, you cannot give values "
-                    "to any other constructor args"
-                )
-            self.filename = filename
-            self.FILEIN = open(filename, "rb")
-            self.more_to_read = True
-            return
-        elif fp is not None:
-            if (
-                filename is not None
-                or size is not None
-                or intVal is not None
-                or bitlist is not None
-                or bitstring is not None
-                or hexstring is not None
-                or textstring is not None
-                or rawbytes is not None
-            ):
-                raise ValueError(
-                    "When fileobject is specified, you cannot give "
-                    "values to any other constructor args"
-                )
-            bits = self.read_bits_from_fileobject(fp)
-            bitlist = list(map(int, bits))
-            self._size = len(bitlist)
-        elif intVal is not None:
-            if (
-                filename is not None
-                or fp is not None
-                or bitlist is not None
+                bitlist is not None
                 or bitstring is not None
                 or hexstring is not None
                 or textstring is not None
@@ -242,9 +144,7 @@ class BitVector:
                     self._size = len(bitlist)
         elif size is not None and size >= 0:
             if (
-                filename is not None
-                or fp is not None
-                or intVal is not None
+                intVal is not None
                 or bitlist is not None
                 or bitstring is not None
                 or hexstring is not None
@@ -261,9 +161,7 @@ class BitVector:
             return
         elif bitstring is not None:
             if (
-                filename is not None
-                or fp is not None
-                or size is not None
+                size is not None
                 or intVal is not None
                 or bitlist is not None
                 or hexstring is not None
@@ -278,9 +176,7 @@ class BitVector:
             self._size = len(bitlist)
         elif bitlist is not None:
             if (
-                filename is not None
-                or fp is not None
-                or size is not None
+                size is not None
                 or intVal is not None
                 or bitstring is not None
                 or hexstring is not None
@@ -294,9 +190,7 @@ class BitVector:
             self._size = len(bitlist)
         elif textstring is not None:
             if (
-                filename is not None
-                or fp is not None
-                or size is not None
+                size is not None
                 or intVal is not None
                 or bitlist is not None
                 or bitstring is not None
@@ -324,9 +218,7 @@ class BitVector:
             self._size = len(bitlist)
         elif hexstring is not None:
             if (
-                filename is not None
-                or fp is not None
-                or size is not None
+                size is not None
                 or intVal is not None
                 or bitlist is not None
                 or bitstring is not None
@@ -341,9 +233,7 @@ class BitVector:
             self._size = len(bitlist)
         elif rawbytes is not None:
             if (
-                filename is not None
-                or fp is not None
-                or size is not None
+                size is not None
                 or intVal is not None
                 or bitlist is not None
                 or bitstring is not None
@@ -600,53 +490,6 @@ class BitVector:
         """
         return self._size
 
-    def read_bits_from_file(self, blocksize: int) -> Self:
-        """Reads a block of bits from the associated disk file.
-
-        The BitVector instance must have been initialized with a filename. Reads up
-        to blocksize bits from the file, updating the more_to_read attribute to
-        False when the end of file is reached.
-
-        Args:
-            blocksize: The number of bits to read. Must be a multiple of 8.
-
-        Returns:
-            A new BitVector instance containing the bits read from the file.
-
-        Raises:
-            SyntaxError: If the instance was not initialized with a filename.
-            ValueError: If blocksize is not a multiple of 8.
-        """
-        error_str = (
-            "You need to first construct a BitVector "
-            "object with a filename as  argument"
-        )
-        if not self.filename:
-            raise SyntaxError(error_str)
-        if blocksize % 8 != 0:
-            raise ValueError("block size must be a multiple of 8")
-        bitstr = _readblock(blocksize, self)
-        if len(bitstr) == 0:
-            return self.__class__(size=0)
-        else:
-            return self.__class__(bitstring=bitstr)
-
-    def read_bits_from_fileobject(self, fp: Any) -> Any:
-        """Reads characters sequentially from a text or stream file object.
-
-        Args:
-            fp: An open stream or file-like object supporting read().
-
-        Returns:
-            A list of character strings read from the stream object.
-        """
-        bitlist: list[str] = []
-        while 1:
-            bit = fp.read()
-            if bit == "":
-                return bitlist
-            bitlist += bit
-
     def write_bits_to_stream_object(self, fp: Any) -> None:
         """Writes ASCII '0' and '1' characters representing vector bits to a stream.
 
@@ -749,16 +592,6 @@ class BitVector:
             for bit in range(8):
                 value += self[byte * 8 + (7 - bit)] << bit
             file_out.write(bytes([value]))
-
-    def close_file_object(self) -> None:
-        """Closes the input file stream associated with this BitVector.
-
-        Raises:
-            SyntaxError: If no input file object is currently associated.
-        """
-        if not self.FILEIN:
-            raise SyntaxError("No associated open file")
-        self.FILEIN.close()
 
     def __int__(self) -> int:
         """Calculates and returns the unsigned integer value of the bit vector.
@@ -1416,8 +1249,6 @@ class BitVector:
     def set_value(
         self,
         *,
-        filename: str | None = None,
-        fp: Any = None,
         size: int | None = None,
         intVal: int | None = None,
         bitlist: Any = None,
@@ -1432,8 +1263,6 @@ class BitVector:
         the current vector's size and contents.
 
         Args:
-            filename: Path to a disk file to open for streaming input.
-            fp: An open file-like stream object to read bits from.
             size: The desired number of bits for a zero-initialized vector (or
                 used in conjunction with intVal).
             intVal: An integer value to convert into a bit vector.
@@ -1449,8 +1278,6 @@ class BitVector:
         """
         BitVector.__init__(
             self,
-            filename=filename,
-            fp=fp,
             size=size,
             intVal=intVal,
             bitlist=bitlist,
