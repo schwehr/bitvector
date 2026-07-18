@@ -894,7 +894,6 @@ class BitVector:
         self.vector = new_vec
         return self
 
-    # Allow array like subscripting for getting and setting:
     def __setitem__(self, pos: int | slice | Any, item: int | BitVector | Any) -> Any:
         """Assigns a bit or slice of bits at the specified position.
 
