@@ -979,8 +979,36 @@ class BitVector:
         Returns:
             This BitVector instance (self) after in-place shifting.
         """
-        for i in range(n):
-            self.shift_left_by_one()
+        if n <= 0:
+            return self
+
+        word_shift = n // 64
+        bit_shift = n % 64
+
+        vec = self.vector
+        new_vec = array.array(ARRAY_TYPE, [0] * len(vec))
+
+        if bit_shift == 0:
+            for i in range(len(vec) - word_shift):
+                new_vec[i] = vec[i + word_shift]
+        else:
+            for i in range(len(vec) - word_shift):
+                val = vec[i + word_shift] >> bit_shift
+                if i + word_shift + 1 < len(vec):
+                    val |= (vec[i + word_shift + 1] & ((1 << bit_shift) - 1)) << (
+                        64 - bit_shift
+                    )
+                new_vec[i] = val
+
+        clear_from = max(0, self._size - n)
+        clear_word = clear_from // 64
+        clear_bit = clear_from % 64
+        if clear_word < len(new_vec):
+            new_vec[clear_word] &= (1 << clear_bit) - 1
+            for i in range(clear_word + 1, len(new_vec)):
+                new_vec[i] = 0
+
+        self.vector = new_vec
         return self
 
     def shift_right(self, n: int) -> Self:
@@ -992,8 +1020,42 @@ class BitVector:
         Returns:
             This BitVector instance (self) after in-place shifting.
         """
-        for i in range(n):
-            self.shift_right_by_one()
+        if n <= 0:
+            return self
+
+        word_shift = n // 64
+        bit_shift = n % 64
+
+        vec = self.vector
+        new_vec = array.array(ARRAY_TYPE, [0] * len(vec))
+
+        if bit_shift == 0:
+            for i in range(word_shift, len(vec)):
+                new_vec[i] = vec[i - word_shift]
+        else:
+            for i in range(word_shift, len(vec)):
+                val = (vec[i - word_shift] << bit_shift) & 0xFFFFFFFFFFFFFFFF
+                if i - word_shift - 1 >= 0:
+                    val |= vec[i - word_shift - 1] >> (64 - bit_shift)
+                new_vec[i] = val
+
+        clear_until = min(self._size, n)
+        clear_word = clear_until // 64
+        clear_bit = clear_until % 64
+
+        for i in range(clear_word):
+            new_vec[i] = 0
+        if clear_word < len(new_vec):
+            new_vec[clear_word] &= ~((1 << clear_bit) - 1)
+
+        last_word = self._size // 64
+        last_bit = self._size % 64
+        if last_bit > 0 and last_word < len(new_vec):
+            new_vec[last_word] &= (1 << last_bit) - 1
+            for i in range(last_word + 1, len(new_vec)):
+                new_vec[i] = 0
+
+        self.vector = new_vec
         return self
 
     # Allow array like subscripting for getting and setting:
