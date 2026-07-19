@@ -32,7 +32,8 @@ The project repository is structured as a modern Python package:
 - **`examples/`**: Reference usage scripts.
   - **`demo.py`**: Working demo script illustrating package features.
 - **`.github/`**: CI/CD automation and templates, including GitHub Actions
-  workflows (`test.yml`, `lychee.yml`) and `PULL_REQUEST_TEMPLATE.md`.
+  workflows (`test.yml`, `lychee.yml`), `CODEOWNERS`, and
+  `PULL_REQUEST_TEMPLATE.md`.
 - **`pyproject.toml`**: Modern project configuration defining package metadata,
   build system (`hatchling`), dependency groups (`uv`), and tool settings
   (`ruff`, `pytest`, `ty`, `codespell`, `mdformat`, `coverage`).
