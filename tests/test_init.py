@@ -60,10 +60,6 @@ def test_invalid_keyword_error() -> None:
         ({"bitstring": "1010", "rawbytes": b"xy"}, "When a bitstring is specified"),
         ({"bitlist": [1, 0], "hexstring": "a"}, "When bits are specified"),
         (
-            {"textstring": "hello", "rawbytes": b"a"},
-            "When bits are specified through textstring",
-        ),
-        (
             {"hexstring": "0f", "rawbytes": b"xy"},
             "When bits are specified through hexstring",
         ),
@@ -101,8 +97,6 @@ def test_constructor_conflicting_args_raises_error(
         ({"bitstring": ""}, "", 0),
         ({"bitlist": [1, 1, 0, 1]}, "1101", 4),
         ({"bitlist": []}, "", 0),
-        ({"textstring": "A\x05"}, "0100000100000101", 16),
-        ({"textstring": ""}, "", 0),
         ({"hexstring": "0FaE"}, "0000111110101110", 16),
         ({"hexstring": ""}, "", 0),
         ({"rawbytes": b"\x00\xff"}, "0000000011111111", 16),
@@ -122,6 +116,15 @@ def test_constructor_valid_kwargs(
     bv = BitVector.BitVector(**kwargs)
     assert str(bv) == expected_str
     assert bv._size == expected_size
+
+
+def test_from_string() -> None:
+    """Tests initializing BitVector from a string via the from_string method."""
+    bv = BitVector.BitVector.from_string("A")
+    assert str(bv) == "01000001"
+
+    bv2 = BitVector.BitVector.from_string("A\x05")
+    assert bv2._size == 16
 
 
 def test_intVal_zero_hex_helper() -> None:

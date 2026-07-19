@@ -10,7 +10,6 @@ import BitVector
 @pytest.mark.parametrize(
     ("kwargs", "expected"),
     [
-        ({"textstring": "hello"}, "hello"),
         ({"bitstring": "01000001"}, "A"),
         ({"size": 0}, ""),
     ],
@@ -24,6 +23,12 @@ def test_get_bitvector_in_ascii(kwargs: dict[str, Any], expected: str) -> None:
     """
     bv = BitVector.BitVector(**kwargs)
     assert bv.get_bitvector_in_ascii() == expected
+
+
+def test_get_bitvector_in_ascii_from_string() -> None:
+    """Tests ASCII string conversion when initialized via from_string."""
+    bv = BitVector.BitVector.from_string("hello")
+    assert bv.get_bitvector_in_ascii() == "hello"
 
 
 @pytest.mark.parametrize("bitstring", ["1", "101", "10101", "1010101"])
@@ -74,7 +79,6 @@ def test_get_bitvector_in_hex_invalid_length_raises_error(bitstring: str) -> Non
     ("kwargs", "expected"),
     [
         ({"bitstring": "01010111"}, "01010111"),
-        ({"textstring": "A"}, "01000001"),
         ({"hexstring": "f"}, "1111"),
         ({"size": 0}, ""),
     ],
