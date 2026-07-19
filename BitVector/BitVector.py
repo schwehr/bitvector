@@ -968,7 +968,18 @@ class BitVector:
         Yields:
             The integer bit value (0 or 1) at each position from right to left.
         """
-        yield from (self[i] for i in range(self._size - 1, -1, -1))
+        size = self._size
+        if size == 0:
+            return
+        vec = self.vector
+        num_blocks = len(vec)
+        val = vec[num_blocks - 1]
+        for bit_idx in range((size - 1) & 63, -1, -1):
+            yield (val >> bit_idx) & 1
+        for b in range(num_blocks - 2, -1, -1):
+            val = vec[b]
+            for bit_idx in range(63, -1, -1):
+                yield (val >> bit_idx) & 1
 
     def __str__(self) -> str:
         """Returns an ASCII string representation of the bit vector ('0's and '1's).
