@@ -256,6 +256,10 @@ def test_bench_iter(benchmark, sample_bv1):
     benchmark(lambda: list(iter(sample_bv1)))
 
 
+def test_bench_reversed(benchmark, sample_bv1):
+    benchmark(lambda: list(reversed(sample_bv1)))
+
+
 def test_bench_len(benchmark, sample_bv1):
     benchmark(len, sample_bv1)
 

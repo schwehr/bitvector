@@ -328,6 +328,67 @@ def test_str(bitstring: str, expected: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("bitstring", "expected_bits"),
+    [
+        ("", []),
+        ("0", [0]),
+        ("1", [1]),
+        ("10110", [0, 1, 1, 0, 1]),
+        # 63 bits (1 bit short of 64-bit block)
+        ("1" + "0" * 61 + "1", [1] + [0] * 61 + [1]),
+        # 64 bits (exact 1 block)
+        ("1" + "0" * 62 + "1", [1] + [0] * 62 + [1]),
+        # 65 bits (spans across 64-bit block boundary)
+        ("1" + "0" * 63 + "1", [1] + [0] * 63 + [1]),
+        # 128 bits (exact 2 blocks)
+        ("1" + "0" * 126 + "1", [1] + [0] * 126 + [1]),
+        # 129 bits (spans across 3 blocks)
+        ("1" + "0" * 127 + "1", [1] + [0] * 127 + [1]),
+        # Alternating bits right at index 63 & 64 (block boundary)
+        ("0" * 63 + "11" + "0" * 64, [0] * 64 + [1, 1] + [0] * 63),
+    ],
+)
+def test_reversed(bitstring: str, expected_bits: list[int]) -> None:
+    """Tests reverse iteration via __reversed__ dunder and built-in reversed().
+
+    Args:
+        bitstring: Initial bitstring representation.
+        expected_bits: Expected list of integer bits yielded in reverse order.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert list(reversed(bv)) == expected_bits
+    assert list(bv.__reversed__()) == expected_bits
+
+
+@pytest.mark.parametrize(
+    "size", [0, 1, 2, 31, 63, 64, 65, 127, 128, 129, 200, 256, 512]
+)
+def test_reversed_block_boundaries(size: int) -> None:
+    """Tests __reversed__ across 64-bit block boundaries and arbitrary sizes.
+
+    Args:
+        size: Vector length in bits to test.
+    """
+    if size == 0:
+        bv = BitVector.BitVector(size=0)
+        assert list(reversed(bv)) == []
+        assert list(bv.__reversed__()) == []
+        return
+
+    bits = ["1" if (i % 7 == 0 or i == size - 1) else "0" for i in range(size)]
+    bitstr = "".join(bits)
+    bv = BitVector.BitVector(bitstring=bitstr)
+    expected = [int(c) for c in reversed(bitstr)]
+
+    assert list(reversed(bv)) == expected
+    assert list(bv.__reversed__()) == expected
+
+
+@pytest.mark.parametrize(
     ("left_str", "right_str", "expected"),
     [
         ("1010", "10100", False),

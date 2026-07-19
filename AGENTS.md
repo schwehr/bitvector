@@ -53,8 +53,8 @@ The core functionality of `bitvector-modern` is implemented in
   - **Memory Array (`self.vector`)**: Store bits in an `array.array('H')`
     (unsigned short integers, 16 bits per element) for memory compactness.
   - **Size (`self.size`)**: Tracks the exact integer number of valid bits.
-  - **Iteration (`__iter__`)**: Supports sequentially yielding individual bits
-    via a generator expression.
+  - **Iteration (`__iter__`, `__reversed__`)**: Supports sequentially yielding
+    individual bits forward and in reverse via generator expressions.
 
 ### Constructors & Data Input (`__init__`)
 
