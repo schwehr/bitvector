@@ -328,6 +328,31 @@ def test_str(bitstring: str, expected: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("bitstring", "expected_bits"),
+    [
+        ("", []),
+        ("10110", [0, 1, 1, 0, 1]),
+        ("1", [1]),
+        ("0", [0]),
+    ],
+)
+def test_reversed(bitstring: str, expected_bits: list[int]) -> None:
+    """Tests reverse iteration via __reversed__ dunder and built-in reversed().
+
+    Args:
+        bitstring: Initial bitstring representation.
+        expected_bits: Expected list of integer bits yielded in reverse order.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert list(reversed(bv)) == expected_bits
+    assert list(bv.__reversed__()) == expected_bits
+
+
+@pytest.mark.parametrize(
     ("left_str", "right_str", "expected"),
     [
         ("1010", "10100", False),

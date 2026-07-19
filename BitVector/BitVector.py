@@ -962,6 +962,14 @@ class BitVector:
         """
         yield from (self[i] for i in range(self._size))
 
+    def __reversed__(self) -> Iterator[int]:
+        """Yields individual bits sequentially from right to left.
+
+        Yields:
+            The integer bit value (0 or 1) at each position from right to left.
+        """
+        yield from (self[i] for i in range(self._size - 1, -1, -1))
+
     def __str__(self) -> str:
         """Returns an ASCII string representation of the bit vector ('0's and '1's).
 
