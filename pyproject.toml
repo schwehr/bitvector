@@ -129,7 +129,6 @@ disable = [
     "pointless-statement",
     "protected-access",
     "redefined-outer-name",
-    "singleton-comparison",
     "too-many-arguments",
     "too-many-branches",
     "too-many-function-args",

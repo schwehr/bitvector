@@ -120,8 +120,8 @@ def test_eq_ne_with_unsupported_types() -> None:
     assert (bv != "hello") is True
     assert (bv == [51]) is False
     assert (bv != [51]) is True
-    assert (bv == None) is False  # noqa: E711
-    assert (bv != None) is True  # noqa: E711
+    assert (bv == None) is False  # noqa: E711  # pylint: disable=singleton-comparison
+    assert (bv != None) is True  # noqa: E711  # pylint: disable=singleton-comparison
 
 
 @pytest.mark.parametrize("op", ["<", "<=", ">", ">="])
