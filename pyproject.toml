@@ -141,5 +141,4 @@ disable = [
     "unexpected-keyword-arg",
     "unnecessary-dunder-call",
     "use-a-generator",
-    "use-implicit-booleaness-not-comparison",
 ]

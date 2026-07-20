@@ -375,8 +375,8 @@ def test_reversed_block_boundaries(size: int) -> None:
     """
     if size == 0:
         bv = BitVector.BitVector(size=0)
-        assert list(reversed(bv)) == []
-        assert list(bv.__reversed__()) == []
+        assert not list(reversed(bv))
+        assert not list(bv.__reversed__())
         return
 
     bits = ["1" if (i % 7 == 0 or i == size - 1) else "0" for i in range(size)]
