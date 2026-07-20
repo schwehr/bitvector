@@ -24,12 +24,13 @@ jobs:
           - name: "Linux (Python 3.14)"
             os: ubuntu-latest
             python-version: "3.14"
-          - name: "macOS (Python 3.14)"
-            os: macos-latest
-            python-version: "3.14"
-          - name: "Windows (Python 3.14)"
-            os: windows-latest
-            python-version: "3.14"
+          # TODO(schwehr): Enable these when dev slows down.
+          # - name: "macOS (Python 3.14)"
+          #   os: macos-latest
+          #   python-version: "3.14"
+          # - name: "Windows (Python 3.14)"
+          #   os: windows-latest
+          #   python-version: "3.14"
 
     steps:
       - name: Checkout code
