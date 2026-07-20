@@ -643,7 +643,7 @@ class BitVector:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
             return self >> abs(n)
-        for i in range(n):
+        for unused_i in range(n):
             self.circular_rotate_left_by_one()
         return self
 
@@ -667,7 +667,7 @@ class BitVector:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
             return self << abs(n)
-        for i in range(n):
+        for unused_i in range(n):
             self.circular_rotate_right_by_one()
         return self
 
@@ -1565,7 +1565,7 @@ class BitVector:
         a_copy = copy.deepcopy(a)
         b_copy = copy.deepcopy(b)
         product = a_copy.gf_multiply(b_copy)
-        quotient, remainder = product.gf_divide_by_modulus(mod, n)
+        _quotient, remainder = product.gf_divide_by_modulus(mod, n)
         return remainder
 
     def gf_MI(self, mod: BitVector, n: int) -> Self | str:
@@ -1655,7 +1655,7 @@ class BitVector:
                 continue
             a_raised_to_jq = a_raised_to_q
             primeflag = 0
-            for j in range(k - 1):
+            for unused_j in range(k - 1):
                 a_raised_to_jq = pow(a_raised_to_jq, 2, p)
                 if a_raised_to_jq == p - 1:
                     primeflag = 1
