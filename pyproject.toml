@@ -140,7 +140,6 @@ disable = [
     "too-many-statements",
     "unexpected-keyword-arg",
     "unnecessary-dunder-call",
-    "unused-variable",
     "use-a-generator",
     "use-implicit-booleaness-not-comparison",
 ]
