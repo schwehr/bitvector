@@ -1643,7 +1643,7 @@ class BitVector:
         for a in probes:
             if a == p:
                 return 1
-        if any([p % a == 0 for a in probes]):
+        if any(p % a == 0 for a in probes):
             return 0
         k, q = 0, p - 1
         while not q & 1:
