@@ -106,11 +106,12 @@ static analysis:
   ```bash
   uv sync
   ```
-- **Linting & Formatting (`ruff`)**: Enforces code style, import sorting, and
-  formatting.
+- **Linting & Formatting (`ruff`, `pylint`)**: Enforces code style, import
+  sorting, formatting, and code quality checks.
   ```bash
   uv run ruff check --fix
   uv run ruff format
+  uv run pylint BitVector tests
   ```
 - **Static Type Checking (`ty`, `mypy`, `pyrefly`, & `pyright`)**: Enforces
   strict type annotations across all modules.

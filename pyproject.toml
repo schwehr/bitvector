@@ -45,20 +45,21 @@ dev = [
     "hypofuzz>=24.0.0",
     "mdformat>=0.7.21",
     "mdformat-gfm>=0.3.7",
-    "mypy>=1.15.0",
-    "pre-commit>=4.6.0",
-    "pyrefly>=1.1.1",
-    "pyright>=1.1.411",
-    "pytest-benchmark>=4.0.0",
-    "pytest>=8.0.0",
-    "pytest-cov>=7.1.0",
-    "ruff>=0.15.20",
-    "ty>=0.0.56",
-    "zizmor>=1.26.1",
-    "pytest-mock>=3.15.1",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.7.6",
     "mkdocstrings[python]>=1.0.6",
+    "mypy>=1.15.0",
+    "pre-commit>=4.6.0",
+    "pylint>=4.0.6",
+    "pyrefly>=1.1.1",
+    "pyright>=1.1.411",
+    "pytest>=8.0.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.15.20",
+    "ty>=0.0.56",
+    "zizmor>=1.26.1",
 ]
 
 [tool.pytest.ini_options]
@@ -90,7 +91,7 @@ exclude_lines = [
 ]
 
 [tool.codespell]
-ignore-words-list = "bu,mis,whet,wit"
+ignore-words-list = "astroid,bu,mis,whet,wit"
 
 [tool.pyrefly]
 project-includes = [
@@ -100,3 +101,46 @@ project-includes = [
 
 [tool.pyright]
 include = ["BitVector"]
+
+[tool.pylint.main]
+py-version = "3.13"
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.messages_control]
+disable = [
+    "chained-comparison",
+    "consider-using-enumerate",
+    "consider-using-f-string",
+    "consider-using-in",
+    "consider-using-with",
+    "duplicate-code",
+    "fixme",
+    "inconsistent-return-statements",
+    "invalid-name",
+    "line-too-long",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "no-else-break",
+    "no-else-raise",
+    "no-else-return",
+    "pointless-statement",
+    "protected-access",
+    "redefined-outer-name",
+    "singleton-comparison",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-function-args",
+    "too-many-lines",
+    "too-many-positional-arguments",
+    "too-many-public-methods",
+    "too-many-return-statements",
+    "too-many-statements",
+    "unexpected-keyword-arg",
+    "unnecessary-dunder-call",
+    "unused-variable",
+    "use-a-generator",
+    "use-implicit-booleaness-not-comparison",
+]
