@@ -62,7 +62,7 @@ def test_getitem_int_raises_error(index: int) -> None:
     """
     bv = BitVector.BitVector(bitstring="10110")
     with pytest.raises(ValueError, match="index range error"):
-        bv[index]
+        bv[index]  # pylint: disable=pointless-statement
 
 
 @pytest.mark.parametrize(

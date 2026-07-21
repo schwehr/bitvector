@@ -406,11 +406,11 @@ print(
 )
 print(bv3)  # 0100000100100000011010000111010101101110011001110111001001111001
 print("\nCircular shift to the left by 7 positions:")
-bv3 << 7
+bv3 << 7  # pylint: disable=pointless-statement
 print(bv3)  # 1001000000110100001110101011011100110011101110010011110010100000
 
 print("\nCircular shift to the right by 7 positions:")
-bv3 >> 7
+bv3 >> 7  # pylint: disable=pointless-statement
 print(bv3)  # 0100000100100000011010000111010101101110011001110111001001111001
 
 print("Test len() on the above bit vector:")
@@ -693,15 +693,15 @@ print("       the runs are: " + str(bv.runs()))
 print("\nExperiments with chained invocations of circular shifts:")
 bv = BitVector(bitlist=(1, 1, 1, 0, 0, 1))
 print(bv)
-bv >> 1
+bv >> 1  # pylint: disable=pointless-statement
 print(bv)
-bv >> 1 >> 1
+bv >> 1 >> 1  # pylint: disable=pointless-statement
 print(bv)
 bv = BitVector(bitlist=(1, 1, 1, 0, 0, 1))
 print(bv)
-bv << 1
+bv << 1  # pylint: disable=pointless-statement
 print(bv)
-bv << 1 << 1
+bv << 1 << 1  # pylint: disable=pointless-statement
 print(bv)
 
 print("\nExperiments with chained invocations of NON-circular shifts:")
