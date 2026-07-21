@@ -173,6 +173,35 @@ def test_shift_left_right(direction: str, shift_amount: int, expected: str) -> N
 
 
 @pytest.mark.parametrize(
+    ("initial_bitstring", "shift_amount", "expected_bitstring"),
+    [
+        ("101101", 2, "110100"),
+        ("101101", 0, "101101"),
+        ("101101", -3, "101101"),
+        ("1" * 128, 0, "1" * 128),
+        ("1" * 64 + "0" * 64 + "1" * 64, 64, "0" * 64 + "1" * 64 + "0" * 64),
+        ("1" * 128, 10, "1" * 118 + "0" * 10),
+        ("1" * 192, 130, "1" * 62 + "0" * 130),
+        ("1" * 192, 200, "0" * 192),
+    ],
+)
+def test_shift_left_comprehensive(
+    initial_bitstring: str, shift_amount: int, expected_bitstring: str
+) -> None:
+    """Tests shift_left across single-word, multi-word, multiple-of-64, and boundary conditions.
+
+    Args:
+        initial_bitstring: Initial bitstring representation of the vector.
+        shift_amount: Number of positions to shift left.
+        expected_bitstring: Expected bitstring representation after shifting.
+    """
+    bv = BitVector.BitVector(bitstring=initial_bitstring)
+    res = bv.shift_left(shift_amount)
+    assert res is bv
+    assert str(bv) == expected_bitstring
+
+
+@pytest.mark.parametrize(
     ("direction", "pad_count", "expected_str", "expected_size"),
     [
         ("left", 2, "00101", 5),
