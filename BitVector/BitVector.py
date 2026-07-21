@@ -253,55 +253,54 @@ class BitVector:
             if pos < 0:
                 pos = self._size + pos
             return (self.vector[pos // 64] >> (pos & 63)) & 1
-        else:
-            slicebits = []
-            i, j = pos.start, pos.stop
-            if i is None and j is None:
-                return copy.deepcopy(self)
-            if i is None:
-                if j >= 0:
-                    if j > len(self):
-                        raise ValueError("illegal slice index values")
-                    for x in range(j):
-                        slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
-                else:
-                    if abs(j) > len(self):
-                        raise ValueError("illegal slice index values")
-                    for x in range(len(self) - abs(j)):
-                        slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
-            if j is None:
-                if i >= 0:
-                    if i > len(self):
-                        raise ValueError("illegal slice index values")
-                    for x in range(i, len(self)):
-                        slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
-                else:
-                    if abs(i) > len(self):
-                        raise ValueError("illegal slice index values")
-                    for x in range(len(self) - abs(i), len(self)):
-                        slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
-            if 0 <= j < i:
-                raise ValueError("illegal slice index values")
-            if i < 0 <= j < len(self) + i:
-                raise ValueError("illegal slice index values")
-            if j < 0 <= i:
-                if len(self) + j < i:
+        slicebits = []
+        i, j = pos.start, pos.stop
+        if i is None and j is None:
+            return copy.deepcopy(self)
+        if i is None:
+            if j >= 0:
+                if j > len(self):
                     raise ValueError("illegal slice index values")
-
-                for x in range(i, len(self) + j):
+                for x in range(j):
                     slicebits.append(self[x])
                 return BitVector(bitlist=slicebits)
-            if self._size == 0:
-                return BitVector(bitstring="")
-            if i == j:
-                return BitVector(bitstring="")
-            for x in range(i, j):
+
+            if abs(j) > len(self):
+                raise ValueError("illegal slice index values")
+            for x in range(len(self) - abs(j)):
                 slicebits.append(self[x])
             return BitVector(bitlist=slicebits)
+        if j is None:
+            if i >= 0:
+                if i > len(self):
+                    raise ValueError("illegal slice index values")
+                for x in range(i, len(self)):
+                    slicebits.append(self[x])
+                return BitVector(bitlist=slicebits)
+
+            if abs(i) > len(self):
+                raise ValueError("illegal slice index values")
+            for x in range(len(self) - abs(i), len(self)):
+                slicebits.append(self[x])
+            return BitVector(bitlist=slicebits)
+        if 0 <= j < i:
+            raise ValueError("illegal slice index values")
+        if i < 0 <= j < len(self) + i:
+            raise ValueError("illegal slice index values")
+        if j < 0 <= i:
+            if len(self) + j < i:
+                raise ValueError("illegal slice index values")
+
+            for x in range(i, len(self) + j):
+                slicebits.append(self[x])
+            return BitVector(bitlist=slicebits)
+        if self._size == 0:
+            return BitVector(bitstring="")
+        if i == j:
+            return BitVector(bitstring="")
+        for x in range(i, j):
+            slicebits.append(self[x])
+        return BitVector(bitlist=slicebits)
 
     def __xor__(self, other: BitVector) -> Self:
         """Performs a bitwise exclusive OR (XOR) with another bit vector.
@@ -1485,9 +1484,9 @@ class BitVector:
             y, y_old = y_old - y * quotient, y
         if num != 1:
             return None
-        else:
-            MI = (x_old + MOD) % MOD
-            return self.__class__(intVal=MI)
+
+        MI = (x_old + MOD) % MOD
+        return self.__class__(intVal=MI)
 
     def gf_multiply(self, b: BitVector) -> Self:
         """Multiplies two polynomials in Galois Field GF(2).
@@ -1595,10 +1594,10 @@ class BitVector:
             y, y_old = y_old ^ quotient.gf_multiply(y), y
         if int(num) != 1:
             return f"NO MI. However, the GCD of {NUM} and {MOD} is {num}"
-        else:
-            z = x_old ^ MOD
-            quotient, remainder = z.gf_divide_by_modulus(MOD, n)
-            return remainder
+
+        z = x_old ^ MOD
+        quotient, remainder = z.gf_divide_by_modulus(MOD, n)
+        return remainder
 
     def runs(self) -> list[str]:
         """Extracts contiguous runs of identical bits ('0's and '1's).

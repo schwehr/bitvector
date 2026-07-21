@@ -116,7 +116,6 @@ disable = [
     "line-too-long",
     "missing-class-docstring",
     "missing-function-docstring",
-    "no-else-return",
     "pointless-statement",
     "protected-access",
     "redefined-outer-name",
