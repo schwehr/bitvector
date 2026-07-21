@@ -21,8 +21,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.html"
-Download = "https://engineering.purdue.edu/kak/dist/BitVector-3.5.0.tar.gz"
+Homepage = "https://github.com/schwehr/bitvector-modern"
+Repository = "https://github.com/schwehr/bitvector-modern"
+Issues = "https://github.com/schwehr/bitvector-modern/issues"
 
 [build-system]
 requires = ["hatchling"]
