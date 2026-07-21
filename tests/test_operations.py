@@ -251,6 +251,8 @@ def test_count_bits(bitstring: str, expected_count: int) -> None:
     [
         ("", 0),
         ("100111" + "0" * 20, 4),
+        ("0" * 128, 0),
+        ("1" * 64 + "0" * 64, 64),
     ],
 )
 def test_count_bits_sparse(bitstring: str, expected_count: int) -> None:
