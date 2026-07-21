@@ -16,6 +16,10 @@ dist/
 *.egg
 .eggs/
 
+# Test artifacts
+test.txt
+testinput*.txt
+
 # Coverage
 .benchmarks/
 .coverage
