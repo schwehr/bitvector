@@ -14,6 +14,13 @@ def test_setitem_type_error() -> None:
         bv["0"] = 1  # type: ignore[index]
 
 
+def test_getitem_type_error() -> None:
+    """Verifies that non-integer or slice bit retrieval raises TypeError."""
+    bv = BitVector.BitVector(size=5)
+    with pytest.raises(TypeError, match="pos must be an integer or slice"):
+        _ = bv["0"]  # type: ignore[index]
+
+
 @pytest.mark.parametrize(
     ("index", "val", "err_match"),
     [
