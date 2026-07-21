@@ -118,12 +118,16 @@ def test_unpermute() -> None:
     [
         ("circular_rot_left", "1000", "0001"),
         ("circular_rot_left", "10000000000000000001", "00000000000000000011"),
+        ("circular_rot_left", "1" + "0" * 128 + "1", "0" * 128 + "11"),
         ("circular_rot_right", "0001", "1000"),
         ("circular_rot_right", "10000000000000000001", "11000000000000000000"),
+        ("circular_rot_right", "1" + "0" * 128 + "1", "11" + "0" * 128),
         ("shift_left_by_one", "1011", "0110"),
         ("shift_left_by_one", "1" + "0" * 18 + "1", "0" * 18 + "10"),
+        ("shift_left_by_one", "1" + "0" * 128 + "1", "0" * 128 + "10"),
         ("shift_right_by_one", "1101", "0110"),
         ("shift_right_by_one", "1" + "0" * 18 + "1", "01" + "0" * 18),
+        ("shift_right_by_one", "1" + "0" * 128 + "1", "01" + "0" * 128),
     ],
 )
 def test_rotations_and_one_bit_shifts(
