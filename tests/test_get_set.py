@@ -1,7 +1,7 @@
 """Tests bit retrieval and assignment (__getitem__, __setitem__, slicing, iteration)."""
 
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
@@ -12,7 +12,7 @@ def test_setitem_type_error() -> None:
     """Verifies that non-integer bit assignment raises TypeError."""
     bv = BitVector.BitVector(size=5)
     with pytest.raises(TypeError, match="pos must be an integer"):
-        bv["0"] = 1  # type: ignore[index]
+        bv[cast(Any, "0")] = 1
 
 
 @pytest.mark.parametrize(
@@ -79,7 +79,7 @@ def test_setitem_valid(
         expected: The expected vector bitstring after modification.
     """
     bv = BitVector.BitVector(bitstring=initial)
-    bv[index] = val
+    bv[cast(Any, index)] = val
     assert str(bv) == expected
 
 
