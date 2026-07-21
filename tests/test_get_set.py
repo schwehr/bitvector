@@ -7,6 +7,13 @@ import pytest
 import BitVector
 
 
+def test_setitem_type_error() -> None:
+    """Verifies that non-integer bit assignment raises TypeError."""
+    bv = BitVector.BitVector(size=5)
+    with pytest.raises(TypeError, match="pos must be an integer"):
+        bv["0"] = 1  # type: ignore[index]
+
+
 @pytest.mark.parametrize(
     ("index", "val", "err_match"),
     [
