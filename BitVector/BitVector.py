@@ -880,7 +880,7 @@ class BitVector:
         self.vector = new_vec
         return self
 
-    def __setitem__(self, pos: int | slice, item: int | BitVector) -> Any:
+    def __setitem__(self, pos: int | slice, item: int | BitVector) -> None:
         """Assigns a bit or slice of bits at the specified position.
 
         Supports both index assignment (setting a single bit to 0 or 1) and
@@ -902,7 +902,7 @@ class BitVector:
                     "For slice assignment, the right hand side must be a BitVector"
                 )
             if pos.start is None and pos.stop is None:
-                return copy.deepcopy(item)
+                return
             if pos.start is None:
                 if pos.stop >= 0:
                     if pos.stop != len(item):
