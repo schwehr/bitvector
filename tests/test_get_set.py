@@ -154,3 +154,17 @@ def test_bitvector_iterator() -> None:
     assert iter(it) is it
     assert list(it) == [1, 0, 1]
     assert not list(iter(BitVector.BitVector(size=0)))
+
+
+def test_setitem_slice_start_negative_stop_positive() -> None:
+    bv = BitVector.BitVector(bitstring="1111111111")
+    # len=10, start=-3 (7), stop=9
+    bv[-3:9] = BitVector.BitVector(bitstring="00")
+    assert str(bv) == "1111111001"
+
+
+def test_setitem_slice_start_negative_stop_positive_invalid_len() -> None:
+    bv = BitVector.BitVector(bitstring="1111111111")
+    # len=10, start=-3 (7), stop=9
+    with pytest.raises(ValueError, match="incompatible lengths for slice assignment 6"):
+        bv[-3:9] = BitVector.BitVector(bitstring="000")
