@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""Demonstration of BitVector features.
+
+This script demonstrates various ways to construct, manipulate, and
+utilize BitVector objects.
+"""
 
 import base64
 import io
