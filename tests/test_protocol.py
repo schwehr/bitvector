@@ -1,3 +1,8 @@
+"""Unit tests for BitVectorProtocol.
+
+Verifies that the BitVector class complies with the BitVectorProtocol.
+"""
+
 from typing import cast
 
 from BitVector import BitVector, BitVectorProtocol

@@ -1,3 +1,9 @@
+"""BitVectorProtocol definition.
+
+This module defines the typing protocol for BitVector operations,
+ensuring type safety and consistent interfaces.
+"""
+
 from typing import Any, Iterator, Protocol, Self
 
 
