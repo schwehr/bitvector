@@ -60,6 +60,7 @@ dev = [
     "ruff>=0.15.20",
     "ty>=0.0.56",
     "zizmor>=1.26.1",
+    "pylint-pytest>=1.1.8",
 ]
 
 [tool.pytest.ini_options]
@@ -103,6 +104,7 @@ project-includes = [
 include = ["BitVector"]
 
 [tool.pylint.main]
+load-plugins = ["pylint_pytest"]
 py-version = "3.13"
 
 [tool.pylint.format]
@@ -117,7 +119,6 @@ disable = [
     "missing-class-docstring",
     "missing-function-docstring",
     "protected-access",
-    "redefined-outer-name",
     "too-many-arguments",
     "too-many-branches",
     "too-many-function-args",
