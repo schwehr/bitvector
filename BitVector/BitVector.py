@@ -1651,7 +1651,7 @@ class BitVector:
             k += 1
         for a in probes:
             a_raised_to_q = pow(a, q, p)
-            if a_raised_to_q == 1 or a_raised_to_q == p - 1:
+            if a_raised_to_q in (1, p - 1):
                 continue
             a_raised_to_jq = a_raised_to_q
             primeflag = 0
