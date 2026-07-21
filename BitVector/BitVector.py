@@ -1539,13 +1539,13 @@ class BitVector:
                 remainder_highest_power = len(remainder) - remainder.next_set_bit(0) - 1
             if (remainder_highest_power < mod_highest_power) or int(remainder) == 0:
                 break
-            else:
-                exponent_shift = remainder_highest_power - mod_highest_power
-                quotient[len(quotient) - exponent_shift - 1] = 1
-                quotient_mod_product = copy.deepcopy(mod)
-                quotient_mod_product.pad_from_left(len(remainder) - len(mod))
-                quotient_mod_product.shift_left(exponent_shift)
-                remainder = remainder ^ quotient_mod_product
+
+            exponent_shift = remainder_highest_power - mod_highest_power
+            quotient[len(quotient) - exponent_shift - 1] = 1
+            quotient_mod_product = copy.deepcopy(mod)
+            quotient_mod_product.pad_from_left(len(remainder) - len(mod))
+            quotient_mod_product.shift_left(exponent_shift)
+            remainder = remainder ^ quotient_mod_product
         if len(remainder) > n:
             remainder = remainder[len(remainder) - n :]
         return quotient, remainder
