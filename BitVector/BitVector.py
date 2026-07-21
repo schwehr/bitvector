@@ -394,8 +394,8 @@ class BitVector:
         res = self.__class__(size=self._size)
         lpb = list(map(operator.__inv__, self.vector))
         res.vector = array.array(ARRAY_TYPE)
-        for i in range(len(lpb)):
-            res.vector.append(lpb[i] & 0xFFFFFFFFFFFFFFFF)
+        for val in lpb:
+            res.vector.append(val & 0xFFFFFFFFFFFFFFFF)
         return res
 
     def __add__(self, other: BitVector) -> Self:
@@ -910,13 +910,13 @@ class BitVector:
                 if pos.start >= 0:
                     if (len(self) - pos.start) != len(item):
                         raise ValueError("incompatible lengths for slice assignment 3")
-                    for i in range(len(item)):
-                        self[pos.start + i] = item[i]
+                    for i, val in enumerate(item):
+                        self[pos.start + i] = val
                 else:
                     if abs(pos.start) != len(item):
                         raise ValueError("incompatible lengths for slice assignment 4")
-                    for i in range(len(item)):
-                        self[len(self) + pos.start + i] = item[i]
+                    for i, val in enumerate(item):
+                        self[len(self) + pos.start + i] = val
                 return
             if pos.stop < 0 <= pos.start:
                 if (len(self) + pos.stop - pos.start) != len(item):
