@@ -56,7 +56,7 @@ x = 1234567890123456789012345678901234567890123456789012345678901234567890123456
 bv = BitVector(intVal=x)
 print("\nHere is a bit vector constructed from a very large integer:")
 print(bv)
-print("The integer value of the above bit vector is:%d" % int(bv))
+print(f"The integer value of the above bit vector is:{int(bv)}")
 
 # Construct a bit vector directly from a file-like object:
 bit_str = "111100001111"
@@ -771,5 +771,5 @@ print("The primality test for " + str(int(bv)) + ": " + str(check))
 print("\nTest generating min-canonical form of a BitVector instance:")
 for i in range(255, 10000, 1555):
     bv = BitVector(intVal=i, size=14)
-    print("\nbv:            %s" % str(bv))
-    print("min canonical: %s" % str(bv.min_canonical()))
+    print(f"\nbv:            {bv}")
+    print(f"min canonical: {bv.min_canonical()}")
