@@ -41,6 +41,16 @@ ARRAY_TYPE = "Q"
 
 
 class BitVector:
+    """A memory-efficient packed representation of bit arrays and bit vectors.
+
+    Uses `array.array('Q')` unsigned integers for compact bitwise storage,
+    manipulation, boolean logic, shifts, rotations, and GF(2^n) arithmetic.
+
+    Attributes:
+        vector: Underlying array storing packed integer words.
+        FILEOUT: Output stream object for file writing, if assigned.
+    """
+
     __slots__ = ("_size", "FILEOUT", "vector")
     _size: int
     FILEOUT: BinaryIO | None
