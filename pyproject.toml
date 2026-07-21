@@ -110,7 +110,6 @@ max-line-length = 88
 
 [tool.pylint.messages_control]
 disable = [
-    "consider-using-with",
     "duplicate-code",
     "fixme",
     "inconsistent-return-statements",
