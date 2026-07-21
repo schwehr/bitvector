@@ -237,12 +237,12 @@ def test_rshift(shift: int, expected: str) -> None:
             "011110",
         ),
         (
-            "0000000000",
-            slice(-2, 6),
-            3,
+            "000000",
+            slice(-5, 4),
+            2,
             "incompatible lengths for slice assignment 6",
-            "11",
-            "0000000000",
+            "111",
+            "011100",
         ),
         (
             "0000",
