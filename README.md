@@ -36,6 +36,12 @@ To execute the automated test suite and check code coverage:
 uv run pytest
 ```
 
+To run coverage without benchmark tests and generate an HTML report:
+
+```bash
+uv run pytest --benchmark-skip --cov-report=html
+```
+
 To continuously run adaptive, coverage-guided property-based fuzzing on the
 hypothesis test suite (`tests/test_properties.py`):
 
