@@ -224,6 +224,19 @@ def test_reset(val: int, expected: str) -> None:
     assert res is bv
 
 
+def test_reset_coverage() -> None:
+    """Tests reset with vector size multiple of word size and size 0."""
+    # rem == 0, len(self.vector) > 0
+    bv_64 = BitVector.BitVector(size=64)
+    bv_64.reset(1)
+    assert str(bv_64) == "1" * 64
+
+    # rem == 0, len(self.vector) == 0
+    bv_0 = BitVector.BitVector(size=0)
+    bv_0.reset(1)
+    assert str(bv_0) == ""
+
+
 @pytest.mark.parametrize(
     ("bitstring", "expected_count"),
     [
