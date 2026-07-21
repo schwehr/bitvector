@@ -232,6 +232,16 @@ def test_shift_right_comprehensive(
     assert str(bv) == expected_bitstring
 
 
+def test_shift_right_extended_vector() -> None:
+    """Verifies shift_right clears trailing excess words when vector storage is over-allocated."""
+    bv = BitVector.BitVector(bitstring="1" * 65)
+    bv.vector.append(999)
+    res = bv.shift_right(1)
+    assert res is bv
+    assert str(bv) == "0" + "1" * 64
+    assert bv.vector[-1] == 0
+
+
 @pytest.mark.parametrize(
     ("direction", "pad_count", "expected_str", "expected_size"),
     [
