@@ -284,11 +284,11 @@ class BitVector:
                     for x in range(len(self) - abs(i), len(self)):
                         slicebits.append(self[x])
                     return BitVector(bitlist=slicebits)
-            if (i >= 0 and j >= 0) and i > j:
+            if 0 <= j < i:
                 raise ValueError("illegal slice index values")
-            if (i < 0 and j >= 0) and (len(self) - abs(i)) > j:
+            if i < 0 <= j < len(self) - abs(i):
                 raise ValueError("illegal slice index values")
-            if i >= 0 and j < 0:
+            if j < 0 <= i:
                 if len(self) - abs(j) < i:
                     raise ValueError("illegal slice index values")
                 else:
@@ -918,13 +918,13 @@ class BitVector:
                     for i in range(len(item)):
                         self[len(self) + pos.start + i] = item[i]
                 return
-            if pos.start >= 0 and pos.stop < 0:
+            if pos.stop < 0 <= pos.start:
                 if (len(self) + pos.stop - pos.start) != len(item):
                     raise ValueError("incompatible lengths for slice assignment 5")
                 for i in range(pos.start, len(self) + pos.stop):
                     self[i] = item[i - pos.start]
                 return
-            if pos.start < 0 and pos.stop >= 0:
+            if pos.start < 0 <= pos.stop:
                 if (len(self) - pos.stop + pos.start) != len(item):
                     raise ValueError("incompatible lengths for slice assignment 6")
                 for i in range(len(self) + pos.start, pos.stop):
