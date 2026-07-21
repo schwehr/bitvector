@@ -51,8 +51,10 @@ repos:
       - id: pylint
         additional_dependencies:
           - hypothesis
+          - pylint-pytest
           - pytest
           - pytest-benchmark
+          - pytest-cov
 
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.21
