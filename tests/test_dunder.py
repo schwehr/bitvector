@@ -129,6 +129,7 @@ def test_deepcopy() -> None:
     memo: dict[int, Any] = {}
     bv_memo = copy.deepcopy(bv, memo)
     assert str(bv_memo) == "10110"
+    # pylint: disable-next=unnecessary-dunder-call
     assert str(bv.__deepcopy__()) == "10110"
 
     bv_tuple = BitVector.BitVector(bitstring="1001")
@@ -361,6 +362,7 @@ def test_reversed(bitstring: str, expected_bits: list[int]) -> None:
         else BitVector.BitVector(size=0)
     )
     assert list(reversed(bv)) == expected_bits
+    # pylint: disable-next=unnecessary-dunder-call
     assert list(bv.__reversed__()) == expected_bits
 
 
@@ -376,6 +378,7 @@ def test_reversed_block_boundaries(size: int) -> None:
     if size == 0:
         bv = BitVector.BitVector(size=0)
         assert not list(reversed(bv))
+        # pylint: disable-next=unnecessary-dunder-call
         assert not list(bv.__reversed__())
         return
 
@@ -385,6 +388,7 @@ def test_reversed_block_boundaries(size: int) -> None:
     expected = [int(c) for c in reversed(bitstr)]
 
     assert list(reversed(bv)) == expected
+    # pylint: disable-next=unnecessary-dunder-call
     assert list(bv.__reversed__()) == expected
 
 
