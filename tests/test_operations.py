@@ -289,6 +289,7 @@ def test_set_value_invalid_keyword_error() -> None:
     """Verifies passing unexpected keyword arguments to set_value raises TypeError."""
     bv = BitVector.BitVector(intVal=7, size=16)
     with pytest.raises(TypeError, match="unexpected keyword argument"):
+        # pylint: disable-next=unexpected-keyword-arg
         bv.set_value(invalid_param=123)  # type: ignore[call-arg]  # ty: ignore[unknown-argument]
 
 

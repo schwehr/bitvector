@@ -29,6 +29,7 @@ def test_positional_args_error() -> None:
 def test_invalid_keyword_error() -> None:
     """Verifies passing unexpected keyword arguments raises TypeError."""
     with pytest.raises(TypeError, match="unexpected keyword argument"):
+        # pylint: disable-next=unexpected-keyword-arg
         BitVector.BitVector(invalid_param=123)  # type: ignore[call-arg]  # ty: ignore[unknown-argument]
 
 

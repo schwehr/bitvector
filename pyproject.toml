@@ -127,5 +127,4 @@ disable = [
     "too-many-public-methods",
     "too-many-return-statements",
     "too-many-statements",
-    "unexpected-keyword-arg",
 ]
