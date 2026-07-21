@@ -291,10 +291,10 @@ class BitVector:
             if j < 0 <= i:
                 if len(self) + j < i:
                     raise ValueError("illegal slice index values")
-                else:
-                    for x in range(i, len(self) + j):
-                        slicebits.append(self[x])
-                    return BitVector(bitlist=slicebits)
+
+                for x in range(i, len(self) + j):
+                    slicebits.append(self[x])
+                return BitVector(bitlist=slicebits)
             if self._size == 0:
                 return BitVector(bitstring="")
             if i == j:
@@ -1200,8 +1200,10 @@ class BitVector:
         """
         if self._size == 0:
             raise ValueError("First arg bitvec has no bits")
-        elif self._size < otherBitVec._size:
+
+        if self._size < otherBitVec._size:
             raise ValueError("First arg bitvec too short")
+
         max_index = self._size - otherBitVec._size + 1
         for i in range(max_index):
             if self[i : i + otherBitVec._size] == otherBitVec:
