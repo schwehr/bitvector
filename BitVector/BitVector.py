@@ -934,10 +934,10 @@ class BitVector:
                     self[i] = item[i - pos.start]
                 return
             if pos.start < 0 <= pos.stop:
-                if (len(self) - pos.stop + pos.start) != len(item):
+                if (pos.stop - len(self) - pos.start) != len(item):
                     raise ValueError("incompatible lengths for slice assignment 6")
                 for i in range(len(self) + pos.start, pos.stop):
-                    self[i] = item[i - pos.start]
+                    self[i] = item[i - len(self) - pos.start]
                 return
             if (pos.stop - pos.start) != len(item):
                 raise ValueError("incompatible lengths for slice assignment 7")
