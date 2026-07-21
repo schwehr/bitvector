@@ -225,9 +225,8 @@ print(
 )
 # bv1 = BitVector( bitstring = '00001010' )
 bv1 = BitVector(bitstring="11100111")
-FILEOUT = open("test.txt", "wb")
-bv1.write_to_file(FILEOUT)
-FILEOUT.close()
+with open("test.txt", "wb") as FILEOUT:
+    bv1.write_to_file(FILEOUT)
 
 print(
     "\nDisplay bit vectors written out to file and read back from the file and their respective lengths:"
@@ -246,9 +245,8 @@ print(
     "\nHere are all the first 64 bits read from the file again after the file object was closed and opened again:"
 )
 print(bv1)
-FILEOUT = open("testinput5.txt", "wb")
-bv1.write_to_file(FILEOUT)
-FILEOUT.close()
+with open("testinput5.txt", "wb") as FILEOUT:
+    bv1.write_to_file(FILEOUT)
 
 print(
     "\nExperiment in 64-bit permutation and unpermutation of the previous 64-bit bitvector:"
