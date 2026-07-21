@@ -1,6 +1,7 @@
 """Tests bit retrieval and assignment (__getitem__, __setitem__, slicing, iteration)."""
 
 from collections.abc import Iterator
+from typing import Any
 
 import pytest
 
@@ -14,11 +15,26 @@ def test_setitem_type_error() -> None:
         bv["0"] = 1  # type: ignore[index]
 
 
-def test_getitem_type_error() -> None:
-    """Verifies that non-integer or slice bit retrieval raises TypeError."""
+@pytest.mark.parametrize(
+    "invalid_pos",
+    [
+        "0",
+        3.14,
+        [0],
+        (0,),
+        None,
+        {"pos": 0},
+    ],
+)
+def test_getitem_type_error(invalid_pos: Any) -> None:
+    """Verifies that non-integer or non-slice bit retrieval raises TypeError.
+
+    Args:
+        invalid_pos: An object that is neither an integer nor a slice.
+    """
     bv = BitVector.BitVector(size=5)
     with pytest.raises(TypeError, match="pos must be an integer or slice"):
-        _ = bv["0"]  # type: ignore[index]
+        _ = bv[invalid_pos]  # type: ignore[index]
 
 
 @pytest.mark.parametrize(

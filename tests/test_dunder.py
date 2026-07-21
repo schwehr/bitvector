@@ -329,6 +329,31 @@ def test_str(bitstring: str, expected: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("bitstring", "expected"),
+    [
+        ("", 0),
+        ("0", 0),
+        ("1", 1),
+        ("1010", 10),
+        ("11111111", 255),
+    ],
+)
+def test_int(bitstring: str, expected: int) -> None:
+    """Tests integer conversion dunder (__int__ / int()) on empty and non-empty vectors.
+
+    Args:
+        bitstring: Initial bitstring representation.
+        expected: Expected integer conversion output.
+    """
+    bv = (
+        BitVector.BitVector(bitstring=bitstring)
+        if bitstring
+        else BitVector.BitVector(size=0)
+    )
+    assert int(bv) == expected
+
+
+@pytest.mark.parametrize(
     ("bitstring", "expected_bits"),
     [
         ("", []),
