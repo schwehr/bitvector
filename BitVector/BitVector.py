@@ -240,7 +240,7 @@ class BitVector:
         hex_str = "".join(f"{ord(c):02x}" for c in textstring)
         return cls(hexstring=hex_str)
 
-    def __getitem__(self, pos: int | slice | Any) -> Any:
+    def __getitem__(self, pos: int | slice) -> Any:
         """Retrieves the bit or slice of bits from the designated position.
 
         Args:
