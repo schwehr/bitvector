@@ -1,7 +1,7 @@
 """Tests for BitVector dunder methods (__xor__, __and__, __add__, etc.)."""
 
 import copy
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import pytest
 
@@ -296,7 +296,7 @@ def test_setitem_slice_type_error() -> None:
         TypeError,
         match="For slice assignment, the right hand side must be a BitVector",
     ):
-        bv[0:1] = [1]
+        bv[0:1] = cast(Any, [1])
 
 
 def test_setitem_full_slice() -> None:
