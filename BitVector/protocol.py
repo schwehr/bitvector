@@ -8,6 +8,12 @@ from typing import Any, Iterator, Protocol, Self
 
 
 class BitVectorProtocol(Protocol):
+    """Protocol defining the structural typing interface for BitVector instances.
+
+    Attributes:
+        size: Total number of bits in the vector.
+    """
+
     size: int
 
     def __xor__(self, other: Self) -> Self: ...
