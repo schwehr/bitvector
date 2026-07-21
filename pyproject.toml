@@ -110,7 +110,6 @@ max-line-length = 88
 
 [tool.pylint.messages_control]
 disable = [
-    "chained-comparison",
     "consider-using-enumerate",
     "consider-using-f-string",
     "consider-using-in",
