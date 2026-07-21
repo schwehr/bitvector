@@ -286,13 +286,13 @@ class BitVector:
                     return BitVector(bitlist=slicebits)
             if 0 <= j < i:
                 raise ValueError("illegal slice index values")
-            if i < 0 <= j < len(self) - abs(i):
+            if i < 0 <= j < len(self) + i:
                 raise ValueError("illegal slice index values")
             if j < 0 <= i:
-                if len(self) - abs(j) < i:
+                if len(self) + j < i:
                     raise ValueError("illegal slice index values")
                 else:
-                    for x in range(i, len(self) - abs(j)):
+                    for x in range(i, len(self) + j):
                         slicebits.append(self[x])
                     return BitVector(bitlist=slicebits)
             if self._size == 0:
