@@ -130,6 +130,11 @@ static analysis:
   ```bash
   uv run codespell
   ```
+- **Static Analysis & Security Scanning (`semgrep`)**: Enforces static analysis
+  and security rules.
+  ```bash
+  uv run semgrep scan --config p/default
+  ```
 - **Pre-commit Hooks**: Enforces standards prior to commits. Must be installed
   when setting up a workspace:
   ```bash

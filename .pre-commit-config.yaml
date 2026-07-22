@@ -82,6 +82,12 @@ repos:
       - id: bandit
         exclude: ^tests/
 
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.170.0
+    hooks:
+      - id: semgrep
+        args: [ --config, p/default ]
+
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
     hooks:
