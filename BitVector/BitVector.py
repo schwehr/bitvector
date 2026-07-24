@@ -39,6 +39,9 @@ _hexdict = {
 # which is used for compact bitwise storage.
 ARRAY_TYPE = "Q"
 
+# Lookup table for 8-bit bit-reversal used in word/byte integer conversion.
+_BIT_REV_8 = bytes(sum(((b >> i) & 1) << (7 - i) for i in range(8)) for b in range(256))
+
 
 class BitVector:
     """A memory-efficient packed representation of bit arrays and bit vectors.
@@ -582,9 +585,11 @@ class BitVector:
         """
         if self._size == 0:
             return 0
-        int_val = 0
-        for i in range(self._size):
-            int_val = (int_val << 1) | self[i]
+        raw = self.vector.tobytes()
+        int_val = int.from_bytes(raw.translate(_BIT_REV_8), "big")
+        unused_bits = (len(raw) * 8) - self._size
+        if unused_bits > 0:
+            int_val >>= unused_bits
         return int_val
 
     def get_bitvector_in_ascii(self) -> str:
