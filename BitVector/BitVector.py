@@ -48,12 +48,10 @@ class BitVector:
 
     Attributes:
         vector: Underlying array storing packed integer words.
-        FILEOUT: Output stream object for file writing, if assigned.
     """
 
-    __slots__ = ("_size", "FILEOUT", "vector")
+    __slots__ = ("_size", "vector")
     _size: int
-    FILEOUT: BinaryIO | None
     vector: array.array[int]
 
     def __init__(
@@ -86,7 +84,6 @@ class BitVector:
                 arguments are specified together, or if input values are invalid.
         """
         self._size = 0
-        self.FILEOUT = None
         if intVal is not None:
             if (
                 bitlist is not None
@@ -569,8 +566,6 @@ class BitVector:
             "be written to a file. Use the padding functions to satisfy "
             "this constraint."
         )
-        if not self.FILEOUT:
-            self.FILEOUT = file_out
         if self._size % 8:
             raise ValueError(err_str)
         for byte in range(int(self._size / 8)):
