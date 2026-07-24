@@ -225,7 +225,8 @@ class BitVector:
             raise ValueError("wrong arg(s) for constructor")
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self.__setitem__, range(len(bitlist)), bitlist))
+        for idx, bit in enumerate(bitlist):
+            self[idx] = bit
 
     @classmethod
     def from_string(cls, textstring: str) -> "BitVector":
@@ -1186,7 +1187,8 @@ class BitVector:
         self._size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self.__setitem__, range(len(bitlist)), bitlist))
+        for idx, bit in enumerate(bitlist):
+            self[idx] = bit
 
     def pad_from_right(self, n: int) -> None:
         """Pads the bit vector with n zeros from the right in-place.
@@ -1199,7 +1201,8 @@ class BitVector:
         self._size = len(bitlist)
         eight_byte_ints_needed = (len(bitlist) + 63) // 64
         self.vector = array.array(ARRAY_TYPE, [0] * eight_byte_ints_needed)
-        list(map(self.__setitem__, range(len(bitlist)), bitlist))
+        for idx, bit in enumerate(bitlist):
+            self[idx] = bit
 
     def __contains__(self, otherBitVec: BitVector) -> bool:
         """Checks if a sub-vector is contained within this bit vector.
