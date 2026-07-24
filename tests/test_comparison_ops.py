@@ -137,3 +137,45 @@ def test_order_comparisons_with_unsupported_types_raise_type_error(
         compare_func(bv, [51])
     with pytest.raises(TypeError):
         compare_func(bv, None)
+
+
+def test_eq_large_vectors() -> None:
+    """Tests equality on multi-word large bitvectors."""
+    # 1000-bit equal vectors
+    vec1 = BitVector.BitVector(bitstring="1010" * 250)
+    vec2 = BitVector.BitVector(bitstring="1010" * 250)
+    assert vec1 == vec2
+
+    # Differ in first word
+    vec3 = BitVector.BitVector(bitstring="0010" + "1010" * 249)
+    assert vec1 != vec3
+
+    # Differ in middle word (around bit 500)
+    bits_mid = list("1010" * 250)
+    bits_mid[500] = "0"
+    vec4 = BitVector.BitVector(bitstring="".join(bits_mid))
+    assert vec1 != vec4
+
+    # Differ in last word (bit 999 is 0, flip to 1)
+    bits_last = list("1010" * 250)
+    bits_last[999] = "1"
+    vec5 = BitVector.BitVector(bitstring="".join(bits_last))
+    assert vec1 != vec5
+
+
+def test_eq_with_differing_unused_bits() -> None:
+    """Tests equality when unused bits in the last integer word differ."""
+    vec1 = BitVector.BitVector(bitstring="10101")
+    vec1_inv = ~vec1  # Bits: "01010", but unused high bits in last word are 1s
+    vec2 = BitVector.BitVector(
+        bitstring="01010"
+    )  # Bits: "01010", unused high bits are 0s
+    assert vec1_inv == vec2
+    assert vec2 == vec1_inv
+
+
+def test_eq_empty_vectors() -> None:
+    """Tests equality comparison on empty vectors (size 0)."""
+    vec1 = BitVector.BitVector(size=0)
+    vec2 = BitVector.BitVector(size=0)
+    assert vec1 == vec2

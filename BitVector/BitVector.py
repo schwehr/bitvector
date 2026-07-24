@@ -1015,12 +1015,20 @@ class BitVector:
             if self._size != other._size:
                 return False
 
-            # TODO: Consider a block-based implementation comparing `self.vector`
-            # elements directly with a mask for the last element for better performance.
-            for val1, val2 in zip(self, other):
-                if val1 != val2:
-                    return False
-            return True
+            if self.vector == other.vector:
+                return True
+
+            rem = self._size & 63
+            if rem == 0:
+                return False
+
+            mask = (1 << rem) - 1
+            if len(self.vector) == 1:
+                return (self.vector[0] & mask) == (other.vector[0] & mask)
+
+            return self.vector[:-1] == other.vector[:-1] and (
+                self.vector[-1] & mask
+            ) == (other.vector[-1] & mask)
 
         if isinstance(other, (int, float)):
             return int(self) == other
