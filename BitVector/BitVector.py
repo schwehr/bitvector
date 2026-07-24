@@ -634,11 +634,30 @@ class BitVector:
         )
 
     def __lshift__(self, n: int) -> Self:
+        """Performs a circular left rotation by n bit positions.
+
+        Rotates the bit vector circularly to the left n times, returning a new
+        BitVector instance without modifying self. Negative values for n delegate
+        to a circular right rotation.
+
+        Args:
+            n: The integer number of positions to circularly rotate left.
+
+        Returns:
+            A new BitVector instance containing the circularly rotated bits.
+
+        Raises:
+            ValueError: If attempting to rotate an empty bit vector.
+        """
+        res = copy.deepcopy(self)
+        res <<= n
+        return res
+
+    def __ilshift__(self, n: int) -> Self:
         """Performs an in-place circular left rotation by n bit positions.
 
-        Rotates the bit vector circularly to the left n times. Negative values
-        for n delegate to a circular right rotation. Modifies and returns the
-        current instance to support method chaining.
+        Rotates the bit vector circularly to the left n times in-place. Negative
+        values for n delegate to an in-place circular right rotation.
 
         Args:
             n: The integer number of positions to circularly rotate left.
@@ -652,17 +671,36 @@ class BitVector:
         if self._size == 0:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
-            return self >> abs(n)
-        for unused_i in range(n):
+            return self.__irshift__(abs(n))
+        for _ in range(n):
             self.circular_rotate_left_by_one()
         return self
 
     def __rshift__(self, n: int) -> Self:
+        """Performs a circular right rotation by n bit positions.
+
+        Rotates the bit vector circularly to the right n times, returning a new
+        BitVector instance without modifying self. Negative values for n delegate
+        to a circular left rotation.
+
+        Args:
+            n: The integer number of positions to circularly rotate right.
+
+        Returns:
+            A new BitVector instance containing the circularly rotated bits.
+
+        Raises:
+            ValueError: If attempting to rotate an empty bit vector.
+        """
+        res = copy.deepcopy(self)
+        res >>= n
+        return res
+
+    def __irshift__(self, n: int) -> Self:
         """Performs an in-place circular right rotation by n bit positions.
 
-        Rotates the bit vector circularly to the right n times. Negative values
-        for n delegate to a circular left rotation. Modifies and returns the
-        current instance to support method chaining.
+        Rotates the bit vector circularly to the right n times in-place. Negative
+        values for n delegate to an in-place circular left rotation.
 
         Args:
             n: The integer number of positions to circularly rotate right.
@@ -676,8 +714,8 @@ class BitVector:
         if self._size == 0:
             raise ValueError("Circular shift of an empty vector makes no sense")
         if n < 0:
-            return self << abs(n)
-        for unused_i in range(n):
+            return self.__ilshift__(abs(n))
+        for _ in range(n):
             self.circular_rotate_right_by_one()
         return self
 
@@ -1714,5 +1752,5 @@ class BitVector:
         Returns:
             A new BitVector instance representing the minimum canonical rotation.
         """
-        intvals_for_circular_shifts = [int(self << 1) for _ in range(len(self))]
+        intvals_for_circular_shifts = [int(self << i) for i in range(len(self))]
         return self.__class__(intVal=min(intvals_for_circular_shifts), size=len(self))

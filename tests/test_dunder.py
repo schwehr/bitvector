@@ -155,15 +155,31 @@ def test_lshift(shift: int, expected: str) -> None:
         expected: Expected output bitstring.
     """
     bv = BitVector.BitVector(bitstring="1000")
-    assert str(bv << shift) == expected
+    res = bv << shift
+    assert str(res) == expected
+    assert str(bv) == "1000"
+    assert res is not bv
 
 
-@pytest.mark.parametrize("op", ["<<", ">>"])
-def test_shift_empty_vector_raises_error(op: Literal["<<", ">>"]) -> None:
+def test_ilshift() -> None:
+    """Tests in-place circular left shift dunder (__ilshift__ / <<=)."""
+    bv = BitVector.BitVector(bitstring="1000")
+    ref = bv
+    bv <<= 1
+    assert str(bv) == "0001"
+    assert bv is ref
+
+    bv <<= -1
+    assert str(bv) == "1000"
+    assert bv is ref
+
+
+@pytest.mark.parametrize("op", ["<<", ">>", "<<=", ">>="])
+def test_shift_empty_vector_raises_error(op: str) -> None:
     """Verifies that circular shifting an empty vector raises ValueError.
 
     Args:
-        op: The shift operator ('<<' or '>>').
+        op: The shift operator ('<<', '>>', '<<=', or '>>=').
     """
     bv_empty = BitVector.BitVector(size=0)
     with pytest.raises(ValueError, match="Circular shift of an empty vector"):
@@ -171,6 +187,10 @@ def test_shift_empty_vector_raises_error(op: Literal["<<", ">>"]) -> None:
             _ = bv_empty << 1
         elif op == ">>":
             _ = bv_empty >> 1
+        elif op == "<<=":
+            bv_empty <<= 1
+        elif op == ">>=":
+            bv_empty >>= 1
 
 
 @pytest.mark.parametrize(
@@ -190,7 +210,23 @@ def test_rshift(shift: int, expected: str) -> None:
         expected: Expected output bitstring.
     """
     bv = BitVector.BitVector(bitstring="1000")
-    assert str(bv >> shift) == expected
+    res = bv >> shift
+    assert str(res) == expected
+    assert str(bv) == "1000"
+    assert res is not bv
+
+
+def test_irshift() -> None:
+    """Tests in-place circular right shift dunder (__irshift__ / >>=)."""
+    bv = BitVector.BitVector(bitstring="1000")
+    ref = bv
+    bv >>= 1
+    assert str(bv) == "0100"
+    assert bv is ref
+
+    bv >>= -1
+    assert str(bv) == "1000"
+    assert bv is ref
 
 
 @pytest.mark.parametrize(

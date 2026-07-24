@@ -115,6 +115,22 @@ def test_bench_shift_right(benchmark, sample_bv1):
     benchmark(operator.rshift, sample_bv1, 10)
 
 
+def test_bench_ilshift(benchmark, sample_bv1):
+    def _run():
+        bv = sample_bv1[:]
+        bv <<= 10
+
+    benchmark(_run)
+
+
+def test_bench_irshift(benchmark, sample_bv1):
+    def _run():
+        bv = sample_bv1[:]
+        bv >>= 10
+
+    benchmark(_run)
+
+
 def test_bench_permute(benchmark, sample_bv1):
     perm = list(reversed(range(1000)))
     benchmark(sample_bv1.permute, perm)
